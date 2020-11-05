@@ -1,0 +1,58 @@
+if anyone know other good resources feel free to add them
+
+Git & Github -> very importent
+https://classroom.udacity.com/courses/ud775
+
+Html && CSS -> basics
+https://classroom.udacity.com/courses/ud001
+
+=====================================================
+
+js basics & quick refresher
+https://classroom.udacity.com/courses/ud803
+
+js for forntend (DOM)
+https://classroom.udacity.com/courses/ud117
+
+js es6 -> updates to the language
+https://classroom.udacity.com/courses/ud356
+
+=====================================================
+
+Http -> concept
+https://classroom.udacity.com/courses/ud897
+
+resful apis -> concept -> jsut an article
+https://searchapparchitecture.techtarget.com/definition/RESTful-API
+
+mvc -> concept -> jsut an article
+https://www.guru99.com/mvc-tutorial.html
+
+=====================================================
+
+react -> hindi and slow but very good entry
+https://www.coursera.org/learn/front-end-react
+
+nodejs -> the same as react
+https://www.coursera.org/learn/server-side-nodejs
+
+=====================================================
+
+react official tutorial -> if you love reading
+https://reactjs.org/tutorial/tutorial.html
+
+recat youtube fast tutorial 
+https://www.youtube.com/watch?v=Ke90Tje7VS0
+
+node udemy course -> recommended by a lot
+https://drive.google.com/drive/u/0/folders/1POKm4t71uTgsnd9PYo8eD9RsOkwvL4_T
+
+node youtube fast tutorial
+https://www.youtube.com/watch?v=RLtyhwFtXQA
+
+=====================================================
+
+youtube bucky roberts -> has cources in everything ^_^
+https://www.youtube.com/user/thenewboston/playlists
+
+And remember google is your friend
