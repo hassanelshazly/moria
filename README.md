@@ -1,20 +1,43 @@
-# Moria
+# Moria - Social Network App
 
-## Getting Started
+Moria is an educational project. The main idea is to apply software 
+engineering concepts and build a large scalable project with different 
+technologies.
+---------------------
 
-First, run the development server:
+Repository is devided into two main packages:
 
-```bash
-npm run dev
+- **frontend** 
+    This pacakge contains Lol.....
+
+- **backend**
+    This pacakge contains Lol.....
+
+
+Getting Started
+------------------
+
+> Now clone 
+
+```
+$ git clone https://github.com/hassanelshazly/moria
+```
+> run the server
+
+```
+$ cd /backend
+
+$ npm install
+
+$ npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> run the frontend
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```
+$ cd /frontend
 
-## Learn More
+$ npm install
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+$ npm start
+```
