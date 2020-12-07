@@ -3,10 +3,10 @@ env:
   es2021: true
   node: true
 extends:
-  - 'eslint:recommended'
-  - 'plugin:react/recommended'
-  - 'prettier'
-  - 'prettier/react'
+  - "eslint:recommended"
+  - "plugin:react/recommended"
+  - "prettier"
+  - "prettier/react"
 parserOptions:
   ecmaFeatures:
     jsx: true
