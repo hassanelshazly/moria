@@ -4,13 +4,27 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "cross-env NODE_ENV=production node server.js",
+    "format": "prettier --write .",
+    "lint": "eslint --fix ."
   },
   "dependencies": {
-    "next": "10.0.1",
+    "apollo-server-express": "^2.19.0",
+    "cross-env": "^7.0.3",
+    "express": "^4.17.1",
+    "graphql": "^15.4.0",
+    "mongoose": "^5.11.4",
+    "next": "10.0.3",
+    "prop-types": "^15.7.2",
     "react": "17.0.1",
     "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.15.0",
+    "eslint-config-prettier": "^7.0.0",
+    "eslint-plugin-react": "^7.21.5",
+    "prettier": "2.2.1"
   }
 }
