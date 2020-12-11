@@ -12,7 +12,7 @@ function getUsername(context) {
             throw new Error("Authentication token must be 'Bearer [token]");
 
         const user = jwt.verify(token, process.env.JWT_SECRET);
-        return user;
+        return user.username;
 
     } catch (err) {
         throw new Error('Invalid/Expired token');
