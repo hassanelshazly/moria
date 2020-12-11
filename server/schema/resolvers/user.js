@@ -21,8 +21,7 @@ module.exports = {
 
     User: {
         posts(parent, args) {
-            const { username } = parent;
-            return Post.findPosts({ username });
+            return Post.findPosts(parent);
         },
 
         followers(parent, args) {

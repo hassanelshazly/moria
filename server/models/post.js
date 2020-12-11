@@ -6,8 +6,8 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    username: {
-        type: String,
+    userId: {
+        type: ObjectId,
         required: true,
         ref: 'User'
     },
@@ -23,7 +23,7 @@ const PostSchema = new mongoose.Schema({
                 type: String,
                 required: true
             },
-            username: {
+            userId: {
                 type: ObjectId,
                 required: true,
                 ref: 'User'
@@ -40,6 +40,6 @@ const PostSchema = new mongoose.Schema({
             ref: 'User'
         }
     ]
-});
+}, { timestamps: true });
 
 module.exports = PostSchema;

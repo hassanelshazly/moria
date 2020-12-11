@@ -1,5 +1,5 @@
 const Post = require("../../data/post");
-const { getUsername } = require("../../util/auth");
+const { getAuthUser } = require("../../util/auth");
 
 module.exports = {
 
@@ -18,32 +18,36 @@ module.exports = {
         likePost(_, args, context) {
             return Post.likePost({
                 ...args,
-                username: getUsername(context)
+                ...getAuthUser(context)
             });
         },
 
         createPost(_, args, context) {
             return Post.createPost({
                 ...args,
-                username: getUsername(context)
+                ...getAuthUser(context)
             });
         },
 
         createComment(_, args, context) {
             return Post.createComment({
                 ...args,
-                username: getUsername(context)
+                ...getAuthUser(context)
             });
         },
 
         deletePost(_, args, context) {
-            // TODO
-            return null;
+            return Post.deletePost({
+                ...args,
+                ...getAuthUser(context)
+            });
         },
 
         deleteComment(_, args, context) {
-            // TODO
-            return null;
+            return Post.deleteComment({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 

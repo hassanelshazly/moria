@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-function getUsername(context) {
+function getAuthUser(context) {
     try {
         const authHeader = context.req.headers.authorization;
         if (!authHeader)
@@ -12,7 +12,7 @@ function getUsername(context) {
             throw new Error("Authentication token must be 'Bearer [token]");
 
         const user = jwt.verify(token, process.env.JWT_SECRET);
-        return user.username;
+        return user;
 
     } catch (err) {
         throw new Error('Invalid/Expired token');
@@ -20,5 +20,5 @@ function getUsername(context) {
 };
 
 module.exports = {
-    getUsername
+    getAuthUser
 }

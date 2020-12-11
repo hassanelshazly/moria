@@ -5,9 +5,9 @@ const Post = gql`
     type Post {
         id: ID!
         body: String!
-        username: String!
+        userId: String!
         createdAt: String!
-        likes: [Like]
+        likes: [ID]
         comments: [Comment]
         likeCount: Int!
         commentCount: Int!
@@ -15,16 +15,16 @@ const Post = gql`
 
     type Comment {
         id: ID!
-        username: String!
-        createdAt: String!
         body: String!
+        userId: String!
+        createdAt: String!
     }
 
-    type Like {
-        id: ID!
-        username: String!
-        createdAt: String!
-    }
+    # type Like {
+    #     id: ID!
+    #     userId: String!
+    #     createdAt: String!
+    # }
 
 `;
 
