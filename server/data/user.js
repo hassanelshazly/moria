@@ -59,7 +59,10 @@ UserModel.statics.register = async function (user) {
 }
 
 UserModel.methods.generateAuthToken = function () {
-    this.token = jwt.sign({ username: this.username },
+    this.token = jwt.sign({
+        username: this.username,
+        userId: this._id
+    },
         process.env.JWT_SECRET,
         { expiresIn: "1 week" });
     return this.token;

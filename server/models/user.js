@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: true,
+        lowercase: true,
         unique: true
     },
     fullname: {
@@ -16,6 +17,7 @@ const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         trim: true,
+        lowercase: true,
         required: true
     },
     password: {
@@ -50,8 +52,8 @@ const UserSchema = new mongoose.Schema({
 // Virtual fields
 UserSchema.virtual('posts', {
     ref: 'Post',
-    localField: 'username',
-    foreignField: 'username'
+    localField: '_id',
+    foreignField: 'userId'
 })
 
 module.exports =  UserSchema;

@@ -7,27 +7,27 @@ PostModel.statics.findPost = async function ({ postId }) {
     return Post.findById(postId);
 }
 
-PostModel.statics.findPosts = async function ({ username }) {
-    const user = await User.findOne({ username })
+PostModel.statics.findPosts = async function ({ userId }) {
+    const user = await User.findOne({ userId })
     await user.populate('posts').execPopulate()
     return user.posts;
 }
 
-PostModel.statics.likePost = async function ({ postId, username }) {
-    if (!username)
+PostModel.statics.likePost = async function ({ postId, userId }) {
+    if (!userId)
         throw new Error("User not authorized");
 
     const post = await Post.findById(postId);
     if (!post)
         throw new Error("Post not Found")
-    console.log(post);
-    await post.addOrRemoveLike({ username });
+
+    await post.addOrRemoveLike({ userId });
     return post;
 }
 
 PostModel.statics.createPost = async function (args) {
-    const { username } = args;
-    if (!username)
+    const { userId } = args;
+    if (!userId)
         throw new Error("User not authorized");
 
     const post = new Post(args);
@@ -35,35 +35,49 @@ PostModel.statics.createPost = async function (args) {
 }
 
 PostModel.statics.createComment = async function (args) {
-    const { postId, body, username } = args;
-    if (!username)
+    const { postId, body, userId } = args;
+    if (!userId)
         throw new Error("User not authorized");
 
-    const post = Post.findById(postId);
-    post.addComment({ username, body });
-    return post;
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+
+    post.comments.push({ userId, body });
+    return await post.save();
 }
 
-PostModel.statics.deletePost = async function ({ postId, username }) {
-    // TODO
-    return null;
+PostModel.statics.deletePost = async function ({ postId, userId }) {
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+
+    if (!userId || userId != post.userId)
+        throw new Error("User not authorized");
+
+    await post.delete();
+    return "Post deleted successfully";
 }
 
-PostModel.statics.deleteComment = async function ({ postId, username }) {
-    // TODO 
-    return null;
+PostModel.statics.deleteComment = async function ({ postId, commentId, userId }) {
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+    
+    const cIdx = post.comments.findIndex(comment => comment._id == commentId);
+    
+    if (cIdx == -1 || post.comments[cIdx].userId != userId)
+        throw new Error("User not authorized");
+
+    post.comments.splice(cIdx, 1);
+    return await post.save();
 }
 
-PostModel.methods.addOrRemoveLike = async function ({ username }) {
-    if (this.likes.find(like => like.username == username))
-        this.likes = this.likes.filter(like => like.username != username);
+PostModel.methods.addOrRemoveLike = async function ({ userId }) {
+    if (this.likes.includes(userId))
+        this.likes = this.likes.filter(like => like != userId);
     else
-        this.likes.push({ username });
-    await this.save();
-}
-
-PostModel.methods.addComment = async function ({ username, body }) {
-    this.comments.push({ username, body });
+        this.likes.push(userId);
     await this.save();
 }
 
