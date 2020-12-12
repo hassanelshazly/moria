@@ -5,6 +5,8 @@ env:
 extends:
   - "eslint:recommended"
   - "plugin:react/recommended"
+  # - "react-app",
+  # - "react-app/jest"
   - "prettier"
   - "prettier/react"
 parserOptions:
