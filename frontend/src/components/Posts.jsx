@@ -254,7 +254,7 @@ function Posts() {
   return (
     <Grid container spacing={2}>
       {posts.map((post) => (
-        <Grid key={post.id} item xs={12} md={6}>
+        <Grid key={post.id} item xs={12}>
           <Post {...post} />
         </Grid>
       ))}

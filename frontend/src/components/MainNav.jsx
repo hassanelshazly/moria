@@ -487,7 +487,7 @@ export default function MainNav(props) {
         </nav>
         <div className={classes.content}>
           <div className={classes.toolbar} />
-          <Container className={classes.main} component="main" maxWidth="lg">
+          <Container className={classes.main} component="main" maxWidth="sm">
             {props.children}
           </Container>
           <footer className={classes.footer}>
