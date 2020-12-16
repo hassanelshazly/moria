@@ -7,8 +7,8 @@ PostModel.statics.findPost = async function ({ postId }) {
     return Post.findById(postId);
 }
 
-PostModel.statics.findPosts = async function ({ userId }) {
-    const user = await User.findOne({ userId })
+PostModel.statics.findPosts = async function ({ id }) {
+    const user = await User.findById(id);
     await user.populate('posts').execPopulate()
     return user.posts;
 }
