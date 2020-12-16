@@ -2,15 +2,26 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
 
 const groupSchema = new mongoose.Schema({
-    title:{
+    groupTitle:{
         type: String,
-        default: "Moria"
+        default: "Moria",
+        required:true
     },
-    members: [{ type: ObjectId, ref: "User" }],
+    groupDesc:String,
+    groupAdmin:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
+    groupMembers: [ { type: ObjectId, ref: "User" } ],
+    groupPost:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Post'
+    }],
     createdAt: {
         type: Date,
         default: Date.now
-    },
+    }
 
 });
 
