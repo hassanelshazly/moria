@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
 
 
-const MessageModel = new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
     from: {
         type: ObjectId,
         required: true,
@@ -24,4 +24,4 @@ const MessageModel = new mongoose.Schema({
 
 }, { timestamps: true });
 
-module.exports = MessageModel;
+module.exports = MessageSchema;
