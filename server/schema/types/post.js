@@ -20,11 +20,19 @@ const Post = gql`
         createdAt: String!
     }
 
-    # type Like {
-    #     id: ID!
-    #     userId: String!
-    #     createdAt: String!
-    # }
+    extend type Query {
+        findPost(postId: ID!): Post
+        findPosts(username: String!): [Post]
+    }
+
+    extend type Mutation {
+        likePost(postId: ID!): Post
+        createPost(body: String!): Post!
+        deletePost(postId: ID!): String
+
+        createComment(postId: ID!, body: String!): Post!
+        deleteComment(postId: ID!, commentId: ID!): Post
+    }
 
 `;
 

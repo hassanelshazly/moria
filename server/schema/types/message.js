@@ -26,7 +26,7 @@ const Message = gql`
         sendMessage(toUserId: ID!, body: String!): Message
     }
 
-    type Subscription {
+    extend type Subscription {
         newMessage: Message
     }
 

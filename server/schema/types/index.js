@@ -1,16 +1,22 @@
 const { gql } = require('apollo-server');
 
-const { Query }    = require('./query');
-const { Post }     = require('./post');
-const { User }     = require('./user');
-const { Mutation } = require('./mutation');
+const { Post } = require('./post');
+const { User } = require('./user');
 const { Message } = require('./message');
 
 const typeDefs = gql`
-    ${Query}
+    type Query {
+        _empty: String
+    }
+    type Mutation {
+        _empty: String
+    }
+    type Subscription {
+        _empty: String
+    }
+
     ${Post}
     ${User}
-    ${Mutation}
     ${Message}
 `;
 

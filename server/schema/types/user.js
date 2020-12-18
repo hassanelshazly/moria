@@ -15,7 +15,19 @@ const User = gql`
         savedPosts: [Post]
     }
 
+    extend type Query {
+        findUser(username: String!) : User
+    }
 
+    extend type Mutation {
+        register(
+            fullname: String!
+            username: String!
+            email: String!
+            password: String!
+        ): User   
+        login(username: String!, password: String!): User
+    }
 `;
 
 module.exports = { User }
