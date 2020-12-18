@@ -4,10 +4,62 @@ const validator = require("validator");
 const mongoose = require("mongoose");
 
 const UserModel = require("../models/user");
+const Post = require("./post");
 
 
 UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
+}
+
+UserModel.statics.follow = async function ({ userId, id }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const toFollow = await User.findById(id);
+    if (!toFollow)
+        throw new Error("User not found");
+
+    await user.addOrRemoveFollower(id);
+    await toFollow.addOrRemoveFollowing(userId);
+    return user;
+}
+
+UserModel.statics.savePost = async function ({ userId, postId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+
+    await user.saveOrUnSavePost(postId);
+    return user;
+}
+
+UserModel.statics.findFollowers = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('followers').execPopulate();
+    return user.followers;
+}
+
+UserModel.statics.findFollowing = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('following').execPopulate();
+    return user.following;
+}
+
+UserModel.statics.findSavedPosts = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('savedPosts').execPopulate();
+    return user.savedPosts;
 }
 
 UserModel.statics.login = async function ({ username, password }) {
@@ -66,6 +118,30 @@ UserModel.methods.generateAuthToken = function () {
         process.env.JWT_SECRET,
         { expiresIn: "1 week" });
     return this.token;
+}
+
+UserModel.methods.addOrRemoveFollower = async function (userId) {
+    if (this.followers.includes(userId))
+        this.followers = this.followers.filter(follower => follower != userId);
+    else
+        this.followers.push(userId);
+    await this.save();
+}
+
+UserModel.methods.addOrRemoveFollowing = async function (userId) {
+    if (this.following.includes(userId))
+        this.following = this.following.filter(following => following != userId);
+    else
+        this.following.push(userId);
+    await this.save();
+}
+
+UserModel.methods.saveOrUnSavePost = async function (postId) {
+    if (this.savedPosts.includes(postId))
+        this.savedPosts = this.savedPosts.filter(post => post != postId);
+    else
+        this.savedPosts.push(postId);
+    await this.save();
 }
 
 const User = mongoose.model("User", UserModel);

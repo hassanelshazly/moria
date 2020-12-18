@@ -1,5 +1,6 @@
 const User = require("../../data/user");
 const Post = require("../../data/post");
+const { getAuthUser } = require("../../util/auth");
 
 module.exports = {
 
@@ -16,6 +17,20 @@ module.exports = {
 
         login(_, args) {
             return User.login(args);
+        },
+
+        follow(_, args, context) {
+            return User.follow({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        savePost(_, args, context) {
+            return User.savePost({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 
@@ -24,14 +39,16 @@ module.exports = {
             return Post.findPosts(parent);
         },
 
+        savedPosts(parent, args) {
+            return Post.findSavedPosts(parent);
+        },
+
         followers(parent, args) {
-            // TODO
-            return null;
+            return User.findFollowers(parent);
         },
 
         following(parent, args) {
-            // TODO
-            return
+            return User.findFollowing(parent);
         }
     }
 }

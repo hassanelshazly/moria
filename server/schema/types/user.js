@@ -27,6 +27,8 @@ const User = gql`
             password: String!
         ): User   
         login(username: String!, password: String!): User
+        follow(id: ID!): User
+        savePost(postId: ID!): User
     }
 `;
 
