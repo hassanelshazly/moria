@@ -3,21 +3,19 @@ const mongoose = require("mongoose");
 const PostModel = require("../models/post");
 const User = require("./user");
 const Notification = require("./notification");
-const { POST } = require("../util/constant");
-const { LIKE } = require("../util/constant");
-const { COMMENT } = require("../util/constant");
+const { POST, LIKE, COMMENT } = require("../util/constant");
 
 PostModel.statics.findPost = async function ({ postId }) {
     const post = await Post.findById(postId);
-    await post.populate('user')
-        .populate('likes')
-        .populate('comments.user')
-        .execPopulate();
+    await post.populate('user').execPopulate();
     return post;
 }
 
-PostModel.statics.findPosts = async function ({ id }) {
-    const user = await User.findById(id);
+PostModel.statics.findPosts = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
     await user.populate({
         path: 'posts',
         populate: {
@@ -27,13 +25,31 @@ PostModel.statics.findPosts = async function ({ id }) {
     return user.posts;
 }
 
+PostModel.statics.findLikes = async function ({ id }) {
+    const post = await Post.findById(id);
+    if (!post)
+        throw new Error("Post not Found");
+
+    await post.populate('likes').execPopulate();
+    return post.likes;
+}
+
+PostModel.statics.findComments = async function ({ id }) {
+    const post = await Post.findById(id);
+    if (!post)
+        throw new Error("Post not Found");
+
+    await post.populate('comments.user').execPopulate();
+    return post.comments;
+}
+
 PostModel.statics.likePost = async function ({ postId, userId }) {
     if (!userId)
         throw new Error("User not authorized");
 
     const post = await Post.findById(postId);
     if (!post)
-        throw new Error("Post not Found")
+        throw new Error("Post not Found");
 
     await post.addOrRemoveLike({ userId });
     await Notification.createNotification({
@@ -83,10 +99,7 @@ PostModel.statics.createComment = async function (args) {
         contentId: post._id,
         author: userId
     });
-    await post.populate('user')
-        .populate('likes')
-        .populate('comments.user')
-        .execPopulate();
+    await post.populate('user').execPopulate();
     return post;
 }
 
@@ -114,10 +127,7 @@ PostModel.statics.deleteComment = async function ({ postId, commentId, userId })
 
     post.comments.splice(cIdx, 1);
     await post.save();
-    await post.populate('user')
-        .populate('likes')
-        .populate('comments.user')
-        .execPopulate();
+    await post.populate('user').execPopulate();
     return post;
 }
 
