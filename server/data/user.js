@@ -22,14 +22,22 @@ UserModel.statics.follow = async function ({ userId, id }) {
     if (!toFollow)
         throw new Error("User not found");
 
-    await user.addOrRemoveFollowing(id);
+    const created = await user.addOrRemoveFollowing(id);
     await toFollow.addOrRemoveFollower(userId);
 
-    await Notification.createNotification({
-        content: FOLLOW,
-        contentId: id,
-        author: userId
-    });
+    if (created) {
+        await Notification.createNotification({
+            content: FOLLOW,
+            contentId: id,
+            author: userId
+        });
+    } else {
+        await Notification.deleteMany({
+            content: FOLLOW,
+            contentId: id,
+            author: userId
+        });
+    }
 
     return user;
 }
@@ -138,19 +146,31 @@ UserModel.methods.addOrRemoveFollower = async function (userId) {
 }
 
 UserModel.methods.addOrRemoveFollowing = async function (userId) {
-    if (this.following.includes(userId))
+    let created = false;
+    if (this.following.includes(userId)) {
         this.following = this.following.filter(following => following != userId);
-    else
+        created = false;
+    }
+    else {
         this.following.push(userId);
+        created = true;
+    }
     await this.save();
+    return created;
 }
 
 UserModel.methods.saveOrUnSavePost = async function (postId) {
-    if (this.savedPosts.includes(postId))
+    let created = false;
+    if (this.savedPosts.includes(postId)) {
         this.savedPosts = this.savedPosts.filter(post => post != postId);
-    else
+        created = false;
+    }
+    else {
         this.savedPosts.push(postId);
+        created = true;
+    }
     await this.save();
+    return created;
 }
 
 // It's placed here to avoid circular dependency
@@ -163,7 +183,7 @@ UserModel.statics.findNotifications = async function ({ userId }) {
         populate: [
             {
                 path: 'user'
-            }, 
+            },
             {
                 path: 'author'
             }

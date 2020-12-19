@@ -52,12 +52,6 @@ PostModel.statics.likePost = async function ({ postId, userId }) {
         throw new Error("Post not Found");
 
     await post.addOrRemoveLike({ userId });
-    await Notification.createNotification({
-        post,
-        content: LIKE,
-        contentId: post._id,
-        author: userId
-    });
     await post.populate('user').execPopulate();
     return post;
 }
@@ -112,10 +106,16 @@ PostModel.statics.deletePost = async function ({ postId, userId }) {
         throw new Error("User not authorized");
 
     await post.delete();
+    await Notification.deleteMany({
+        content: POST,
+        contentId: post._id,
+        author: post.user
+    });
     return "Post deleted successfully";
 }
 
-PostModel.statics.deleteComment = async function ({ postId, commentId, userId }) {
+PostModel.statics.deleteComment = async function (args) {
+    const { postId, commentId, userId } = args;
     const post = await Post.findById(postId);
     if (!post)
         throw new Error("Post not found");
@@ -128,15 +128,35 @@ PostModel.statics.deleteComment = async function ({ postId, commentId, userId })
     post.comments.splice(cIdx, 1);
     await post.save();
     await post.populate('user').execPopulate();
+    await Notification.deleteMany({
+        content: COMMENT,
+        contentId: post._id,
+        author: userId
+    });
     return post;
 }
 
 PostModel.methods.addOrRemoveLike = async function ({ userId }) {
-    if (this.likes.includes(userId))
+    if (this.likes.includes(userId)) {
         this.likes = this.likes.filter(like => like != userId);
-    else
+        await this.save();
+        await Notification.deleteMany({
+            content: LIKE,
+            contentId: this._id,
+            author: userId
+        })
+    }
+    else {
         this.likes.push(userId);
-    await this.save();
+        await this.save();
+        await Notification.createNotification({
+            post,
+            content: LIKE,
+            contentId: this._id,
+            author: userId
+        });
+    }
+
 }
 
 
