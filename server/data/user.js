@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 
 const UserModel = require("../models/user");
 const Post = require("./post");
+const Notification = require("./notification");
+const { FOLLOW } = require("../util/constant");
 
 
 UserModel.statics.findUser = function ({ username }) {
@@ -22,6 +24,13 @@ UserModel.statics.follow = async function ({ userId, id }) {
 
     await user.addOrRemoveFollower(id);
     await toFollow.addOrRemoveFollowing(userId);
+
+    await Notification.createNotification({
+        content: FOLLOW,
+        contentId: id,
+        author: userId
+    });
+
     return user;
 }
 
@@ -142,6 +151,25 @@ UserModel.methods.saveOrUnSavePost = async function (postId) {
     else
         this.savedPosts.push(postId);
     await this.save();
+}
+
+// It's placed here to avoid circular dependency
+UserModel.statics.findNotifications = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate({
+        path: 'notifications',
+        populate: [
+            {
+                path: 'user'
+            }, 
+            {
+                path: 'author'
+            }
+        ]
+    }).execPopulate();
+    return user.notifications;
 }
 
 const User = mongoose.model("User", UserModel);

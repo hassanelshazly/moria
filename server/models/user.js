@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.virtual('posts', {
     ref: 'Post',
     localField: '_id',
-    foreignField: 'userId'
+    foreignField: 'user'
 });
 
 UserSchema.virtual('notifications', {

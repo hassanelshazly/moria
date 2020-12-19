@@ -1,6 +1,6 @@
 /**************************************************
  * FOLLOW -> {
- *      authorId: follower
+ *      authorId: follower(who made the follow)
  *      userId: following(whose bening followed)
  *      contentId: follower
  * }

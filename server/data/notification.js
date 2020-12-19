@@ -11,9 +11,9 @@ const {
 
 
 async function resolvePost(post) {
-    await post.populate('userId').execPopulate();
-    console.log(post.userId.following.map(following => following._id));
-    return post.userId.following.map(following => following._id);
+    await post.populate('user').execPopulate();
+    console.log(post.user.following.map(following => following._id));
+    return post.user.following.map(following => following._id);
 }
 
 async function resolveFollow(user) {
@@ -21,14 +21,14 @@ async function resolveFollow(user) {
 }
 
 async function resolveLike(post) {
-    return [post.userId];
+    return [post.user._id];
 }
 
 async function resolveComment(post) {
     const commentAuthors = new Set();
-    commentAuthors.add(post.userId);
+    commentAuthors.add(post.user._id);
     post.comments.forEach(comment => {
-        commentAuthors.add(comment.userId)
+        commentAuthors.add(comment.user._id)
     });
     return [...commentAuthors];
 }

@@ -23,11 +23,16 @@ const User = gql`
         register(
             fullname: String!
             username: String!
-            email: String!
+            email:    String!
             password: String!
-        ): User   
-        login(username: String!, password: String!): User
-        follow(id: ID!): User
+        ): User  
+
+        login(
+            username: String!
+            password: String!
+        ): User
+
+        follow(id: ID!):       User
         savePost(postId: ID!): User
     }
 `;
