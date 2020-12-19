@@ -22,8 +22,8 @@ UserModel.statics.follow = async function ({ userId, id }) {
     if (!toFollow)
         throw new Error("User not found");
 
-    await user.addOrRemoveFollower(id);
-    await toFollow.addOrRemoveFollowing(userId);
+    await user.addOrRemoveFollowing(id);
+    await toFollow.addOrRemoveFollower(userId);
 
     await Notification.createNotification({
         content: FOLLOW,

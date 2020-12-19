@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const NotificationModel = require("../models/notification");
-const User = require("./user");
 const {
     FOLLOW,
     POST,
@@ -12,8 +11,8 @@ const {
 
 async function resolvePost(post) {
     await post.populate('user').execPopulate();
-    console.log(post.user.following.map(following => following._id));
-    return post.user.following.map(following => following._id);
+    console.log(post.user.followers.map(follower => follower._id));
+    return post.user.followers.map(follower => follower._id);
 }
 
 async function resolveFollow(user) {
@@ -67,24 +66,6 @@ NotificationModel.statics.createNotification = async function (args) {
     for (const notification of notifications) {
         await notification.save();
     }
-}
-
-NotificationModel.statics.findNotifications = async function ({ userId }) {
-    const user = await User.findById(userId);
-    if (!user)
-        throw new Error("User not found");
-    await user.populate({
-        path: 'notifications',
-        populate: [
-            {
-                path: 'user'
-            }, 
-            {
-                path: 'author'
-            }
-        ]
-    }).execPopulate();
-    return user.notifications;
 }
 
 const Notification = mongoose.model("Notification", NotificationModel);
