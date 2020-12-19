@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const PostModel = require("../models/post");
 const User = require("./user");
+const Notification = require("./notification");
+const { POST } = require("../util/constant");
 
 PostModel.statics.findPost = async function ({ postId }) {
     return Post.findById(postId);
@@ -31,7 +33,14 @@ PostModel.statics.createPost = async function (args) {
         throw new Error("User not authorized");
 
     const post = new Post(args);
-    return post.save();
+    await post.save();
+    await Notification.createNotification({
+        post,
+        content: POST,
+        contentId: post._id,
+        author: post.userId
+    });
+    return post;
 }
 
 PostModel.statics.createComment = async function (args) {

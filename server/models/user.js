@@ -51,6 +51,12 @@ UserSchema.virtual('posts', {
     ref: 'Post',
     localField: '_id',
     foreignField: 'userId'
+});
+
+UserSchema.virtual('notifications', {
+    ref: 'Notification',
+    localField: '_id',
+    foreignField: 'user'
 })
 
 module.exports =  UserSchema;

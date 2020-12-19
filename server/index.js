@@ -36,3 +36,4 @@ server.listen(port, () => {
     console.log(`Server started on http://localhost:${port}`);
 });
 
+process.on('warning', e => console.warn(e.stack));

@@ -1,8 +1,9 @@
-const { gql } = require('apollo-server');
+const { gql } = require("apollo-server");
 
-const { Post } = require('./post');
-const { User } = require('./user');
-const { Message } = require('./message');
+const { Post } = require("./post");
+const { User } = require("./user");
+const { Message } = require("./message");
+const {Notification} = require("./notification")
 
 const typeDefs = gql`
     type Query {
@@ -18,6 +19,7 @@ const typeDefs = gql`
     ${Post}
     ${User}
     ${Message}
+    ${Notification}
 `;
 
 module.exports = typeDefs;
