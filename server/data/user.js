@@ -57,24 +57,24 @@ UserModel.statics.savePost = async function ({ userId, postId }) {
     return user;
 }
 
-UserModel.statics.findFollowers = async function ({ id }) {
-    const user = await User.findById(id);
+UserModel.statics.findFollowers = async function ({ userId}) {
+    const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
     await user.populate('followers').execPopulate();
     return user.followers;
 }
 
-UserModel.statics.findFollowing = async function ({ id }) {
-    const user = await User.findById(id);
+UserModel.statics.findFollowing = async function ({ userId}) {
+    const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
     await user.populate('following').execPopulate();
     return user.following;
 }
 
-UserModel.statics.findSavedPosts = async function ({ id }) {
-    const user = await User.findById(id);
+UserModel.statics.findSavedPosts = async function ({ userId}) {
+    const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
     await user.populate('savedPosts').execPopulate();

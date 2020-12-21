@@ -44,19 +44,19 @@ module.exports = {
 
     User: {
         posts(parent, args) {
-            return Post.findPosts(parent);
+            return Post.findPosts({ userId: parent.id });
         },
 
         savedPosts(parent, args) {
-            return Post.findSavedPosts(parent);
+            return User.findSavedPosts({ userId: parent.id });
         },
 
         followers(parent, args) {
-            return User.findFollowers(parent);
+            return User.findFollowers({ userId: parent.id });
         },
 
         following(parent, args) {
-            return User.findFollowing(parent);
+            return User.findFollowing({ userId: parent.id });
         }
     }
 }
