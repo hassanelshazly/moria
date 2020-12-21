@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const NotificationModel = require("../models/notification");
+const { pubSub, NEW_NOTIFICATION } = require("../util/subscription");
 const {
     FOLLOW,
     POST,
@@ -55,7 +56,7 @@ async function resolveUsers({ author, content, contentId, post }) {
 
 NotificationModel.statics.createNotification = async function (args) {
     const users = await resolveUsers(args);
-    const { author, content, contentId, post } = args;
+    const { author, content, contentId } = args;
     const notifications = users.map(user => new Notification({
         user,
         author,
@@ -65,6 +66,8 @@ NotificationModel.statics.createNotification = async function (args) {
 
     for (const notification of notifications) {
         await notification.save();
+        await notification.populate("user").populate("author").execPopulate();
+        await pubSub.publish(NEW_NOTIFICATION, { newNotification: notification });
     }
 }
 

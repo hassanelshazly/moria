@@ -18,10 +18,10 @@ function getAuthUser(context) {
 
     try {
         const user = jwt.verify(token, process.env.JWT_SECRET);
+        return user;
     } catch (err) {
         throw new Error('Invalid/Expired token');
     }
-    return user;
 }
 
 // FACEBOOK STRATEGY
