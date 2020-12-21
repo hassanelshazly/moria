@@ -19,6 +19,14 @@ module.exports = {
             return User.login(args);
         },
 
+        loginUsingGoogle(_, args) {
+            return User.googleLogin(args);
+        },
+
+        loginUsingFacebook(_, args) {
+            return User.facebookLogin(args);
+        },
+
         follow(_, args, context) {
             return User.follow({
                 ...args,

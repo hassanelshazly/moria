@@ -32,6 +32,14 @@ const User = gql`
             password: String!
         ): User
 
+        loginUsingFacebook(
+            accessToken: String!
+        ): User
+
+        loginUsingGoogle(
+            accessToken: String!
+        ): User
+
         follow(id: ID!):       User
         savePost(postId: ID!): User
     }

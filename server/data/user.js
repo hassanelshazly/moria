@@ -2,11 +2,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 
 const UserModel = require("../models/user");
 const Post = require("./post");
 const Notification = require("./notification");
 const { FOLLOW } = require("../util/constant");
+const { authFacebook, authGoogle } = require("../util/auth");
 
 
 UserModel.statics.findUser = function ({ username }) {
@@ -125,6 +127,59 @@ UserModel.statics.register = async function (user) {
 
     // return the user
     return newUser;
+}
+
+UserModel.statics.facebookLogin = async function ({ accessToken }) {
+    const { data, info } = await authFacebook({
+        body: {
+            access_token: accessToken
+        }
+    }, {});
+
+    if (info)
+        throw new Error("Error occured in login using fb");
+
+    const { profile } = data;
+    let user = await User.findOne({ 'social.facebookId': profile.id });
+    if (!user) {
+        user = new User({
+            username: new ObjectId,
+            fullname: profile.displayName,
+            email: profile.emails[0].value || "null",
+            'social.facebookId': profile.id
+        });
+    }
+
+    await user.save();
+    user.generateAuthToken();
+    return user;
+}
+
+UserModel.statics.googleLogin = async function ({ accessToken }) {
+    const { data, info } = await authGoogle({
+        body: {
+            access_token: accessToken,
+            refresh_token: "null"
+        }
+    }, {});
+
+    if (info)
+        throw new Error("Error occured in login using Google");
+
+    const { profile } = data;
+    let user = await User.findOne({ 'social.googleId': profile.id });
+    if (!user) {
+        user = new User({
+            username: new ObjectId,
+            fullname: profile.displayName,
+            email: profile.emails[0].value || "null",
+            'social.googleId': profile.id
+        });
+    }
+
+    await user.save();
+    user.generateAuthToken();
+    return user;
 }
 
 UserModel.methods.generateAuthToken = function () {

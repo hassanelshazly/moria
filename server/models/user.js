@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Schema;
+const { ObjectId } = mongoose.Types;
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -22,8 +22,11 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        trim: true,
-        required: true
+        trim: true
+    },
+    social: {
+        googleId: String,
+        facebookId: String
     },
     following: [
         {
@@ -59,4 +62,4 @@ UserSchema.virtual('notifications', {
     foreignField: 'user'
 })
 
-module.exports =  UserSchema;
+module.exports = UserSchema;
