@@ -11,15 +11,19 @@ const MessageSchema = new mongoose.Schema({
     to: {
         type: ObjectId,
         required: true,
-        ref: "User"
+        refPath: "onModel"
     },
     body: {
         type: String,
         required: true,
     },
-    seen: {
-        type: Boolean,
-        default: false
+    onModel: {
+        type: String,
+        enum: [
+            'User',
+            'GroupChat'
+        ],
+        default: 'User'
     }
 
 }, { timestamps: true });

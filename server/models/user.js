@@ -45,8 +45,13 @@ const UserSchema = new mongoose.Schema({
             type: ObjectId,
             ref: "Post"
         }
-    ]
-
+    ], 
+    groupChats: [
+        {
+            type: ObjectId,
+            ref: "GroupChat"
+        }
+    ],
 }, { timestamps: true });
 
 // Virtual fields
