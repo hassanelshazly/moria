@@ -14,7 +14,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
-
+import { useMediaQuery } from "@material-ui/core";
+import classNames from 'classnames'
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
@@ -27,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   borderRight500: {
     borderRight: "1px solid #e0e0e0",
+    // backgroundColor:"red"
   },
   messageArea: {
     height: "70vh",
@@ -51,8 +53,8 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "30px",
   },
   peopleList: {
-    [theme.breakpoints.down("md")]: {
-      //   display:none
+    [theme.breakpoints.down("sm")]: {
+      display:"none"
     },
   },
 }));
@@ -68,7 +70,7 @@ const Chat = () => {
     <div>
       <Grid container>
         <Grid item xs={12}>
-          <Paper elevation="2" square>
+          <Paper elevation="2"  style={{borderRadius:"30px"}}>
             <Typography
               style={{ textAlign: "center", borderRadius: "50px" }}
               variant="h4"
@@ -80,7 +82,7 @@ const Chat = () => {
       </Grid>
 
       <Grid container component={Paper} className={classes.chatSection}>
-        <Grid item xs={3} className={classes.borderRight500}>
+        <Grid item xs={3} className={classNames(classes.peopleList,classes.borderRight500)}>
           <List>
             <ListItem button key="AhmedEssam">
               <ListItemIcon>
@@ -135,7 +137,7 @@ const Chat = () => {
             </ListItem>
           </List>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item sm={12} md={9}>
           <List className={classes.messageArea}>
             <ListItem key="1">
               <Grid container>
