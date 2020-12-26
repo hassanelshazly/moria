@@ -67,7 +67,7 @@ GroupChatModel.statics.findGroupChats = async function (args) {
 }
 
 GroupChatModel.statics.createGroupChat = async function (args) {
-    let { userId, membersId } = args;
+    let { title, userId, membersId } = args;
     if (!userId)
         throw new Error("User not authorized");
 
@@ -83,6 +83,7 @@ GroupChatModel.statics.createGroupChat = async function (args) {
     });
 
     const groupChat = new GroupChat({
+        title,
         admin: userId,
         members: membersId
     })

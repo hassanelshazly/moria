@@ -11,8 +11,8 @@ module.exports = {
 
 
     Mutation: {
-        likePage(_, args, context) {
-            return Page.likePage({
+        followPage(_, args, context) {
+            return Page.followPage({
                 ...args,
                 ...getAuthUser(context)
             });
@@ -42,10 +42,6 @@ module.exports = {
 
 
     Page: {
-        likeCount(parent) {
-            return parent.likes.length;
-        },
-
         posts(parent, args) {
             return Post.findPosts(parent);
         },

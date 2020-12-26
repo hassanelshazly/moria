@@ -15,7 +15,7 @@ const GroupChat = gql`
     }
 
     extend type Mutation {
-        createGroupChat(membersId: [ID!]!): GroupChat
+        createGroupChat(title: String!, membersId: [ID!]!): GroupChat
         sendGroupMessage(groupChatId: ID!, body: String!): Message
     }
 `;

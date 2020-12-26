@@ -7,6 +7,17 @@ module.exports = {
     Query: {
         findUser(_, args) {
             return User.findUser(args);
+        },
+
+        findPosts(_, args) {
+            return User.findPosts(args);
+        },
+
+        findTimeline(_, args, context) {
+            return User.findTimeline({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 
@@ -44,7 +55,7 @@ module.exports = {
 
     User: {
         posts(parent, args) {
-            return Post.findPosts({ userId: parent.id });
+            return User.findPosts({ userId: parent.id });
         },
 
         savedPosts(parent, args) {

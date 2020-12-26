@@ -1,4 +1,5 @@
 const Post = require("../../data/post");
+const User = require("../../data/user");
 const { getAuthUser } = require("../../util/auth");
 
 module.exports = {
@@ -8,10 +9,6 @@ module.exports = {
         findPost(_, args) {
             return Post.findPost(args);
         },
-
-        findPosts(_, args) {
-            return Post.findPosts(args);
-        }
     },
 
     Mutation: {

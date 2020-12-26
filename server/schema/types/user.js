@@ -17,6 +17,8 @@ const User = gql`
 
     extend type Query {
         findUser(username: String!) : User
+        findPosts(userId: String!): [Post]
+        findTimeline: [Post]
     }
 
     extend type Mutation {

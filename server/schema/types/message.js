@@ -31,8 +31,6 @@ const Message = gql`
     extend type Subscription {
         newMessage: Message
     }
-
-
 `;
 
 module.exports = { Message }

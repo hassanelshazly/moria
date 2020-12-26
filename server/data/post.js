@@ -11,20 +11,6 @@ PostModel.statics.findPost = async function ({ postId }) {
     return post;
 }
 
-PostModel.statics.findPosts = async function ({ userId }) {
-    const user = await User.findById(userId);
-    if (!user)
-        throw new Error("User not found");
-
-    await user.populate({
-        path: 'posts',
-        populate: {
-            path: 'user'
-        }
-    }).execPopulate();
-    return user.posts;
-}
-
 PostModel.statics.findLikes = async function ({ id }) {
     const post = await Post.findById(id);
     if (!post)

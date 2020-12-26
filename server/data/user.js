@@ -15,6 +15,29 @@ UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
 }
 
+UserModel.statics.findPosts = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    await user.populate({
+        path: 'posts',
+        populate: {
+            path: 'user'
+        }
+    }).execPopulate();
+    return user.posts;
+}
+
+UserModel.statics.findTimeline = async function ({ userId }) {
+    const user = await User.findById(userId);
+    let posts = [];
+    user.following.forEach(follwing => {
+        posts = posts.concat(User.findPosts({ userId: following._id }));
+    });
+    return posts;
+}
+
 UserModel.statics.follow = async function ({ userId, id }) {
     const user = await User.findById(userId);
     if (!user)
@@ -57,7 +80,7 @@ UserModel.statics.savePost = async function ({ userId, postId }) {
     return user;
 }
 
-UserModel.statics.findFollowers = async function ({ userId}) {
+UserModel.statics.findFollowers = async function ({ userId }) {
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
@@ -65,7 +88,7 @@ UserModel.statics.findFollowers = async function ({ userId}) {
     return user.followers;
 }
 
-UserModel.statics.findFollowing = async function ({ userId}) {
+UserModel.statics.findFollowing = async function ({ userId }) {
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
@@ -73,7 +96,7 @@ UserModel.statics.findFollowing = async function ({ userId}) {
     return user.following;
 }
 
-UserModel.statics.findSavedPosts = async function ({ userId}) {
+UserModel.statics.findSavedPosts = async function ({ userId }) {
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");

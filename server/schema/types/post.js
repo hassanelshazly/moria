@@ -22,7 +22,6 @@ const Post = gql`
 
     extend type Query {
         findPost(postId: ID!):        Post
-        findPosts(userId: String!): [Post]
     }
 
     extend type Mutation {

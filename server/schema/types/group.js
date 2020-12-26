@@ -20,7 +20,6 @@ const Group = gql`
         createGroupPost(body: String!): Post!
         deleteGroupPost(postId: ID!):   String
     }
-
 `;
 
 module.exports = { Group }

@@ -17,13 +17,11 @@ const Page = gql`
     }
 
     extend type Mutation {
-        likePage(postId: ID!):         Page
+        followPage(postId: ID!):         Page
         createPage(title: String!):    Page!
         createPagePost(body: String!): Post!
         deletePagePost(postId: ID!):   String
     }
-
-
 `;
 
 module.exports = { Page }

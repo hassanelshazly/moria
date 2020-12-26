@@ -9,7 +9,6 @@ module.exports = {
         }
     },
 
-
     Mutation: {
         createGroup(_, args, context) {
             return Group.createGroup({
@@ -31,20 +30,16 @@ module.exports = {
                 ...getAuthUser(context)
             });
         }
-
-        
     },
 
 
     Group: {
-
         posts(parent, args) {
-            return Post.findGroupPosts(parent);
+            return null;
         },
 
-        Members(parent, args) {
-            return parent.Members.length;
+        members(parent, args) {
+            return null;
         }
-
     }
 }
