@@ -7,10 +7,19 @@ const Group = gql`
         admin:        User!
         title:        String!
         createdAt:    String
-        Members:      [User]
+        members:      [User]
         posts:        [Post]
     }
 
+    extend type Query {
+        findGroup(groupId: ID!):   Group
+    }
+
+    extend type Mutation {
+        createGroup(title: String!):    Group!
+        createGroupPost(body: String!): Post!
+        deleteGroupPost(postId: ID!):   String
+    }
 
 `;
 

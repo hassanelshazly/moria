@@ -6,10 +6,21 @@ const Page = gql`
         id:         ID!
         owner:      User!
         title:      String!
-        Desc:       String
+        desc:       String
         createdAt:  String
         followers:  [User]
         Posts:      [Post]
+    }
+
+    extend type Query {
+        findPage(pageId: ID!):     Page
+    }
+
+    extend type Mutation {
+        likePage(postId: ID!):         Page
+        createPage(title: String!):    Page!
+        createPagePost(body: String!): Post!
+        deletePagePost(postId: ID!):   String
     }
 
 
