@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Schema;
+const { ObjectId } = mongoose.Types;
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -22,11 +22,11 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        trim: true,
-        required: true
+        trim: true
     },
-    token: {
-        type: String
+    social: {
+        googleId: String,
+        facebookId: String
     },
     following: [
         {
@@ -45,15 +45,26 @@ const UserSchema = new mongoose.Schema({
             type: ObjectId,
             ref: "Post"
         }
-    ]
-
+    ], 
+    groupChats: [
+        {
+            type: ObjectId,
+            ref: "GroupChat"
+        }
+    ],
 }, { timestamps: true });
 
 // Virtual fields
 UserSchema.virtual('posts', {
     ref: 'Post',
     localField: '_id',
-    foreignField: 'userId'
+    foreignField: 'user'
+});
+
+UserSchema.virtual('notifications', {
+    ref: 'Notification',
+    localField: '_id',
+    foreignField: 'user'
 })
 
-module.exports =  UserSchema;
+module.exports = UserSchema;

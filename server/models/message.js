@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Schema;
+const { ObjectId } = mongoose.Types;
 
 
-const MessageModel = new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
     from: {
         type: ObjectId,
         required: true,
@@ -11,17 +11,21 @@ const MessageModel = new mongoose.Schema({
     to: {
         type: ObjectId,
         required: true,
-        ref: "User"
+        refPath: "onModel"
     },
     body: {
         type: String,
         required: true,
     },
-    seen: {
-        type: Boolean,
-        default: false
+    onModel: {
+        type: String,
+        enum: [
+            'User',
+            'GroupChat'
+        ],
+        default: 'User'
     }
 
 }, { timestamps: true });
 
-module.exports = MessageModel;
+module.exports = MessageSchema;
