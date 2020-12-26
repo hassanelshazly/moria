@@ -6,6 +6,8 @@ const Query = gql`
         findPost(postId: ID!): Post
         findPosts(username: String!): [Post]
         findUser(username: String!) : User
+        findPage(pageId: ID!): Page
+        findGroup(groupId: ID!): Group
     }
 
 `;
