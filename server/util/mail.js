@@ -14,8 +14,12 @@ async function sendVerifyMail(email, name, token) {
         html: `<div style="font-family:'Open Sans','Helvetica Neue','Helvetica',Helvetica,Arial,sans-serif;
                 color:#294661;align-content: center; max-width:600px;margin: auto; padding: 10px;">
 
-                    <div style="font-size:20px">
-                        Dear ${name}, <br> <br>
+                    <div style="font-size:21px">
+                        Dear ${name},
+                    </div>
+
+                    <div style="font-size:18px">
+                        <br>
                         Welcome to Moria platform <br>
                         Let's verify your account to unlock the full features.
                     </div>
@@ -26,7 +30,7 @@ async function sendVerifyMail(email, name, token) {
                     </div>
 
                     <div style="font-size:18px;text-align: center;">
-                        <a href="http://localhost:3000/verify-acount/${token}"> <br>Verify My Account</a> 
+                        <a href="http://localhost:3000/verify-account/${token}"> <br>Verify My Account</a> 
                     </div>
 
                     <div style="font-size:12px;text-align: center;">
