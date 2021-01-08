@@ -24,6 +24,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    isActivated: {
+        type: Boolean,
+        default: false
+    },
+    activationToken: {
+        type: String,
+        lowercase: true,
+    },
     social: {
         googleId: String,
         facebookId: String

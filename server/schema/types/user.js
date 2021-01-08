@@ -19,6 +19,7 @@ const User = gql`
         findUser(username: String!) : User
         findPosts(userId: String!): [Post]
         findTimeline: [Post]
+        isActivated: Boolean
     }
 
     extend type Mutation {
@@ -40,6 +41,10 @@ const User = gql`
 
         loginUsingGoogle(
             accessToken: String!
+        ): User
+
+        verifyAccount(
+            activationToken: String!
         ): User
 
         follow(id: ID!):       User

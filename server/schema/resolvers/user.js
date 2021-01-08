@@ -18,6 +18,13 @@ module.exports = {
                 ...args,
                 ...getAuthUser(context)
             });
+        },
+
+        isActivated(_, args, context) {
+            return User.isActivated({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 
@@ -36,6 +43,10 @@ module.exports = {
 
         loginUsingFacebook(_, args) {
             return User.facebookLogin(args);
+        },
+
+        verifyAccount(_, args, context) {
+            return User.verifyAccount(args);
         },
 
         follow(_, args, context) {
