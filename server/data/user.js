@@ -150,8 +150,9 @@ UserModel.statics.register = async function (user) {
     if (!validator.isLength(password, { min: 5 }))
         throw new Error("Password too short!");
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser)
+    const existingUsername = await User.findOne({ username });
+    const existingEmail = await User.findOne({ email });
+    if (existingUsername | existingEmail)
         throw new Error('User exists already!');
 
     // hash the password
@@ -162,8 +163,8 @@ UserModel.statics.register = async function (user) {
     const newUser = new User(user);
     await newUser.save();
 
-    activationToken =  newUser.generateAuthToken();
-    newUser.activationToken =  activationToken;
+    activationToken = newUser.generateAuthToken();
+    newUser.activationToken = activationToken;
     await newUser.save();
 
     // send verifaction mail 
@@ -190,9 +191,10 @@ UserModel.statics.facebookLogin = async function ({ accessToken }) {
     let user = await User.findOne({ 'social.facebookId': profile.id });
     if (!user) {
         user = new User({
+            isActivated: true,
             username: new ObjectId,
             fullname: profile.displayName,
-            email: profile.emails[0].value || "null",
+            email: profile.emails[0].value || new ObjectId,
             'social.facebookId': profile.id
         });
     }
@@ -217,6 +219,7 @@ UserModel.statics.googleLogin = async function ({ accessToken }) {
     let user = await User.findOne({ 'social.googleId': profile.id });
     if (!user) {
         user = new User({
+            isActivated: true,
             username: new ObjectId,
             fullname: profile.displayName,
             email: profile.emails[0].value || "null",
