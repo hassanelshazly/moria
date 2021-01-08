@@ -8,8 +8,8 @@ const UserModel = require("../models/user");
 const Post = require("./post");
 const Notification = require("./notification");
 const { FOLLOW } = require("../util/constant");
+const { sendVerifyMail } = require("../util/mail");
 const { authFacebook, authGoogle } = require("../util/auth");
-
 
 UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
@@ -32,7 +32,7 @@ UserModel.statics.findPosts = async function ({ userId }) {
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
     let posts = [];
-    user.following.forEach(follwing => {
+    user.following.forEach(following => {
         posts = posts.concat(User.findPosts({ userId: following._id }));
     });
     return posts;
@@ -124,8 +124,25 @@ UserModel.statics.login = async function ({ username, password }) {
     return user;
 }
 
+UserModel.statics.isActivated = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    return user.isActivated;
+}
+
+UserModel.statics.verifyAccount = async function ({ activationToken }) {
+    const user = await User.findOne({ activationToken });
+    if (!user)
+        throw new Error("Activation failed");
+
+    user.isActivated = true;
+    await user.save();
+    return user;
+}
+
 UserModel.statics.register = async function (user) {
-    let { username, email, password } = user;
+    let { username, fullname, email, password } = user;
     // validate the data
     if (!validator.isEmail(email))
         throw new Error("E-Mail is invalid.");
@@ -144,6 +161,13 @@ UserModel.statics.register = async function (user) {
     // Store into the database
     const newUser = new User(user);
     await newUser.save();
+
+    activationToken =  newUser.generateAuthToken();
+    newUser.activationToken =  activationToken;
+    await newUser.save();
+
+    // send verifaction mail 
+    sendVerifyMail(email, fullname, activationToken);
 
     // genertate jwt token for the session
     newUser.generateAuthToken();
