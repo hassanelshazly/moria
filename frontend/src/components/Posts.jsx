@@ -47,7 +47,6 @@ const posts = [
         user_id: "2",
         user_name: "Eslam",
         user_photo: Avatar0,
-        created_at: 1577836800,
         text: "This looks breathtaking!",
       },
       {
@@ -55,7 +54,6 @@ const posts = [
         user_id: "3",
         user_name: "Radwa",
         user_photo: Avatar1,
-        created_at: 1577836800,
         text: "I wish I was there.",
       },
       {
@@ -132,6 +130,7 @@ function Comment(props) {
 
 const commentPropTypes = {
   id: PropTypes.string.isRequired,
+  user_id: PropTypes.string.isRequired,
   user_name: PropTypes.string.isRequired,
   user_photo: PropTypes.string,
   text: PropTypes.string.isRequired,

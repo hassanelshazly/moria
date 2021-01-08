@@ -1,11 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import AccountCircleTwoTone from "@material-ui/icons/AccountCircleTwoTone";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
 import Container from "@material-ui/core/Container";
 import CreateIcon from "@material-ui/icons/Create";
+import CreatePostDialog from "../dialogs/CreatePostDialog";
+import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import ForumIcon from "@material-ui/icons/Forum";
@@ -28,19 +31,30 @@ import Menu from "@material-ui/core/Menu";
 import MenuIcon from "@material-ui/icons/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import SearchBar from "./SearchBar";
+import SignUpDialog from "../dialogs/SignUpDialog";
+import SignInDialog from "../dialogs/SignInDialog";
+import Snackbar from "@material-ui/core/Snackbar";
+import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import Switch from "@material-ui/core/Switch";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+
 import { useStateValue } from "../state/store";
-import { setMenuAnchor } from "../state/actions";
-import { Switch } from "@material-ui/core";
+import {
+  setDialog,
+  setMenuAnchor,
+  setUser,
+  setSnackbar,
+  showSnackbar,
+} from "../state/actions";
 
 const drawerWidth = 240;
 export let isItDark = false;
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -165,8 +179,105 @@ ElevationScroll.propTypes = {
   children: PropTypes.element.isRequired,
 };
 
+function RootLevelDialogs() {
+  const [{ dialog }, dispatch] = useStateValue();
+
+  return useMemo(() => {
+    const handleDialogClose = () => {
+      dispatch(setDialog(null));
+    };
+
+    return (
+      <React.Fragment>
+        <Dialog
+          open={dialog === "sign-in"}
+          onClose={handleDialogClose}
+          aria-labelledby="sign-in-dialog"
+        >
+          <SignInDialog />
+        </Dialog>
+        <Dialog
+          open={dialog === "sign-up"}
+          onClose={handleDialogClose}
+          aria-labelledby="sign-up-dialog"
+        >
+          <SignUpDialog />
+        </Dialog>
+        <Dialog
+          open={dialog === "create-post"}
+          onClose={handleDialogClose}
+          aria-labelledby="create-post-dialog"
+        >
+          <CreatePostDialog />
+        </Dialog>
+      </React.Fragment>
+    );
+  }, [dispatch, dialog]);
+}
+
+function RootLevelSnackbar() {
+  const [{ snackbar }, dispatch] = useStateValue();
+
+  return useMemo(() => {
+    const handleSnackbarClose = (event, reason) => {
+      if (reason === "clickaway") return;
+      dispatch(setSnackbar(false));
+    };
+
+    const processQueue = () => {
+      if (snackbar.queue.length > 0) {
+        dispatch(setSnackbar(true, snackbar.queue.shift()));
+      }
+    };
+
+    const handleSnackbarExited = () => {
+      processQueue();
+    };
+
+    return (
+      <Snackbar
+        key={snackbar.messageInfo ? snackbar.messageInfo.key : undefined}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        onExited={handleSnackbarExited}
+        ContentProps={{
+          "aria-describedby": "message-id",
+        }}
+      >
+        <SnackbarContentWrapper
+          onClose={handleSnackbarClose}
+          variant={
+            snackbar.messageInfo ? snackbar.messageInfo.variant : undefined
+          }
+          message={
+            snackbar.messageInfo ? snackbar.messageInfo.message : undefined
+          }
+          actionLabel={
+            snackbar.messageInfo ? snackbar.messageInfo.actionLabel : undefined
+          }
+          onActionClick={
+            snackbar.messageInfo ? snackbar.messageInfo.action : undefined
+          }
+        />
+      </Snackbar>
+    );
+  }, [dispatch, snackbar]);
+}
+
 function DrawerHeader() {
-  const [{ user }] = useStateValue();
+  const [{ user }, dispatch] = useStateValue();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser !== null) {
+      dispatch(setUser(JSON.parse(storedUser)));
+    }
+  }, [dispatch]);
 
   return useMemo(() => {
     return (
@@ -180,7 +291,7 @@ function DrawerHeader() {
         </ListItemAvatar>
         <ListItemText
           primary="Welcome!"
-          secondary={user && user.name ? user.name : "Anonymous"}
+          secondary={user && user.fullname ? user.fullname : "Anonymous"}
         />
       </React.Fragment>
     );
@@ -205,6 +316,17 @@ function AccountMenu() {
       dispatch(setMenuAnchor("account", null));
     };
 
+    const handleAccountClick = () => {
+      if (!user) {
+        dispatch(setDialog("sign-in"));
+      } else {
+        localStorage.removeItem("user");
+        dispatch(setUser(null));
+        dispatch(showSnackbar("success", "Signed out"));
+      }
+      handleMenuClose();
+    };
+
     return (
       <Menu
         anchorEl={account}
@@ -215,7 +337,9 @@ function AccountMenu() {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem>{!user ? "Sign in" : "Sign out"}</MenuItem>
+        <MenuItem onClick={handleAccountClick}>
+          {!user ? "Sign in" : "Sign out"}
+        </MenuItem>
       </Menu>
     );
   }, [dispatch, user, account, isMenuOpen]);
@@ -504,7 +628,7 @@ export default function MainNav(props) {
         </nav>
         <div className={classes.content}>
           <div className={classes.toolbar} />
-          <Container className={classes.main} component="main" maxWidth="sm">
+          <Container className={classes.main} component="main" maxWidth="lg">
             {props.children}
           </Container>
           <footer className={classes.footer}>
@@ -512,6 +636,8 @@ export default function MainNav(props) {
           </footer>
         </div>
       </div>
+      <RootLevelDialogs />
+      <RootLevelSnackbar />
     </React.Fragment>
   );
 }
