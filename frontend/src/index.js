@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import ReactDOM from "react-dom";
 import { ThemeProvider } from "@material-ui/core/styles";
 import "fontsource-roboto";
@@ -13,8 +14,10 @@ ReactDOM.render(
   <React.StrictMode>
     <StateProvider initialState={initialState} reducer={reducer}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
+        <Router>
+          <CssBaseline />
+          <App />
+        </Router>
       </ThemeProvider>
     </StateProvider>
   </React.StrictMode>,
