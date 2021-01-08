@@ -2,12 +2,106 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 
 const UserModel = require("../models/user");
+const Post = require("./post");
+const Notification = require("./notification");
+const { FOLLOW } = require("../util/constant");
+const { authFacebook, authGoogle } = require("../util/auth");
 
 
 UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
+}
+
+UserModel.statics.findPosts = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    await user.populate({
+        path: 'posts',
+        populate: {
+            path: 'user'
+        }
+    }).execPopulate();
+    return user.posts;
+}
+
+UserModel.statics.findTimeline = async function ({ userId }) {
+    const user = await User.findById(userId);
+    let posts = [];
+    user.following.forEach(follwing => {
+        posts = posts.concat(User.findPosts({ userId: following._id }));
+    });
+    return posts;
+}
+
+UserModel.statics.follow = async function ({ userId, id }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const toFollow = await User.findById(id);
+    if (!toFollow)
+        throw new Error("User not found");
+
+    const created = await user.addOrRemoveFollowing(id);
+    await toFollow.addOrRemoveFollower(userId);
+
+    if (created) {
+        await Notification.createNotification({
+            content: FOLLOW,
+            contentId: id,
+            author: userId
+        });
+    } else {
+        await Notification.deleteMany({
+            content: FOLLOW,
+            contentId: id,
+            author: userId
+        });
+    }
+
+    return user;
+}
+
+UserModel.statics.savePost = async function ({ userId, postId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+
+    await user.saveOrUnSavePost(postId);
+    return user;
+}
+
+UserModel.statics.findFollowers = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('followers').execPopulate();
+    return user.followers;
+}
+
+UserModel.statics.findFollowing = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('following').execPopulate();
+    return user.following;
+}
+
+UserModel.statics.findSavedPosts = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate('savedPosts').execPopulate();
+    return user.savedPosts;
 }
 
 UserModel.statics.login = async function ({ username, password }) {
@@ -58,6 +152,59 @@ UserModel.statics.register = async function (user) {
     return newUser;
 }
 
+UserModel.statics.facebookLogin = async function ({ accessToken }) {
+    const { data, info } = await authFacebook({
+        body: {
+            access_token: accessToken
+        }
+    }, {});
+
+    if (info)
+        throw new Error("Error occured in login using fb");
+
+    const { profile } = data;
+    let user = await User.findOne({ 'social.facebookId': profile.id });
+    if (!user) {
+        user = new User({
+            username: new ObjectId,
+            fullname: profile.displayName,
+            email: profile.emails[0].value || "null",
+            'social.facebookId': profile.id
+        });
+    }
+
+    await user.save();
+    user.generateAuthToken();
+    return user;
+}
+
+UserModel.statics.googleLogin = async function ({ accessToken }) {
+    const { data, info } = await authGoogle({
+        body: {
+            access_token: accessToken,
+            refresh_token: "null"
+        }
+    }, {});
+
+    if (info)
+        throw new Error("Error occured in login using Google");
+
+    const { profile } = data;
+    let user = await User.findOne({ 'social.googleId': profile.id });
+    if (!user) {
+        user = new User({
+            username: new ObjectId,
+            fullname: profile.displayName,
+            email: profile.emails[0].value || "null",
+            'social.googleId': profile.id
+        });
+    }
+
+    await user.save();
+    user.generateAuthToken();
+    return user;
+}
+
 UserModel.methods.generateAuthToken = function () {
     this.token = jwt.sign({
         username: this.username,
@@ -66,6 +213,61 @@ UserModel.methods.generateAuthToken = function () {
         process.env.JWT_SECRET,
         { expiresIn: "1 week" });
     return this.token;
+}
+
+UserModel.methods.addOrRemoveFollower = async function (userId) {
+    if (this.followers.includes(userId))
+        this.followers = this.followers.filter(follower => follower != userId);
+    else
+        this.followers.push(userId);
+    await this.save();
+}
+
+UserModel.methods.addOrRemoveFollowing = async function (userId) {
+    let created = false;
+    if (this.following.includes(userId)) {
+        this.following = this.following.filter(following => following != userId);
+        created = false;
+    }
+    else {
+        this.following.push(userId);
+        created = true;
+    }
+    await this.save();
+    return created;
+}
+
+UserModel.methods.saveOrUnSavePost = async function (postId) {
+    let created = false;
+    if (this.savedPosts.includes(postId)) {
+        this.savedPosts = this.savedPosts.filter(post => post != postId);
+        created = false;
+    }
+    else {
+        this.savedPosts.push(postId);
+        created = true;
+    }
+    await this.save();
+    return created;
+}
+
+// It's placed here to avoid circular dependency
+UserModel.statics.findNotifications = async function ({ userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+    await user.populate({
+        path: 'notifications',
+        populate: [
+            {
+                path: 'user'
+            },
+            {
+                path: 'author'
+            }
+        ]
+    }).execPopulate();
+    return user.notifications;
 }
 
 const User = mongoose.model("User", UserModel);

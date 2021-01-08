@@ -1,28 +1,44 @@
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
 
-const groupSchema = new mongoose.Schema({
-    groupTitle:{
+const GroupSchema = new mongoose.Schema({
+    title: {
         type: String,
-        default: "Moria",
-        required:true
+        required: true
     },
-    groupDesc:String,
-    groupAdmin:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        required:true
+    Description: {
+        type: String
     },
-    groupMembers: [ { type: ObjectId, ref: "User" } ],
-    groupPost:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Post'
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    admin: {
+        type: ObjectId,
+        ref: 'User',
+        required: true
+    },
+    members: [
+        {
+            type: ObjectId,
+            ref: "User"
+        }
+    ],
+    requests: [
+        {
+            user: {
+                type: ObjectId,
+                ref: "User"
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now()
+            }
+        }
+    ],
+    posts: [
+        {
+            type: ObjectId,
+            ref: 'Post'
+        }
+    ],
 
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model('Group', groupSchema);
+module.exports = GroupSchema;

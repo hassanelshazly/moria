@@ -1,27 +1,31 @@
-const mongoose=  require("mongoose");
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema;
 
-const pageSchema = new mongoose.Schema({
-
-    pageTitle:String,
-    pageDesc:String,
-    owner:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+const PageSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
     },
-    followers:[ { 
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
-    }] ,
-    followersCount:Number,
-    pagePost:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Post'
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
+    Description: {
+        type: String
     },
+    owner: {
+        type: ObjectId,
+        ref: 'User'
+    },
+    followers: [
+        {
+            type: ObjectId,
+            ref: 'User'
+        }
+    ],
+    posts: [
+        {
+            type: ObjectId,
+            ref: 'Post'
+        }
+    ]
 
-});
+}, { timestamps: true });
 
-module.exports = pageSchema;
+module.exports = PageSchema;

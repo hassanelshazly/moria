@@ -1,17 +1,31 @@
-const { gql } = require('apollo-server');
+const { gql } = require("apollo-server");
 
-const { Query }    = require('./query');
-const { Post }     = require('./post');
-const { User }     = require('./user');
-const { Mutation } = require('./mutation');
-const { Message } = require('./message');
+const { Post } = require("./post");
+const { User } = require("./user");
+const { Page } = require("./page");
+const { Group } = require("./group");
+const { Message } = require("./message");
+const { Notification } = require("./notification");
+const { GroupChat } = require("./chat");
 
 const typeDefs = gql`
-    ${Query}
+    type Query {
+        _empty: String
+    }
+    type Mutation {
+        _empty: String
+    }
+    type Subscription {
+        _empty: String
+    }
+
     ${Post}
     ${User}
-    ${Mutation}
+    ${Page}
+    ${Group} 
     ${Message}
+    ${GroupChat}
+    ${Notification}
 `;
 
 module.exports = typeDefs;

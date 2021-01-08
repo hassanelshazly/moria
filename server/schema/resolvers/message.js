@@ -37,5 +37,19 @@ module.exports = {
                 }
             )
         }
+    },
+
+    UserGroup: {
+        __resolveType(obj, context, info) {
+            if (obj.username) {
+                return 'User';
+            }
+
+            if (obj.admin) {
+                return 'GroupChat';
+            }
+
+            return null;
+        },
     }
 }
