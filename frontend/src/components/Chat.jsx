@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect , useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -14,7 +14,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery, useTheme } from "@material-ui/core";
+import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
+import 'emoji-mart/css/emoji-mart.css'
+import { Picker } from 'emoji-mart'
+
 import classNames from 'classnames'
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -52,6 +56,23 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: "10px",
     borderRadius: "30px",
   },
+  pickerSpanStyling:{
+    position:"absolute",
+    bottom:"23vh",
+    left:"400px",
+    [theme.breakpoints.up("md")]: {
+      left:"25vw",
+
+    },
+    [theme.breakpoints.down("md")]: {
+      left:"25vw",
+
+    },
+    [theme.breakpoints.down("sm")]: {
+      left:"0",
+
+    },
+  },
   peopleList: {
     [theme.breakpoints.down("sm")]: {
       display:"none"
@@ -66,6 +87,16 @@ const Chat = () => {
     dummy.current.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  const [newMessage , setNewMessage] = useState("");
+  const [showEmoji , setShowEmoji] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'), {
+    defaultMatches: true
+  });
+  const addEmoji = e => {
+    let emoji = e.native;
+    setNewMessage(newMessage + emoji);
+  };
   return (
     <div>
       <Grid container>
@@ -102,7 +133,7 @@ const Chat = () => {
             />
           </Grid>
           <Divider />
-          <List>
+          <List >
             <ListItem button key="KhaledEmara">
               <ListItemIcon>
                 <Avatar alt="Khaled Emara" src="" />
@@ -138,7 +169,7 @@ const Chat = () => {
           </List>
         </Grid>
         <Grid item sm={12} md={9}>
-          <List className={classes.messageArea}>
+          <List className={classes.messageArea} onClick={()=>{setShowEmoji(false)}}>
             <ListItem key="1">
               <Grid container>
                 <Grid item xs={12}>
@@ -222,22 +253,47 @@ const Chat = () => {
             </ListItem>
             <div ref={dummy}></div>
           </List>
+
+          {showEmoji &&
+          <span className={classes.pickerSpanStyling}>
+              <Picker onSelect={addEmoji} />
+          </span>}
           <Grid container style={{ padding: "20px" }}>
-            <Grid item xs={11}>
-              <TextField
-                id="outlined-basic-email"
-                label="Type Something"
-                fullWidth
-              />
-            </Grid>
-            <Grid xs={1} align="right">
-              <Fab
-                color="primary"
-                aria-label="add"
-                style={{ backgroundColor: "purple " }}
-              >
-                <SendIcon />
-              </Fab>
+
+
+
+            <Grid container spacing={isMobile? 4 : 2}>
+              <Grid xs={2} sm={1} align="left" >
+                <Fab
+                  color="primary"
+                  aria-label="emoji"
+                  style={{ backgroundColor: "purple " }}
+                  onClick={()=>{setShowEmoji(!showEmoji)}}
+                >
+                  <EmojiEmotionsIcon   />
+                </Fab>
+              </Grid>
+              <Grid item xs={8} sm={10} >
+
+                <TextField
+                  id="outlined-basic-email"
+                  label="Type Something"
+                  value={newMessage}
+                  onChange={e=>{setNewMessage(e.target.value)}}
+                  fullWidth
+                />
+              </Grid>
+            
+
+              <Grid xs={2} sm={1} align="right">
+                <Fab
+                  color="primary"
+                  aria-label="add"
+                  style={{ backgroundColor: "purple " }}
+                >
+                  <SendIcon />
+                </Fab>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
