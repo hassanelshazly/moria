@@ -81,7 +81,7 @@ export default function SignInDialog() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sing-In
+          Sign-In
         </Typography>
         <Grid className={classes.form} container spacing={2}>
           <Grid item xs={12}>
