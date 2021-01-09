@@ -134,7 +134,8 @@ const Chat = () => {
             />
           </Grid>
           <Divider />
-          <List >
+          <List > 
+            {/* Online People */}
             <ListItem button key="KhaledEmara">
               <ListItemIcon>
                 <Avatar alt="Khaled Emara" src="" />
@@ -144,10 +145,7 @@ const Chat = () => {
               <ListItemText
                 disableTypography
                 secondary={
-                  <Typography
-                    type="body2"
-                    style={{ color: "green", fontWeight: "bold" }}
-                  >
+                  <Typography type="body2" style={{ color: "green", fontWeight: "bold" }} >
                     Online
                   </Typography>
                 }
@@ -161,12 +159,15 @@ const Chat = () => {
               </ListItemIcon>
               <ListItemText primary="Hassan">Hassan</ListItemText>
             </ListItem>
+
             <ListItem button key="Eslam">
               <ListItemIcon>
                 <Avatar alt="Eslam" src="" />
               </ListItemIcon>
               <ListItemText primary="Eslam">Eslam</ListItemText>
             </ListItem>
+
+
           </List>
         </Grid>
         <Grid item sm={12} md={9}>
