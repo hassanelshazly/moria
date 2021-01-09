@@ -20,6 +20,7 @@ import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
 
 import classNames from 'classnames'
+import Message from "./Message";
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
@@ -170,13 +171,7 @@ const Chat = () => {
         </Grid>
         <Grid item sm={12} md={9}>
           <List className={classes.messageArea} onClick={()=>{setShowEmoji(false)}}>
-            <ListItem key="1">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    className={classes.senderStyle}
-                    align="right"
-                    primary="It is a long established fact that a reader will be distracted by the readable content of 
+            <Message  key="1" messageText="It is a long established fact that a reader will be distracted by the readable content of 
                     a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
                     normal distribution of letters, as opposed to using 'Content here, content here', making it look 
                     like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
@@ -186,49 +181,15 @@ const Chat = () => {
                     like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
                     as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
                     their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-                    purpose (injected humour and the like)."
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText
-                    style={{ paddingRight: "15px" }}
-                    align="right"
-                    secondary="09:30"
-                  ></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="2">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    className={classes.receiverStyle}
-                    align="left"
-                    primary=" readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+                    purpose (injected humour and the like)." messageDate="09:30" sender={true} />
+            <Message  key="2" messageText="readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
                     as their default model text,is a long established fact that a reader will be distracted by the readable content of 
                     a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
                     normal distribution of letters, as opposed to using 'Content here, content here', making it look 
                     like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
                     as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy."
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText
-                    style={{ paddingLeft: "15px" }}
-                    align="left"
-                    secondary="09:31"
-                  ></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    className={classes.senderStyle}
-                    primary="It is a long established fact that a reader will be distracted by the readable content of 
+                    their infancy." messageDate="09:31" sender={false} />
+            <Message  key="3" messageText="It is a long established fact that a reader will be distracted by the readable content of 
                     a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
                     normal distribution of letters, as opposed to using 'Content here, content here', making it look 
                     like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
@@ -239,18 +200,8 @@ const Chat = () => {
                     as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in
                     their infancy. Various English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
                     as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy. Various"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText
-                    style={{ paddingRight: "15px" }}
-                    align="right"
-                    secondary="10:30"
-                  ></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
+                    their infancy. Various" messageDate="10:30" sender={true} />
+            
             <div ref={dummy}></div>
           </List>
 
