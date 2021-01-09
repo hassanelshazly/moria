@@ -18,7 +18,7 @@ function App() {
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <CallToAction
-          headerTitle="Moria Socail Media Platform"
+          headerTitle="Moria Social Media Platform"
           subheaderTitle="Connect with the people you care about"
           subtitle="Sign in now and start posting"
           primaryActionText={user ? "Post" : "Sign in"}
