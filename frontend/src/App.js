@@ -12,6 +12,7 @@ import MainNav from "./components/MainNav";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Chat from "./pages/Chat";
 
 import { useStateValue } from "./state/store";
 
@@ -43,8 +44,11 @@ function App() {
           <Route exact path="/">
             <Home />
           </Route>
-          <Route path="/profile">
+          <Route path="/profile/">
             <Profile />
+          </Route>
+          <Route path="/chat/">
+            <Chat />
           </Route>
         </Switch>
       </MainNav>

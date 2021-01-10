@@ -22,6 +22,10 @@ const SIGN_IN = gql`
       fullname
       createdAt
       token
+      following {
+        id
+        username
+      }
     }
   }
 `;

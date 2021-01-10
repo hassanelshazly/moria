@@ -1,18 +1,23 @@
 import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "./Button";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
+import Checkbox from "@material-ui/core/Checkbox";
 import Chip from "@material-ui/core/Chip";
 import EditIcon from "@material-ui/icons/Edit";
 import FaceIcon from "@material-ui/icons/Face";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 
 import Avatar from "../assets/images/avatar-0.png";
+
+import { useStateValue } from "../state/store";
+import { setDialog, setUser } from "../state/actions";
 
 const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
   relative: { position: "relative" },
@@ -60,6 +65,7 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
   details: {
     display: "flex",
     flexDirection: "column",
+    width: "100%",
   },
   content: {
     flex: "1 0 auto",
@@ -72,11 +78,16 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
     position: "absolute",
     bottom: 0,
     right: 0,
+  },
+  photoEditIcon: {
     background: "GhostWhite",
+    margin: spacing(1),
   },
   controls: {
     display: "flex",
     alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
     paddingLeft: spacing(1),
     paddingBottom: spacing(1),
   },
@@ -86,42 +97,78 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
 }));
 
 function InfoHeader(props) {
+  const [{ user }, dispatch] = useStateValue();
+
+  const { title, label, profile_user, action, checked } = props;
+
   const classes = useStyles();
+  const theme = useTheme();
   const width = useWidth();
   const cardContent = useRef(null);
-  const [media, setMedia] = React.useState(null);
+  const [cover, setCover] = React.useState(null);
+  const [photo, setPhoto] = React.useState(null);
+  const [isFollowing, setIsFollowing] = React.useState(checked);
   const [cardContentHeight, setCardContentHeight] = React.useState(0);
-
-  const { title, label, hasImage } = props;
 
   let heightOffset = Math.round(0.3 * 480);
   if (width === "sm") heightOffset = Math.round(0.3 * 360);
   if (width === "xs") heightOffset = Math.round(0.3 * 240);
 
   useEffect(() => {
-    console.log(cardContent.current.offsetHeight);
     setCardContentHeight(cardContent.current.offsetHeight);
   }, [cardContent]);
 
-  const handleMediaChange = (event) => {
-    setMedia(event.target.files[0]);
+  const handleCoverChange = (event) => {
+    setCover(event.target.files[0]);
+  };
+
+  const handlePhotoChange = (event) => {
+    setPhoto(event.target.files[0]);
+  };
+
+  const handleAction = () => {
+    dispatch(setDialog("create-post"));
+  };
+
+  const handleActionToggle = (event) => {
+    setIsFollowing(event.target.checked);
+    action({
+      variables: {
+        id: profile_user.id,
+      },
+    });
+    if (event.target.checked)
+      dispatch(
+        setUser({ following: [profile_user, ...user.following], ...user })
+      );
+    else
+      dispatch(
+        setUser({
+          following: user.following.filter(
+            (item) => item.id !== profile_user.id
+          ),
+          ...user,
+        })
+      );
   };
 
   return (
     <form className={classes.relative} noValidate autoComplete="off">
       <Card
-        style={{ marginBottom: cardContentHeight - heightOffset }}
+        style={{
+          marginBottom: cardContentHeight - heightOffset + theme.spacing(2),
+        }}
         className={classes.card}
       >
         <input
           accept="image/*"
           className={classes.input}
-          id="icon-button-file"
+          id="cover-edit-button"
           type="file"
-          onChange={handleMediaChange}
+          onChange={handleCoverChange}
         />
-        <label className={classes.mediaEditLabel} htmlFor="icon-button-file">
-          <IconButton aria-label="edit-media" component="span">
+        <label className={classes.mediaEditLabel} htmlFor="cover-edit-button">
+          <IconButton aria-label="edit-cover" component="span">
             <EditIcon className={classes.mediaEditIcon} />
           </IconButton>
         </label>
@@ -129,35 +176,42 @@ function InfoHeader(props) {
           component="img"
           className={classes.cardCover}
           onError={() => {
-            if (media) setMedia(null);
+            if (cover) setCover(null);
           }}
           src={
-            media
-              ? URL.createObjectURL(media)
+            cover
+              ? URL.createObjectURL(cover)
               : "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1404&q=80"
           }
-          alt={media ? media.name : "Post Photo"}
+          alt={cover ? cover.name : "Post Photo"}
         />
         <CardContent ref={cardContent} className={classes.cardContent}>
           <Card className={classes.innerCard} elevation={0}>
-            {hasImage && (
-              <div className={classes.relative}>
-                <CardMedia
-                  component="img"
-                  className={classes.photo}
-                  image={Avatar}
-                  loading="auto"
-                  title={title}
-                />
+            <div className={classes.relative}>
+              <CardMedia
+                component="img"
+                className={classes.photo}
+                image={photo ? URL.createObjectURL(photo) : Avatar}
+                loading="auto"
+                title={title}
+              />
+              <input
+                accept="image/*"
+                className={classes.input}
+                id="photo-edit-button"
+                type="file"
+                onChange={handlePhotoChange}
+              />
+              <label className={classes.photoEdit} htmlFor="photo-edit-button">
                 <IconButton
-                  className={classes.photoEdit}
-                  aria-label="edit-media"
+                  className={classes.photoEditIcon}
+                  aria-label="edit-photo"
                   component="span"
                 >
                   <EditIcon />
                 </IconButton>
-              </div>
-            )}
+              </label>
+            </div>
             <div className={classes.details}>
               <CardContent className={classes.content}>
                 <Typography component="h1" variant="h5">
@@ -172,7 +226,21 @@ function InfoHeader(props) {
                 />
               </CardContent>
               <div className={classes.controls}>
-                <Button color="red">Post Now</Button>
+                <Button color="red" onClick={handleAction}>
+                  Post Now
+                </Button>
+                {isFollowing != null && (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={isFollowing}
+                        onChange={handleActionToggle}
+                        name="isFollowing"
+                      />
+                    }
+                    label={isFollowing ? "Following" : "Follow"}
+                  />
+                )}
               </div>
             </div>
           </Card>
@@ -185,7 +253,9 @@ function InfoHeader(props) {
 InfoHeader.propTypes = {
   title: PropTypes.string,
   label: PropTypes.string,
-  hasImage: PropTypes.bool,
+  profile_user: PropTypes.string,
+  action: PropTypes.func,
+  checked: PropTypes.bool,
 };
 
 export default InfoHeader;

@@ -32,6 +32,10 @@ const SIGN_UP = gql`
       fullname
       createdAt
       token
+      following {
+        id
+        username
+      }
     }
   }
 `;
@@ -67,11 +71,11 @@ export default function SignUpDialog() {
   // eslint-disable-next-line no-empty-pattern
   const [{}, dispatch] = useStateValue();
   const [signUp] = useMutation(SIGN_UP, {
-    onCompleted({ login: user }) {
+    onCompleted({ register: user }) {
       dispatch(setUser(user));
       localStorage.setItem("user", JSON.stringify(user));
       dispatch(setDialog(null));
-      dispatch(showSnackbar("success", "Successfully signed in"));
+      dispatch(showSnackbar("success", "Successfully signed up"));
     },
     onError(error) {
       dispatch(showSnackbar("error", error.message));

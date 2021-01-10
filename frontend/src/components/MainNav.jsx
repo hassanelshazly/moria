@@ -5,17 +5,18 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import AccountCircleTwoTone from "@material-ui/icons/AccountCircleTwoTone";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
+import ChatIcon from "@material-ui/icons/Chat";
 import Container from "@material-ui/core/Container";
 import CreateIcon from "@material-ui/icons/Create";
 import CreatePostDialog from "../dialogs/CreatePostDialog";
 import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
-import ForumIcon from "@material-ui/icons/Forum";
+import FaceIcon from "@material-ui/icons/Face";
+import GroupIcon from "@material-ui/icons/Group";
 import Hidden from "@material-ui/core/Hidden";
 import HomeIcon from "@material-ui/icons/Home";
 import IconButton from "@material-ui/core/IconButton";
-import InfoIcon from "@material-ui/icons/Info";
 import KeyboardArrowDownRoundedIcon from "@material-ui/icons/KeyboardArrowDownRounded";
 import KeyboardArrowLeftRoundedIcon from "@material-ui/icons/KeyboardArrowLeftRounded";
 import KeyboardArrowRightRoundedIcon from "@material-ui/icons/KeyboardArrowRightRounded";
@@ -43,6 +44,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
+import { useHistory } from "react-router-dom";
 import { useStateValue } from "../state/store";
 import {
   setDialog,
@@ -274,9 +276,13 @@ function DrawerHeader() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser !== null) {
+    if (storedUser && storedUser != "undefined" && storedUser != "null") {
       dispatch(setUser(JSON.parse(storedUser)));
     }
+
+    return () => {
+      if (user) localStorage.setItem("user", JSON.stringify(user));
+    };
   }, [dispatch]);
 
   return useMemo(() => {
@@ -394,24 +400,40 @@ const drawerItemsStyles = makeStyles((theme) => ({
 function DrawerItems() {
   const classes = drawerItemsStyles();
 
+  const history = useHistory();
+
   return useMemo(() => {
     const items = [
       {
+        id: "/",
         icon: <HomeIcon />,
         text: "Home",
         selected: true,
+        action: () => history.push("/"),
       },
       {
+        id: "/profile/",
+        icon: <FaceIcon />,
+        text: "Profile",
+        action: () => history.push("/profile/"),
+      },
+      {
+        id: "/page/",
         icon: <CreateIcon />,
         text: "My Page",
+        action: () => history.push("/"),
       },
       {
-        icon: <ForumIcon />,
-        text: "My Groups",
+        id: "/group/",
+        icon: <GroupIcon />,
+        text: "My Group",
+        action: () => history.push("/"),
       },
       {
-        icon: <InfoIcon />,
-        text: "About Us",
+        id: "/chat/",
+        icon: <ChatIcon />,
+        text: "Chat",
+        action: () => history.push("/chat"),
       },
     ];
 
@@ -419,11 +441,11 @@ function DrawerItems() {
       <List>
         {items.map((item) => (
           <ListItem
-            key={item.text}
+            key={item.id}
             className={classes.listItem}
-            selected={item.selected}
+            selected={history.location.pathname === item.id}
             button
-            onClick={item.action}
+            onClick={() => history.push(item.id)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
@@ -628,7 +650,7 @@ export default function MainNav(props) {
         </nav>
         <div className={classes.content}>
           <div className={classes.toolbar} />
-          <Container className={classes.main} component="main" maxWidth="lg">
+          <Container className={classes.main} component="main" maxWidth="md">
             {props.children}
           </Container>
           <footer className={classes.footer}>

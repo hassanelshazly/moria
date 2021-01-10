@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -71,6 +71,7 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
 
 function CreatePostDialog(props) {
   const classes = useStyles();
+  const theme = useTheme();
   const width = useWidth();
   const cardContent = useRef(null);
   const [media, setMedia] = React.useState(null);
@@ -118,7 +119,9 @@ function CreatePostDialog(props) {
   return (
     <form className={classes.relative} noValidate autoComplete="off">
       <Card
-        style={{ marginBottom: cardContentHeight - heightOffset }}
+        style={{
+          marginBottom: cardContentHeight - heightOffset + theme.spacing(2),
+        }}
         className={classes.card}
       >
         <input
