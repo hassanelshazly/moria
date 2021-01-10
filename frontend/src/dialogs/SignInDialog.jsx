@@ -85,7 +85,7 @@ export default function SignInDialog() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sing-In
+          Sign-In
         </Typography>
         <Grid className={classes.form} container spacing={2}>
           <Grid item xs={12}>
@@ -94,7 +94,7 @@ export default function SignInDialog() {
               required
               fullWidth
               id="user-name"
-              label="UserName"
+              label="User Name"
               name="username"
               autoComplete="name"
               value={userName}
@@ -107,7 +107,7 @@ export default function SignInDialog() {
               required
               fullWidth
               name="password"
-              label="Passwrod"
+              label="Password"
               type="password"
               id="password"
               autoComplete="current-password"

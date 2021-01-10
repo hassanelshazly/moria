@@ -55,7 +55,7 @@ function Home() {
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <CallToAction
-          headerTitle="Moria Socail Media Platform"
+          headerTitle="Moria Social Media Platform"
           subheaderTitle="Connect with the people you care about"
           subtitle={
             user ? `Start posting now` : "Sign in and start posting now"

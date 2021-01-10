@@ -188,7 +188,7 @@ export default function SignUpDialog() {
                 dispatch(setDialog("sign-in"));
               }}
             >
-              Already have an account? Sing In
+              Already have an account? Sign In
             </Link>
           </Grid>
         </Grid>
