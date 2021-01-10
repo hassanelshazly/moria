@@ -9,6 +9,10 @@ module.exports = {
             return User.findUser(args);
         },
 
+        findAllUsers(_, args) {
+            return User.findAllUsers(args);
+        },
+
         findPosts(_, args) {
             return User.findPosts(args);
         },
