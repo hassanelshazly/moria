@@ -19,7 +19,7 @@ const useStyles = makeStyles(()=>{
 })
 const GET_ALL_USERS = gql`
   query GetAllUsers() {
-    findUsers { //TODO: Change query Name
+    findAllUsers  { //TODO: Change query Name
       id
       fullname
     }
@@ -41,7 +41,7 @@ function Discovery() {
         <Grid item container spacing={4}>
 
            {
-              data.findUsers.map(someuser=>{
+              data.findAllUsers.map(someuser=>{
                  if(someuser.id != user.id)
                  {
                     return (
