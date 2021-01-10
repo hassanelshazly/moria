@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useRef, useEffect , useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
+// import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -18,6 +17,16 @@ import { useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
+
+
+import { gql, useQuery,useLazyQuery,useMutation  } from '@apollo/client';
+import { useStateValue } from "./../state/store";
+
+
+
+
+
+
 
 import classNames from 'classnames'
 import Message from "./Message";
@@ -81,13 +90,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+const GET_MESSAGES = gql`
+  query GetMessages($receiver: ID!) {
+    findMessages(toUserId: $receiver) {
+      id
+      from
+      to
+      body
+      createdAt
+    }
+  }
+`;
+
+const SEND_MESSAGE = gql`
+  mutation ($receiver:ID!  , $text:String!) {
+    sendMessage(toUserId: $receiver, body: $text) {
+      id
+      from
+      to
+      body
+      createdAt
+    }
+  } 
+`;
 const Chat = () => {
+  const [{ user }] = useStateValue();
+  const [addMessage] = useMutation(SEND_MESSAGE);
+
+  const res1 =  useQuery(GET_MESSAGES, {
+    variables: { receiver: user.id },
+  });
+  const messageArray=[];
+  if (res1.error ) return <p>{res1.error.message}</p>;
+  const [getRes2 , res2] =  useLazyQuery(GET_MESSAGES) 
+ 
+  const [currentReceiver , setCurrentReceiver] = useState("#");
+
   const classes = useStyles();
   const dummy = useRef();
   useEffect(() => {
     dummy.current.scrollIntoView({ behavior: "smooth" });
   }, []);
-
+ 
   const [newMessage , setNewMessage] = useState("");
   const [showEmoji , setShowEmoji] = useState(false);
   const theme = useTheme();
@@ -98,6 +143,53 @@ const Chat = () => {
     let emoji = e.native;
     setNewMessage(newMessage + emoji);
   };
+
+  const handleSendMessage = ()=>{
+    addMessage({ variables: { receiver: currentReceiver , text:newMessage } });
+    setNewMessage("");
+  }
+
+  // Dummy Data
+//   const user = {id:100 , fullname:"Ahmed Essam" , 
+//   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
+//   ,{id:3 , fullname:"Ali"},{id:4 , fullname:"Taha"}]};
+//   let messageArray = [
+//   {key:1 , text:`It is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
+//   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} ,
+//   {key:2 , text:`It is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
+//   purpose (injected humour and the like).`  , date:"09:30" ,sender:false} ,
+//   {key:3 , text:`It is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
+//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
+//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
+//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
+//   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} 
+
+// ]
+
   return (
     <div>
       <Grid container>
@@ -115,12 +207,13 @@ const Chat = () => {
 
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid item xs={3} className={classNames(classes.peopleList,classes.borderRight500)}>
+          
           <List>
-            <ListItem button key="AhmedEssam">
+            <ListItem button key={user.id}>
               <ListItemIcon>
-                <Avatar alt="Ahmed Essam" src="" />
+                <Avatar alt={user.fullname} src="" />
               </ListItemIcon>
-              <ListItemText primary="Ahmed Essam"></ListItemText>
+              <ListItemText primary={user.fullname}></ListItemText>
             </ListItem>
           </List>
 
@@ -136,72 +229,53 @@ const Chat = () => {
           <Divider />
           <List > 
             {/* Online People */}
-            <ListItem button key="KhaledEmara">
-              <ListItemIcon>
-                <Avatar alt="Khaled Emara" src="" />
-              </ListItemIcon>
-              <ListItemText primary="Khaled Emara">Khaled Emara</ListItemText>
+            
 
-              <ListItemText
-                disableTypography
-                secondary={
-                  <Typography type="body2" style={{ color: "green", fontWeight: "bold" }} >
-                    Online
-                  </Typography>
-                }
-                align="right"
-              ></ListItemText>
-            </ListItem>
-
-            <ListItem button key="Hassan">
-              <ListItemIcon>
-                <Avatar alt="Hassan" src="" />
-              </ListItemIcon>
-              <ListItemText primary="Hassan">Hassan</ListItemText>
-            </ListItem>
-
-            <ListItem button key="Eslam">
-              <ListItemIcon>
-                <Avatar alt="Eslam" src="" />
-              </ListItemIcon>
-              <ListItemText primary="Eslam">Eslam</ListItemText>
-            </ListItem>
+            {user.following.map(someuser=>(
+              
+              <ListItem button key={someuser.id} onClick={()=>{  
+                 setCurrentReceiver(someuser.id);
+                 getRes2( {variables: { receiver: someuser.id } } );
+                 if(!res1.loading)
+                 {
+                    res1.data.findMessages.forEach( x=>{
+                    if(x.from == someuser.id)
+                        {
+                            messageArray.push(x.findMessages)
+                        }
+                        
+                    })
+                    if(res2.data && res2.data.findMessages )
+                    {
+                      res2.data.findMessages.forEach( x=>{
+                        if(x.from == user.id)
+                            {
+                                messageArray.push(x.findMessages)
+                            }
+                            
+                        })
+                    }
+                    messageArray.sort((a,b)=> a.createdAt <= b.createdAt);
+                 }
+              }}  >
+                  <ListItemIcon>
+                    <Avatar alt={someuser.fullname} src="" />
+                  </ListItemIcon>
+                  <ListItemText primary={someuser.fullname} >{someuser.fullname}</ListItemText>
+              </ListItem>
+            ))}
+           
+            
 
 
           </List>
         </Grid>
         <Grid item sm={12} md={9}>
           <List className={classes.messageArea} onClick={()=>{setShowEmoji(false)}}>
-            <Message  key="1" messageText="It is a long established fact that a reader will be distracted by the readable content of 
-                    a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-                    normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-                    like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text,is a long established fact that a reader will be distracted by the readable content of 
-                    a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-                    normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-                    like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-                    purpose (injected humour and the like)." messageDate="09:30" sender={true} />
-            <Message  key="2" messageText="readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text,is a long established fact that a reader will be distracted by the readable content of 
-                    a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-                    normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-                    like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy." messageDate="09:31" sender={false} />
-            <Message  key="3" messageText="It is a long established fact that a reader will be distracted by the readable content of 
-                    a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-                    normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-                    like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-                    purpose (injected humour and the like). distribution of letters, as opposed to using 'Content here, content here', making it look 
-                    like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy. Various English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-                    as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in
-                    their infancy. Various" messageDate="10:30" sender={true} />
+            
+            {messageArray.map(x=>(
+              <Message key={x.id} messageText={x.body} messageDate={x.createdAt} sender={x.from== user.id} />
+            ))}
             
             <div ref={dummy}></div>
           </List>
@@ -242,6 +316,7 @@ const Chat = () => {
                   color="primary"
                   aria-label="add"
                   style={{ backgroundColor: "purple " }}
+                  onClick={handleSendMessage}
                 >
                   <SendIcon />
                 </Fab>
