@@ -7,7 +7,7 @@ const Post = gql`
         user:         User!
         body:         String!
         createdAt:    String!
-        likes:        [ID]
+        likes:        [User]
         comments:     [Comment]
         likeCount:    Int!
         commentCount: Int!

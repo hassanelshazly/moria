@@ -232,7 +232,7 @@ function Post(props) {
     likes,
   } = props;
 
-  const [likeState, setLikeState] = useState(likes.includes(user.id));
+  const [likeState, setLikeState] = useState(likes.find(like => like.id == user.id));
   const [commentsState, setCommentsState] = useState(comments);
 
   const handleExpandClick = () => {
