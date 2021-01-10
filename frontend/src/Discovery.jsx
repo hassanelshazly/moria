@@ -1,13 +1,11 @@
 import { Grid,makeStyles,Typography } from '@material-ui/core';
 import React from 'react'
 import UserCard from "./UserCard";
-import pi1 from "./temp_profile_imgs/1.png"
-import pi2 from "./temp_profile_imgs/2.png"
-import pi3 from "./temp_profile_imgs/3.png"
-import pi4 from "./temp_profile_imgs/4.png"
-import pi5 from "./temp_profile_imgs/5.png"
-import pi6 from "./temp_profile_imgs/6.png"
-import pi7 from "./temp_profile_imgs/7.png"
+import { gql, useQuery } from '@apollo/client';
+import { useStateValue } from "<path to root>/state/store";
+
+
+
 
 const useStyles = makeStyles(()=>{
     return {
@@ -19,35 +17,45 @@ const useStyles = makeStyles(()=>{
         }
     }
 })
+const GET_ALL_USERS = gql`
+  query GetAllUsers() {
+    findUsers { //TODO: Change query Name
+      id
+      fullname
+    }
+  }
+`;
 function Discovery() {
-    const classes= useStyles();
+   // eslint-disable-next-line no-unused-vars
+   const { loading, error, data } = useQuery(GET_ALL_USERS);
+   const [{ user }] = useStateValue();
+   
+   if (error) return `Error! ${error.message}`;
+
+   const classes= useStyles();
     return (
         <Grid container direction={"column"}>
 
         <Typography className={classes.headerStyle} variant={"h4"}>People you may know</Typography>
          
         <Grid item container spacing={4}>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Ahmed Essam"} profileImg={pi1}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Hassan"} profileImg={pi2}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Khaled"} profileImg={pi3}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Hosni"} profileImg={pi5}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Radwa"} profileImg={pi4}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Eslam"} profileImg={pi6}/>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-               <UserCard name={"Hussien"} profileImg={pi7}/>
-            </Grid>
+
+           {
+              data.findUsers.map(someuser=>{
+                 if(someuser.id != user.id)
+                 {
+                    return (
+                           <Grid item xs={12} sm={6} md={4}>
+                                 <UserCard name={someuser.fullname} />
+                           </Grid>
+                    )
+                 }
+              })
+           }
+            
+
+
+            
            
             </Grid>
             
