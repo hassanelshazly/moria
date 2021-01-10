@@ -15,6 +15,10 @@ UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
 }
 
+UserModel.statics.findAllUsers = function () {
+    return User.find({});
+}
+
 UserModel.statics.findPosts = async function ({ userId }) {
     const user = await User.findById(userId);
     if (!user)
@@ -152,7 +156,7 @@ UserModel.statics.register = async function (user) {
 
     const existingUsername = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });
-    if (existingUsername | existingEmail)
+    if (existingUsername || existingEmail)
         throw new Error('User exists already!');
 
     // hash the password
