@@ -27,7 +27,9 @@ const GET_USER_POSTS = gql`
         }
         body
         createdAt
-        likes
+        likes {
+          id
+        }
         comments {
           id
           body
@@ -138,7 +140,11 @@ function Profile() {
         title={fullname}
         label="Profile"
         profile_user={{ id: user_id, username }}
-        action={followUser}
+        action={followUser({
+          variables: {
+            user_id
+          }
+        })}
         checked={
           user_name
             ? user.following.some((el) => el.username === user_name)

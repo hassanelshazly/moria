@@ -19,7 +19,9 @@ const GET_FEED_POSTS = gql`
       }
       body
       createdAt
-      likes
+      likes {
+        id
+      }
       comments {
         id
         body
