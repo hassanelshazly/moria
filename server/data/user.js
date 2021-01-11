@@ -20,15 +20,6 @@ UserModel.statics.findAllUsers = function () {
     return User.find({});
 }
 
-UserModel.statics.findPosts = async function ({ userId }) {
-    const user = await User.findById(userId);
-    if (!user)
-        throw new Error("User not found");
-
-    await user.populate('posts').execPopulate();
-    return user.posts.filter(post => !(post.group || post.page));
-}
-
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
     let posts = await User.findPosts({ userId });
@@ -82,28 +73,58 @@ UserModel.statics.savePost = async function ({ userId, postId }) {
     return user;
 }
 
-UserModel.statics.findFollowers = async function ({ userId }) {
-    const user = await User.findById(userId);
+UserModel.statics.findPosts = async function ({ id }) {
+    const user = await User.findById(id);
     if (!user)
         throw new Error("User not found");
+
+    await user.populate('posts').execPopulate();
+    return user.posts.filter(post => !(post.group || post.page));
+}
+
+UserModel.statics.findFollowers = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+
     await user.populate('followers').execPopulate();
     return user.followers;
 }
 
-UserModel.statics.findFollowing = async function ({ userId }) {
-    const user = await User.findById(userId);
+UserModel.statics.findFollowing = async function ({ id }) {
+    const user = await User.findById(id);
     if (!user)
         throw new Error("User not found");
+
     await user.populate('following').execPopulate();
     return user.following;
 }
 
-UserModel.statics.findSavedPosts = async function ({ userId }) {
-    const user = await User.findById(userId);
+UserModel.statics.findSavedPosts = async function ({ id }) {
+    const user = await User.findById(id);
     if (!user)
         throw new Error("User not found");
+
     await user.populate('savedPosts').execPopulate();
     return user.savedPosts;
+}
+
+UserModel.statics.findPages = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+
+    await user.populate('pages').execPopulate();
+    return user.pages;
+}
+
+UserModel.statics.findGroups = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+
+    await user.populate('groups').execPopulate();
+    return user.groups;
 }
 
 UserModel.statics.login = async function ({ username, password }) {
@@ -262,6 +283,22 @@ UserModel.methods.addOrRemoveFollower = async function (userId) {
         this.followers = this.followers.filter(follower => follower != userId);
     else
         this.followers.push(userId);
+    await this.save();
+}
+
+UserModel.methods.addOrRemovePage = async function (pageId) {
+    if (this.pages.includes(pageId))
+        this.pages = this.pages.filter(page => page != pageId);
+    else
+        this.pages.push(pageId);
+    await this.save();
+}
+
+UserModel.methods.addOrRemoveGroup = async function (groupId) {
+    if (this.groups.includes(groupId))
+        this.groups = this.groups.filter(group => group != groupId);
+    else
+        this.groups.push(groupId);
     await this.save();
 }
 

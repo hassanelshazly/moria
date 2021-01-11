@@ -70,6 +70,18 @@ const UserSchema = new mongoose.Schema({
             ref: "GroupChat"
         }
     ],
+    pages: [
+        {
+            type: ObjectId,
+            ref: "Page"
+        }
+    ],
+    groups: [
+        {
+            type: ObjectId,
+            ref: "Group"
+        }
+    ],
 }, { timestamps: true });
 
 // Virtual fields

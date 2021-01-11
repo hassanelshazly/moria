@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 
 const Post = require("./post");
+const User = require("./user");
 const PageModel = require("../models/page");
 const { uploadImage } = require("../util/image");
+const { User } = require("../schema/types/user");
 
 PageModel.statics.findPage = async function ({ pageId }) {
     const page = await Page.findById(pageId);
@@ -24,15 +26,37 @@ PageModel.statics.findOwner = async function ({ id }) {
     return page.owner;
 }
 
+PageModel.statics.findPosts = async function ({ id }) {
+    const page = await Page.findById(id);
+    if (!page)
+        throw new Error("Page not Found");
+
+    await page.populate('posts').execPopulate();
+    return page.posts;
+}
+
+PageModel.statics.findFollowers = async function ({ id }) {
+    const page = await Page.findById(id);
+    if (!page)
+        throw new Error("Page not Found");
+
+    await page.populate('followers').execPopulate();
+    return page.followers;
+}
+
 PageModel.statics.followPage = async function (pageId, userId) {
     if (!userId)
         throw new Error("User not authorized");
 
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not Found");
     const page = await Page.findById(pageId);
     if (!page)
         throw new Error("Page not Found");
 
-    await page.addOrRemoveFollower({ userId });
+    await user.addOrRemovePage(pageId);
+    await page.addOrRemoveFollower(userId);
     return page;
 }
 

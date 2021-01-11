@@ -84,19 +84,27 @@ module.exports = {
 
     User: {
         posts(parent, args) {
-            return User.findPosts({ userId: parent.id });
+            return User.findPosts({ id: parent.id });
         },
 
         savedPosts(parent, args) {
-            return User.findSavedPosts({ userId: parent.id });
+            return User.findSavedPosts({ id: parent.id });
         },
 
         followers(parent, args) {
-            return User.findFollowers({ userId: parent.id });
+            return User.findFollowers({ id: parent.id });
         },
 
         following(parent, args) {
-            return User.findFollowing({ userId: parent.id });
+            return User.findFollowing({ id: parent.id });
+        },
+
+        pages(parent, args) {
+            return User.findPages({ id: parent.id });
+        },
+
+        groups(parent, args) {
+            return User.findGroups({ id: parent.id });
         }
     }
 }
