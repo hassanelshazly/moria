@@ -20,12 +20,17 @@ const Message = gql`
     # }
 
     extend type Query {
-        findMessages(toUserId: ID!): [Message]
+        findMessages(
+            toUserId: ID!
+        ): [Message]
         # findConversations:       [Conversation]
     }
 
     extend type Mutation {
-        sendMessage(toUserId: ID!, body: String!): Message
+        sendMessage(
+            toUserId: ID!, 
+            body: String!
+        ): Message
     }
 
     extend type Subscription {

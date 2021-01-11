@@ -9,8 +9,15 @@ PostModel.statics.findPost = async function ({ postId }) {
     const post = await Post.findById(postId);
     if (!post)
         throw new Error("Post not Found");
-    await post.populate('user').execPopulate();
     return post;
+}
+
+PostModel.statics.findUser = async function ({ id }) {
+    const post = await Post.findById(id);
+    if (!post)
+        throw new Error("Post not Found");
+    await post.populate('user').execPopulate();
+    return post.user;
 }
 
 PostModel.statics.findLikes = async function ({ id }) {
@@ -40,23 +47,28 @@ PostModel.statics.likePost = async function ({ postId, userId }) {
         throw new Error("Post not Found");
 
     await post.addOrRemoveLike({ userId });
-    await post.populate('user').execPopulate();
     return post;
 }
 
 PostModel.statics.createPost = async function (args) {
-    const { userId } = args;
+    const { userId, groupId, pageId } = args;
+    let contentType = POST;
     if (!userId)
         throw new Error("User not authorized");
 
     const post = new Post({
         ...args,
-        user: userId
+        user: userId,
+        group: groupId,
+        page: pageId
     });
     await post.save();
+    
+    // TODO
+    // notifications to group pages
     await Notification.createNotification({
         post,
-        content: POST,
+        content: contentType,
         contentId: post._id,
         author: post.user
     });
@@ -81,7 +93,6 @@ PostModel.statics.createComment = async function (args) {
         contentId: post._id,
         author: userId
     });
-    await post.populate('user').execPopulate();
     return post;
 }
 
@@ -90,7 +101,7 @@ PostModel.statics.deletePost = async function ({ postId, userId }) {
     if (!post)
         throw new Error("Post not found");
 
-    if (!userId || userId != post.userId)
+    if (!groupId || !userId || userId != post.userId)
         throw new Error("User not authorized");
 
     await post.delete();
@@ -146,7 +157,6 @@ PostModel.methods.addOrRemoveLike = async function ({ userId }) {
     }
 
 }
-
 
 const Post = mongoose.model("Post", PostModel);
 module.exports = Post;

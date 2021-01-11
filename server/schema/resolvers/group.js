@@ -7,6 +7,10 @@ module.exports = {
     Query: {
         findGroup(_, args) {
             return Group.findGroup(args);
+        },
+
+        findAllGroups(_, args) {
+            return Group.findAllGroups(args);
         }
     },
 
@@ -26,14 +30,14 @@ module.exports = {
         },
 
         createGroupPost(_, args, context) {
-            return Page.createPost({
+            return Group.createGroupPost({
                 ...args,
                 ...getAuthUser(context)
             });
         },
 
         deleteGroupPost(_, args, context) {
-            return Page.deletePost({
+            return Group.deleteGroupPost({
                 ...args,
                 ...getAuthUser(context)
             });
@@ -42,12 +46,29 @@ module.exports = {
 
 
     Group: {
-        posts(parent, args) {
-            return null;
+        admin(parent, args, context) {
+            return Group.findAdmin({ id: parent.id });
         },
 
-        members(parent, args) {
-            return null;
+        posts(parent, args, context) {
+            return Group.findPosts({
+                id: parent.id,
+                ...getAuthUser(context)
+            });
+        },
+
+        members(parent, args, context) {
+            return Group.findMembers({
+                id: parent.id,
+                ...getAuthUser(context)
+            });
+        },
+
+        requests(parent, args, context) {
+            return Group.findRequests({
+                id: parent.id,
+                ...getAuthUser(context)
+            });
         }
     }
 }

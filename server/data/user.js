@@ -24,13 +24,8 @@ UserModel.statics.findPosts = async function ({ userId }) {
     if (!user)
         throw new Error("User not found");
 
-    await user.populate({
-        path: 'posts',
-        populate: {
-            path: 'user'
-        }
-    }).execPopulate();
-    return user.posts;
+    await user.populate('posts').execPopulate();
+    return user.posts.filter(post => !(post.group || post.page));
 }
 
 UserModel.statics.findTimeline = async function ({ userId }) {

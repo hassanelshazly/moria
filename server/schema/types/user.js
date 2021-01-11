@@ -16,11 +16,17 @@ const User = gql`
     }
 
     extend type Query {
-        findUser(username: String!): User
-        findAllUsers:               [User]
-        findPosts(userId: String!): [Post]
-        findTimeline:               [Post]
-        isActivated:                Boolean
+        findUser(
+            username: String!
+        ): User
+
+        findPosts(
+            userId: String!
+        ): [Post]
+
+        findAllUsers: [User]
+        findTimeline: [Post]
+        isActivated:  Boolean
     }
 
     extend type Mutation {
@@ -48,8 +54,13 @@ const User = gql`
             activationToken: String!
         ): User
 
-        follow(id: ID!):       User
-        savePost(postId: ID!): User
+        follow(
+            id: ID!
+        ): User
+
+        savePost(
+            postId: ID!
+        ): User
     }
 `;
 

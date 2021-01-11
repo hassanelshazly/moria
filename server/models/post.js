@@ -11,6 +11,20 @@ const PostSchema = new mongoose.Schema({
         required: true,
         ref: 'User'
     },
+    group: {
+        type: ObjectId,
+        ref: 'Group'
+    },
+    imageUrl: {
+        type: String,
+    },
+    imageId: {
+        type: String,
+    },
+    page: {
+        type: ObjectId,
+        ref: 'Page'
+    },
     likes: [
         {
             type: ObjectId,

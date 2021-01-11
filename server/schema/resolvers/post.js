@@ -51,7 +51,6 @@ module.exports = {
         async uploadImage(_, args, context) {
             let result;
             try {
-               
                 result = await cloudinary.v2.uploader.upload(args.url, {
                     allowed_formats: ["jpg", "png"],
                     public_id: "",
@@ -60,11 +59,16 @@ module.exports = {
             } catch (e) {
                 return `Image could not be uploaded:${e.message}`;
             }
+            console.log(result);
             return `Successful-Photo URL: ${result.url}`;
         }
     },
 
     Post: {
+        user(parent) {
+            return Post.findUser({ id: parent.id });
+        },
+
         likeCount(parent) {
             return parent.likes.length;
         },

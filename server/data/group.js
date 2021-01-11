@@ -1,24 +1,88 @@
 const mongoose = require("mongoose");
 
 const GroupModel = require("../models/group");
+const User = require("./user");
+const Post = require("./post");
 
 GroupModel.statics.findGroup = async function (args) {
     const group = await Group.findById(groupId);
-    await group.populate('admin').execPopulate();
+    if (!group)
+        throw new Error("Group not found");
     return group;
 }
 
+GroupModel.statics.findAllGroups = async function (args) {
+    return await Group.find({});
+}
+
+GroupModel.statics.findAdmin = async function ({ id }) {
+    const group = await Group.findById(id);
+    if (!group)
+        throw new Error("Group not found");
+
+    await group.populate('admin').execPopulate();
+    return group.admin;
+}
+
+GroupModel.statics.findMembers = async function ({ id, userId }) {
+    const group = await Group.findById(id);
+    if (!group)
+        throw new Error("Group not found");
+
+    if (!group.members.includes(userId) && group.admin != userId)
+        throw new Error("User not authorized");
+
+    await group.populate('members').execPopulate();
+    return group.members;
+}
+
+GroupModel.statics.findPosts = async function ({ id, userId }) {
+    const group = await Group.findById(id);
+    if (!group)
+        throw new Error("Group not found");
+
+    if (!group.members.includes(userId) && group.admin != userId)
+        throw new Error("User not authorized");
+
+    await group.populate('posts').execPopulate();
+    return group.posts;
+}
+
+GroupModel.statics.findRequests = async function ({ id, userId }) {
+    const group = await Group.findById(id);
+    if (!group)
+        throw new Error("Group not found");
+
+    if (group.admin != userId)
+        throw new Error("User not authorized");
+
+    await group.populate('requests').execPopulate();
+    return group.requests;
+}
+
 GroupModel.statics.createGroup = async function (args) {
-    const { userId } = args;
+    const { userId, title, membersId } = args;
     if (!userId)
         throw new Error("User not authorized")
 
-    const group = new Group({
-        ...args,
-        user: userId
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const members = membersId.map(async memberId => {
+        const member = await User.findById(memberId);
+        if (!member)
+            throw new Error("Member not found");
+        return member;
     });
+
+    const group = new Group({
+        title,
+        admin: userId,
+        members: membersId
+    });
+
     await group.save();
-    await group.populate('admin').execPopulate();
     return group
 }
 
@@ -26,16 +90,19 @@ GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {
     const group = await Group.findById(groupId);
     if (!group)
         throw new Error("Group not found");
-    
-    if (!userId || userId != group.userId)
-    throw new Error("User not authorized");
 
-    await page.delete();
+    if (!userId || userId != group.admin)
+        throw new Error("User not authorized");
+
+    // TDOD
+    // delete posts
+
+    await group.delete();
     return "Group deleted successfully!";
 }
 
 GroupModel.statics.createGroupPost = async function (args) {
-    const { groupId, body, userId } = args;
+    const { groupId, userId } = args;
     if (!userId)
         throw new Error("User not authorized")
 
@@ -43,10 +110,14 @@ GroupModel.statics.createGroupPost = async function (args) {
     if (!group)
         throw new Error("Group not found");
 
-    group.posts.push({ userId, body });
+    if (!group.members.includes(userId) && group.admin != userId)
+        throw new Error("User not authorized")
+
+    const post = await Post.createPost(args);
+
+    group.posts.push(post._id);
     await group.save();
-    await group.populate('admin').execPopulate();
-    return group;
+    return post;
 }
 
 GroupModel.statics.deleteGroupPost = async function (args) {
@@ -57,13 +128,12 @@ GroupModel.statics.deleteGroupPost = async function (args) {
 
     const pIdx = group.posts.findIndex(post => post._id == postId);
 
-    if (pIdx == -1 || group.posts[pIdx].userId != userId)
+    if (pIdx == -1 || group.posts[pIdx].user != userId || group.admin != userId)
         throw new Error("User not authorized");
 
     group.posts.splice(pIdx, 1);
     await group.save();
-    await group.populate('admin').execPopulate;
-    return group
+    return await Post.deletePost(args);
 }
 
 

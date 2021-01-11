@@ -21,16 +21,32 @@ const Post = gql`
     }
 
     extend type Query {
-        findPost(postId: ID!):     Post
+        findPost(postId: ID!):   Post
     }
 
     extend type Mutation {
-        likePost(postId: ID!):     Post
-        createPost(body: String!): Post!
-        deletePost(postId: ID!):   String
+        likePost(
+            postId: ID!
+        ): Post
+        
+        createPost(
+            body: String!, 
+            imageSrc: String
+        ): Post!
+        
+        deletePost(
+            postId: ID!
+        ): String
 
-        createComment(postId: ID!, body: String!):  Post!
-        deleteComment(postId: ID!, commentId: ID!): Post
+        createComment(
+            postId: ID!, 
+            body: String!
+        ):  Post!
+
+        deleteComment(
+            postId: ID!, 
+            commentId: ID!
+        ): Post
 
         uploadImage(url: String!): String
     }

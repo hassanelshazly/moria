@@ -48,7 +48,7 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: ({ req, connection }) => ({ req, connection }),
-    plugins: [myPlugin],
+    // plugins: [myPlugin],
 });
 
 // Connect to the database

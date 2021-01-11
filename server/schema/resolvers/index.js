@@ -32,12 +32,20 @@ module.exports = {
         ...notificationResolvers.Subscription
     },
 
+    Post: {
+        ...postResolvers.Post
+    },
+
     User: {
         ...userResolvers.User
     },
 
-    Post: {
-        ...postResolvers.Post
+    Page: {
+        ...pageResolvers.Page
+    },
+
+    Group: {
+        ...groupResolvers.Group
     },
 
     UserGroup: {

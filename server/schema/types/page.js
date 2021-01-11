@@ -3,25 +3,44 @@ const { gql } = require('apollo-server');
 const Page = gql`
 
     type Page {
-        id:         ID!
-        owner:      User!
-        title:      String!
-        desc:       String
-        createdAt:  String
-        followers:  [User]
-        posts:      [Post]
+        id:          ID!
+        owner:       User!
+        title:       String!
+        description: String
+        createdAt:   String
+        followers:   [User]
+        posts:       [Post]
     }
 
     extend type Query {
-        findPage(pageId: ID!):     Page
+        findPage(
+            pageId: ID!
+        ): Page
+
+        findAllPages: [Page]
     }
 
     extend type Mutation {
-        followPage(postId: ID!):        Page
-        createPage(title: String!):     Page!
-        deletePage(title: String!):      String
-        createPagePost(body: String!):  Post!
-        deletePagePost(postId: ID!):    String
+        followPage(
+            pageId: ID!
+        ): Page
+
+        createPage(
+            title: String!
+        ): Page!
+
+        deletePage(
+            pageId: ID!
+        ): String
+        
+        createPagePost(
+            pageId: ID!, 
+            body: String!
+        ): Post!
+        
+        deletePagePost(
+            postId: ID!
+        ): String
     }
 `;
 
