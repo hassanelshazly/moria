@@ -169,7 +169,7 @@ UserModel.statics.register = async function (user) {
     newUser.activationToken = activationToken;
     await newUser.save();
 
-    sendVerifyMail(email, fullname, activationToken);
+    // sendVerifyMail(email, fullname, activationToken);
     newUser.generateAuthToken();
 
     return newUser;

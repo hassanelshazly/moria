@@ -1,17 +1,14 @@
-import React, { useMemo } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
-import InfoHeader from "../components/InfoHeader";
+import ProfileHeader from "../components/ProfileHeader";
 import Posts from "../components/Posts";
-import Skeleton from "@material-ui/lab/Skeleton";
 
 import { useRouteMatch, Redirect } from "react-router-dom";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { connect } from "react-redux";
 import { showSnackbar } from "../state/actions";
+
+import useTraceUpdate from "../utils/useTraceUpdate";
 
 const GET_USER_POSTS = gql`
   query GetUserPosts($user_name: String!) {
@@ -19,6 +16,12 @@ const GET_USER_POSTS = gql`
       id
       username
       fullname
+      followers {
+        id
+      }
+      following {
+        id
+      }
       posts {
         id
         user {
@@ -47,31 +50,9 @@ const GET_USER_POSTS = gql`
   }
 `;
 
-const FOLLOW_USER = gql`
-  mutation FollowUser($user_id: ID!) {
-    follow(id: $user_id) {
-      id
-    }
-  }
-`;
-
-const useStyles = makeStyles(() => ({
-  media: {
-    height: 190,
-  },
-}));
-
 function Profile(props) {
-  // eslint-disable-next-line no-empty-pattern
+  useTraceUpdate(props);
   const { user, showSnackbar } = props;
-  const [followUser] = useMutation(FOLLOW_USER, {
-    onCompleted() {
-      showSnackbar("success", "Successfully followed");
-    },
-    onError(error) {
-      showSnackbar("error", error.message);
-    },
-  });
 
   const match = useRouteMatch("/profile/:user_name");
   let user_name = null;
@@ -86,74 +67,34 @@ function Profile(props) {
     skip: !user,
   });
 
-  const classes = useStyles();
+  if (error) {
+    showSnackbar("error", error.message);
+    return <Redirect to="/" />;
+  }
 
-  return useMemo(() => {
-    if (loading)
-      return (
-        <Card>
-          <CardHeader
-            avatar={
-              <Skeleton
-                animation="wave"
-                variant="circle"
-                width={40}
-                height={40}
-              />
-            }
-            title={
-              <Skeleton
-                animation="wave"
-                height={10}
-                width="80%"
-                style={{ marginBottom: 6 }}
-              />
-            }
-            subheader={<Skeleton animation="wave" height={10} width="40%" />}
-          />
-          <Skeleton animation="wave" variant="rect" className={classes.media} />
-          <CardContent>
-            <React.Fragment>
-              <Skeleton
-                animation="wave"
-                height={10}
-                style={{ marginBottom: 6 }}
-              />
-              <Skeleton animation="wave" height={10} width="80%" />
-            </React.Fragment>
-          </CardContent>
-        </Card>
-      );
+  const findUser = data ? data.findUser : {};
+  const {
+    id: user_id,
+    username,
+    fullname,
+    posts,
+    followers,
+    following,
+  } = findUser;
 
-    if (error) {
-      showSnackbar("error", error.message);
-      return <Redirect to="/" />;
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    const { id: user_id, username, fullname, posts } = data.findUser;
-
-    return (
-      <React.Fragment>
-        <InfoHeader
-          title={fullname}
-          label="Profile"
-          profile_user={{ id: user_id, username }}
-          action={followUser}
-          checked={
-            user_name
-              ? user.following.some((el) => el.username === user_name)
-              : null
-          }
-        />
-        <br />
-        <Posts posts={posts} />
-      </React.Fragment>
-    );
-  }, [user, data, loading, error]);
+  return (
+    <React.Fragment>
+      <ProfileHeader
+        profile_user={{ id: user_id, username, fullname }}
+        loading={loading}
+        followingCount={following ? following.length : 0}
+        followersCount={followers ? followers.length : 0}
+        postsCount={posts ? posts.length : 0}
+      />
+      <br />
+      {posts && <Posts posts={posts} />}
+    </React.Fragment>
+  );
 }
 
 Profile.propTypes = {
