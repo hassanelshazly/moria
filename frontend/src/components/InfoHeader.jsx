@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
@@ -18,6 +19,7 @@ import Avatar from "../assets/images/avatar-0.png";
 
 import { connect } from "react-redux";
 import { setDialog, setUser } from "../state/actions";
+import { Grid, useMediaQuery } from "@material-ui/core";
 
 const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
   relative: { position: "relative" },
@@ -94,15 +96,34 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
   input: {
     display: "none",
   },
+  userDetailsStyling:{
+    marginTop:"24px",
+    textAlign:"center",
+    textTransform:"uppercase",
+    fontWeight:"bold",
+    marginRight:"10px",
+    [breakpoints.up("md")]: { fontSize: "14px" },
+    [breakpoints.down("md")]: { fontSize: "12px" },
+    [breakpoints.down("sm")]: { fontSize: "10px" },
+    [breakpoints.down("xs")]: { display:"none" }
+
+  },
+  userCountDetailsStyling:{
+    marginTop:"10px"
+  }
 }));
 
 function InfoHeader(props) {
-  const { user, setDialog, setUser } = props;
+  const {user,setDialog,setUser,postsCount,followersCount,followingCount } = props;
+  
 
   const { title, label, profile_user, action, checked } = props;
 
   const classes = useStyles();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
+    defaultMatches: true,
+  });
   const width = useWidth();
   const cardContent = useRef(null);
   const [cover, setCover] = React.useState(null);
@@ -207,18 +228,46 @@ function InfoHeader(props) {
               </label>
             </div>
             <div className={classes.details}>
-              <CardContent className={classes.content}>
-                <Typography component="h1" variant="h5">
-                  {title}
-                </Typography>
-                <Chip
-                  variant="outlined"
-                  size="small"
-                  icon={<FaceIcon />}
-                  label={label ? label : "Profile"}
-                  color="primary"
-                />
-              </CardContent>
+              <Grid container>
+                <Grid item xs={isMobile? 12: 4}>
+                  <CardContent className={classes.content}>
+                    <Typography component="h1" variant="h5">
+                      {title}
+                    </Typography>
+                    <Chip
+                      variant="outlined"
+                      size="small"
+                      icon={<FaceIcon />}
+                      label={label ? label : "Profile"}
+                      color="primary"
+                    />
+                  </CardContent>
+              </Grid>
+              <Grid item xs={isMobile? 0: 8}>
+                  <div className={classes.userDetailsStyling}>
+                        <Grid container spacing={2}>
+                          <Grid xs={4} item>posts
+                            <br/>
+                            <p className={classes.userCountDetailsStyling}>
+                              {postsCount}
+                            </p>
+                          </Grid>
+                          <Grid xs={4} item>followers
+                            <br/>
+                            <p className={classes.userCountDetailsStyling}>
+                              {followersCount}
+                            </p>
+                          </Grid>
+                          <Grid xs={4} item>following <br/>
+                            <p className={classes.userCountDetailsStyling}>
+                              {followingCount}
+                            </p></Grid>
+                          
+                        </Grid>
+                  </div>
+              </Grid>
+
+              </Grid>
               <div className={classes.controls}>
                 <Button color="red" onClick={handleAction}>
                   Post Now
@@ -237,6 +286,13 @@ function InfoHeader(props) {
                 )}
               </div>
             </div>
+
+
+            
+
+
+
+
           </Card>
         </CardContent>
       </Card>
