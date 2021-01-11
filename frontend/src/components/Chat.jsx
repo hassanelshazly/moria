@@ -159,7 +159,10 @@ const Chat = (props) => {
     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
-
+  const [filter , setFilter] = useState("");
+  const handleSearchChange = (e)=>{
+    setFilter(e.target.value);
+  }
   // Dummy Data
   //   const user = {id:100 , fullname:"Ahmed Essam" ,
   //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
@@ -224,14 +227,16 @@ const Chat = (props) => {
               id="outlined-basic-email"
               label="Search"
               variant="outlined"
+              onChange={handleSearchChange}
               fullWidth
             />
           </Grid>
           <Divider />
-          <List>
+          <List style={{ maxHeight:"460px" ,overflow:"auto"}}>
             {/* Online People */}
 
             {user.following.map((someuser) => (
+              someuser.fullname.includes(filter) &&
               <ListItem
                 button
                 key={someuser.id}
@@ -289,7 +294,7 @@ const Chat = (props) => {
               <Picker onSelect={addEmoji} />
             </span>
           )}
-          <Grid container style={{ padding: "20px" }}>
+          <Grid container style={{ padding: "20px" , display: currentReceiver=="#" ? "none": "block" }}>
             <Grid container spacing={isMobile ? 4 : 2}>
               <Grid xs={2} sm={1} align="left">
                 <Fab
