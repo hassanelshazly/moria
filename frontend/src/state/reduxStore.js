@@ -1,4 +1,53 @@
-import { actionTypes } from "./actions";
+import { createStore } from "redux";
+
+export const actionTypes = {
+  SET_USER: "SET_USER",
+  SET_DIALOG: "SET_DIALOG",
+  SHOW_SNACKBAR: "SHOW_SNACKBAR",
+  SET_SNACKBAR: "SET_SNACKBAR",
+  FILL_FORM: "FILL_FORM",
+  SET_MENU_ANCHOR: "SET_MENU_ANCHOR",
+};
+
+export function setUser(user) {
+  return {
+    type: actionTypes.SET_USER,
+    user,
+  };
+}
+
+export function setDialog(dialog) {
+  return {
+    type: actionTypes.SET_DIALOG,
+    dialog,
+  };
+}
+
+export function showSnackbar(variant, message, actionLabel, action) {
+  return {
+    type: actionTypes.SHOW_SNACKBAR,
+    variant,
+    message,
+    actionLabel,
+    action,
+  };
+}
+
+export function setSnackbar(open, messageInfo) {
+  return {
+    type: actionTypes.SET_SNACKBAR,
+    open,
+    messageInfo,
+  };
+}
+
+export function setMenuAnchor(menu, anchor) {
+  return {
+    type: actionTypes.SET_MENU_ANCHOR,
+    menu,
+    anchor,
+  };
+}
 
 export const initialState = {
   user: null,
@@ -7,7 +56,7 @@ export const initialState = {
   menus: { account: null },
 };
 
-export const reducer = (state, action) => {
+export const rootReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SET_USER:
       return { ...state, user: action.user };
@@ -69,3 +118,7 @@ export const reducer = (state, action) => {
       return state;
   }
 };
+
+const store = createStore(rootReducer);
+
+export default store;

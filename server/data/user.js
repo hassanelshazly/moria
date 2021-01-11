@@ -15,6 +15,10 @@ UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
 }
 
+UserModel.statics.findAllUsers = function () {
+    return User.find({});
+}
+
 UserModel.statics.findPosts = async function ({ userId }) {
     const user = await User.findById(userId);
     if (!user)
@@ -31,14 +35,17 @@ UserModel.statics.findPosts = async function ({ userId }) {
 
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
-    let posts = [];
-    user.following.forEach(following => {
-        posts = posts.concat(User.findPosts({ userId: following._id }));
+    let posts = await User.findPosts({ userId });
+    user.following.forEach(async following => {
+        posts = posts.concat(await User.findPosts({ userId: following._id }));
     });
     return posts;
 }
 
 UserModel.statics.follow = async function ({ userId, id }) {
+    if(id == userId)
+        throw new Error("Really! Are you trying to follow youself?");
+
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
@@ -46,7 +53,7 @@ UserModel.statics.follow = async function ({ userId, id }) {
     const toFollow = await User.findById(id);
     if (!toFollow)
         throw new Error("User not found");
-
+        
     const created = await user.addOrRemoveFollowing(id);
     await toFollow.addOrRemoveFollower(userId);
 
@@ -105,22 +112,17 @@ UserModel.statics.findSavedPosts = async function ({ userId }) {
 }
 
 UserModel.statics.login = async function ({ username, password }) {
-    // get user from database
     const user = await User.findOne({ username });
 
-    // in case of the user is not in the database
     if (!user)
         throw new Error("User not found");
 
-    // match the passward
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
         throw new Error("Password does not match");
 
-    // genertate jwt token for the session
     user.generateAuthToken();
 
-    // return the user
     return user;
 }
 
@@ -143,7 +145,7 @@ UserModel.statics.verifyAccount = async function ({ activationToken }) {
 
 UserModel.statics.register = async function (user) {
     let { username, fullname, email, password } = user;
-    // validate the data
+
     if (!validator.isEmail(email))
         throw new Error("E-Mail is invalid.");
 
@@ -152,14 +154,12 @@ UserModel.statics.register = async function (user) {
 
     const existingUsername = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });
-    if (existingUsername | existingEmail)
+    if (existingUsername || existingEmail)
         throw new Error('User exists already!');
 
-    // hash the password
     user.password = await bcrypt.hash(password,
         parseInt(process.env.SALT_LENGTH));
 
-    // Store into the database
     const newUser = new User(user);
     await newUser.save();
 
@@ -167,13 +167,9 @@ UserModel.statics.register = async function (user) {
     newUser.activationToken = activationToken;
     await newUser.save();
 
-    // send verifaction mail 
     sendVerifyMail(email, fullname, activationToken);
-
-    // genertate jwt token for the session
     newUser.generateAuthToken();
 
-    // return the user
     return newUser;
 }
 

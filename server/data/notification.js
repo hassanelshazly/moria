@@ -12,7 +12,6 @@ const {
 
 async function resolvePost(post) {
     await post.populate('user').execPopulate();
-    console.log(post.user.followers.map(follower => follower._id));
     return post.user.followers.map(follower => follower._id);
 }
 
