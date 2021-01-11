@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -18,7 +19,7 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
 import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
-import { useStateValue } from "./../state/store";
+import { connect } from "react-redux";
 
 import classNames from "classnames";
 import Message from "./Message";
@@ -88,7 +89,12 @@ const GET_MESSAGES = gql`
         id
       }
       to {
-        id
+        ... on User {
+          id
+        }
+        ... on GroupChat {
+          id
+        }
       }
       body
       createdAt
@@ -104,15 +110,21 @@ const SEND_MESSAGE = gql`
         id
       }
       to {
-        id
+        ... on User {
+          id
+        }
+        ... on GroupChat {
+          id
+        }
       }
       body
       createdAt
     }
   }
 `;
-const Chat = () => {
-  const [{ user }] = useStateValue();
+
+const Chat = (props) => {
+  const { user } = props;
   const [addMessage] = useMutation(SEND_MESSAGE);
 
   const res1 = useQuery(GET_MESSAGES, {
@@ -147,7 +159,10 @@ const Chat = () => {
     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
-
+  const [filter , setFilter] = useState("");
+  const handleSearchChange = (e)=>{
+    setFilter(e.target.value);
+  }
   // Dummy Data
   //   const user = {id:100 , fullname:"Ahmed Essam" ,
   //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
@@ -212,14 +227,16 @@ const Chat = () => {
               id="outlined-basic-email"
               label="Search"
               variant="outlined"
+              onChange={handleSearchChange}
               fullWidth
             />
           </Grid>
           <Divider />
-          <List>
+          <List style={{ maxHeight:"460px" ,overflow:"auto"}}>
             {/* Online People */}
 
             {user.following.map((someuser) => (
+              someuser.fullname.includes(filter) &&
               <ListItem
                 button
                 key={someuser.id}
@@ -277,7 +294,7 @@ const Chat = () => {
               <Picker onSelect={addEmoji} />
             </span>
           )}
-          <Grid container style={{ padding: "20px" }}>
+          <Grid container style={{ padding: "20px" , display: currentReceiver=="#" ? "none": "block" }}>
             <Grid container spacing={isMobile ? 4 : 2}>
               <Grid xs={2} sm={1} align="left">
                 <Fab
@@ -321,4 +338,12 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+Chat.propTypes = {
+  user: PropTypes.any,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+export default connect(mapStateToProps)(Chat);

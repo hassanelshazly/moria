@@ -28,7 +28,7 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { formatDistance } from "date-fns";
 
 import { gql, useMutation } from "@apollo/client";
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { showSnackbar } from "../state/actions";
 
 const ADD_COMMENT = gql`
@@ -101,21 +101,16 @@ const commentPropTypes = {
 
 Comment.propTypes = commentPropTypes;
 
-function CommentInput(props) {
+function CommentInputSender(props) {
   const classes = usePostStyles();
-  const [
-    {
-      user: { id, username, fullname },
-    },
-    dispatch,
-  ] = useStateValue();
+  const {
+    user: { id, username, fullname },
+    showSnackbar,
+  } = props;
   const [text, setText] = useState("");
   const [addComment] = useMutation(ADD_COMMENT, {
-    onCompleted() {
-      dispatch(showSnackbar("success", "Successfully commented"));
-    },
     onError(error) {
-      dispatch(showSnackbar("error", error.message));
+      showSnackbar("error", error.message);
     },
   });
 
@@ -180,9 +175,27 @@ function CommentInput(props) {
 const commentInputPropTypes = {
   post_id: PropTypes.string.isRequired,
   setCommentsState: PropTypes.func.isRequired,
+  user: PropTypes.any,
+  showSnackbar: PropTypes.func.isRequired,
 };
 
-CommentInput.propTypes = commentInputPropTypes;
+CommentInputSender.propTypes = commentInputPropTypes;
+
+const mapCommentInputStateToProps = (state) => {
+  return { user: state.user };
+};
+
+function mapCommentInputDispatchToProps(dispatch) {
+  return {
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+const CommentInput = connect(
+  mapCommentInputStateToProps,
+  mapCommentInputDispatchToProps
+)(CommentInputSender);
 
 const usePostStyles = makeStyles((theme) => ({
   media: {
@@ -208,16 +221,13 @@ const usePostStyles = makeStyles((theme) => ({
   },
 }));
 
-function Post(props) {
+function PostViewer(props) {
   const classes = usePostStyles();
   const [expanded, setExpanded] = React.useState(false);
-  const [{ user }, dispatch] = useStateValue();
+  const { current_user, showSnackbar } = props;
   const [likePost] = useMutation(LIKE_POST, {
-    onCompleted() {
-      dispatch(showSnackbar("success", "Successfully liked"));
-    },
     onError(error) {
-      dispatch(showSnackbar("error", error.message));
+      showSnackbar("error", error.message);
     },
   });
 
@@ -232,7 +242,9 @@ function Post(props) {
     likes,
   } = props;
 
-  const [likeState, setLikeState] = useState(likes.find(like => like.id == user.id));
+  const [likeState, setLikeState] = useState(
+    likes.some((el) => el.id === current_user.id)
+  );
   const [commentsState, setCommentsState] = useState(comments);
 
   const handleExpandClick = () => {
@@ -330,9 +342,24 @@ const postPropTypes = {
   user: PropTypes.exact(userPropTypes),
   user_photo: PropTypes.string,
   image: PropTypes.string,
+  current_user: PropTypes.any,
+  showSnackbar: PropTypes.func.isRequired,
 };
 
-Post.propTypes = postPropTypes;
+PostViewer.propTypes = postPropTypes;
+
+const mapPostStateToProps = (state) => {
+  return { current_user: state.user };
+};
+
+function mapPostDispatchToProps(dispatch) {
+  return {
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+const Post = connect(mapPostStateToProps, mapPostDispatchToProps)(PostViewer);
 
 function Posts(props) {
   return (

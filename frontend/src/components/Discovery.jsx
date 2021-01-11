@@ -1,8 +1,10 @@
 import { Grid, makeStyles, Typography } from "@material-ui/core";
 import React from "react";
+import PropTypes from "prop-types";
 import UserCard from "./UserCard";
+
 import { gql, useQuery } from "@apollo/client";
-import { useStateValue } from "<path to root>/state/store";
+import { connect } from "react-redux";
 
 const useStyles = makeStyles(() => {
   return {
@@ -22,10 +24,10 @@ const GET_ALL_USERS = gql`
     }
   }
 `;
-function Discovery() {
+function Discovery(props) {
   // eslint-disable-next-line no-unused-vars
   const { loading, error, data } = useQuery(GET_ALL_USERS);
-  const [{ user }] = useStateValue();
+  const { user } = props;
 
   if (error) return `Error! ${error.message}`;
 
@@ -51,4 +53,12 @@ function Discovery() {
   );
 }
 
-export default Discovery;
+Discovery.propTypes = {
+  user: PropTypes.any,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+export default connect(mapStateToProps)(Discovery);

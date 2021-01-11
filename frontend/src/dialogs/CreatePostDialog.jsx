@@ -13,7 +13,7 @@ import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
 import { gql, useMutation } from "@apollo/client";
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
 const ADD_POST = gql`
@@ -79,14 +79,14 @@ function CreatePostDialog(props) {
   const [cardContentHeight, setCardContentHeight] = React.useState(0);
 
   // eslint-disable-next-line no-empty-pattern
-  const [{}, dispatch] = useStateValue();
+  const { setDialog, showSnackbar } = props;
   const [addPost] = useMutation(ADD_POST, {
     onCompleted() {
-      dispatch(setDialog(null));
-      dispatch(showSnackbar("success", "Successfully posted"));
+      setDialog(null);
+      showSnackbar("success", "Successfully posted");
     },
     onError(error) {
-      dispatch(showSnackbar("error", error.message));
+      showSnackbar("error", error.message);
     },
   });
 
@@ -189,6 +189,16 @@ function CreatePostDialog(props) {
 
 CreatePostDialog.propTypes = {
   label: PropTypes.string,
+  setDialog: PropTypes.func.isRequired,
+  showSnackbar: PropTypes.func.isRequired,
 };
 
-export default CreatePostDialog;
+function mapDispatchToProps(dispatch) {
+  return {
+    setDialog: (dialog) => dispatch(setDialog(dialog)),
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+export default connect(null, mapDispatchToProps)(CreatePostDialog);

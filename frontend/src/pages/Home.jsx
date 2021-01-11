@@ -1,11 +1,12 @@
 import React from "react";
+import PropTypes from "prop-types";
 import CallToAction from "../components/CallToAction";
 import Grid from "@material-ui/core/Grid";
 import Posts from "../components/Posts";
 
 import { Redirect } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
 const GET_FEED_POSTS = gql`
@@ -37,20 +38,20 @@ const GET_FEED_POSTS = gql`
   }
 `;
 
-function Home() {
-  const [{ user }, dispatch] = useStateValue();
+function Home(props) {
+  const { user, showSnackbar, setDialog } = props;
   const { error, data } = useQuery(GET_FEED_POSTS, {
     skip: !user,
   });
 
   if (error) {
-    dispatch(showSnackbar("error", error.message));
+    showSnackbar("error", error.message);
     return <Redirect to="/" />;
   }
 
   const handleAction = () => {
-    if (user) dispatch(setDialog("create-post"));
-    else dispatch(setDialog("sign-in"));
+    if (user) setDialog("create-post");
+    else setDialog("sign-in");
   };
 
   return (
@@ -75,4 +76,22 @@ function Home() {
   );
 }
 
-export default Home;
+Home.propTypes = {
+  user: PropTypes.any,
+  setDialog: PropTypes.func.isRequired,
+  showSnackbar: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    setDialog: (dialog) => dispatch(setDialog(dialog)),
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

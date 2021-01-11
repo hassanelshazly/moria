@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
+import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -9,7 +10,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 
 import { useRouteMatch, Redirect } from "react-router-dom";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { showSnackbar } from "../state/actions";
 
 const GET_USER_POSTS = gql`
@@ -60,15 +61,15 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function Profile() {
+function Profile(props) {
   // eslint-disable-next-line no-empty-pattern
-  const [{ user }, dispatch] = useStateValue();
+  const { user, showSnackbar } = props;
   const [followUser] = useMutation(FOLLOW_USER, {
     onCompleted() {
-      dispatch(showSnackbar("success", "Successfully followed"));
+      showSnackbar("success", "Successfully followed");
     },
     onError(error) {
-      dispatch(showSnackbar("error", error.message));
+      showSnackbar("error", error.message);
     },
   });
 
@@ -87,74 +88,88 @@ function Profile() {
 
   const classes = useStyles();
 
-  if (loading)
+  return useMemo(() => {
+    if (loading)
+      return (
+        <Card>
+          <CardHeader
+            avatar={
+              <Skeleton
+                animation="wave"
+                variant="circle"
+                width={40}
+                height={40}
+              />
+            }
+            title={
+              <Skeleton
+                animation="wave"
+                height={10}
+                width="80%"
+                style={{ marginBottom: 6 }}
+              />
+            }
+            subheader={<Skeleton animation="wave" height={10} width="40%" />}
+          />
+          <Skeleton animation="wave" variant="rect" className={classes.media} />
+          <CardContent>
+            <React.Fragment>
+              <Skeleton
+                animation="wave"
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation="wave" height={10} width="80%" />
+            </React.Fragment>
+          </CardContent>
+        </Card>
+      );
+
+    if (error) {
+      showSnackbar("error", error.message);
+      return <Redirect to="/" />;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const { id: user_id, username, fullname, posts } = data.findUser;
+
     return (
-      <Card>
-        <CardHeader
-          avatar={
-            <Skeleton
-              animation="wave"
-              variant="circle"
-              width={40}
-              height={40}
-            />
+      <React.Fragment>
+        <InfoHeader
+          title={fullname}
+          label="Profile"
+          profile_user={{ id: user_id, username }}
+          action={followUser}
+          checked={
+            user_name
+              ? user.following.some((el) => el.username === user_name)
+              : null
           }
-          title={
-            <Skeleton
-              animation="wave"
-              height={10}
-              width="80%"
-              style={{ marginBottom: 6 }}
-            />
-          }
-          subheader={<Skeleton animation="wave" height={10} width="40%" />}
         />
-        <Skeleton animation="wave" variant="rect" className={classes.media} />
-        <CardContent>
-          <React.Fragment>
-            <Skeleton
-              animation="wave"
-              height={10}
-              style={{ marginBottom: 6 }}
-            />
-            <Skeleton animation="wave" height={10} width="80%" />
-          </React.Fragment>
-        </CardContent>
-      </Card>
+        <br />
+        <Posts posts={posts} />
+      </React.Fragment>
     );
-
-  if (error) {
-    dispatch(showSnackbar("error", error.message));
-    return <Redirect to="/" />;
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  const { id: user_id, username, fullname, posts } = data.findUser;
-
-  return (
-    <React.Fragment>
-      <InfoHeader
-        title={fullname}
-        label="Profile"
-        profile_user={{ id: user_id, username }}
-        action={followUser({
-          variables: {
-            user_id
-          }
-        })}
-        checked={
-          user_name
-            ? user.following.some((el) => el.username === user_name)
-            : null
-        }
-      />
-      <br />
-      <Posts posts={posts} />
-    </React.Fragment>
-  );
+  }, [user, data, loading, error]);
 }
 
-export default Profile;
+Profile.propTypes = {
+  user: PropTypes.any,
+  showSnackbar: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);

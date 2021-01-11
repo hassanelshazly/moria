@@ -16,7 +16,7 @@ import Typography from "@material-ui/core/Typography";
 
 import Avatar from "../assets/images/avatar-0.png";
 
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { setDialog, setUser } from "../state/actions";
 
 const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
@@ -97,7 +97,7 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
 }));
 
 function InfoHeader(props) {
-  const [{ user }, dispatch] = useStateValue();
+  const { user, setDialog, setUser } = props;
 
   const { title, label, profile_user, action, checked } = props;
 
@@ -127,7 +127,7 @@ function InfoHeader(props) {
   };
 
   const handleAction = () => {
-    dispatch(setDialog("create-post"));
+    setDialog("create-post");
   };
 
   const handleActionToggle = (event) => {
@@ -138,18 +138,12 @@ function InfoHeader(props) {
       },
     });
     if (event.target.checked)
-      dispatch(
-        setUser({ following: [profile_user, ...user.following], ...user })
-      );
+      setUser({ following: [profile_user, ...user.following], ...user });
     else
-      dispatch(
-        setUser({
-          following: user.following.filter(
-            (item) => item.id !== profile_user.id
-          ),
-          ...user,
-        })
-      );
+      setUser({
+        following: user.following.filter((item) => item.id !== profile_user.id),
+        ...user,
+      });
   };
 
   return (
@@ -256,6 +250,20 @@ InfoHeader.propTypes = {
   profile_user: PropTypes.string,
   action: PropTypes.func,
   checked: PropTypes.bool,
+  user: PropTypes.any,
+  setDialog: PropTypes.func.isRequired,
+  setUser: PropTypes.func.isRequired,
 };
 
-export default InfoHeader;
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    setUser: (user) => dispatch(setUser(user)),
+    setDialog: (dialog) => dispatch(setDialog(dialog)),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(InfoHeader);
