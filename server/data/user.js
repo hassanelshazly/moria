@@ -32,9 +32,8 @@ UserModel.statics.findPosts = async function ({ userId }) {
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
     let posts = await User.findPosts({ userId });
-    user.following.forEach(async following => {
+    for (following of user.following)
         posts = posts.concat(await User.findPosts({ userId: following._id }));
-    });
     return posts;
 }
 
@@ -188,7 +187,7 @@ UserModel.statics.changeProfile = async function ({ profileSrc, userId }) {
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
-        
+
     user.profileUrl = await uploadImage(profileSrc);
     return await user.save();
 }

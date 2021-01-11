@@ -92,11 +92,11 @@ GroupChatModel.statics.createGroupChat = async function (args) {
     user.groupChats.push(groupChat._id);
     await user.save();
 
-    members.forEach(async member => {
+    for (member of members) {
         member = await member;
         member.groupChats.push(groupChat._id);
         await member.save();
-    });
+    }
 
     await groupChat.populate('admin')
         .populate('members')
