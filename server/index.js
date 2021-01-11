@@ -39,15 +39,6 @@ const myPlugin = {
           }
         };
       },
-
-      didEncounterErrors(requestContext) {
-        console.log("Encountered errors!");
-        return (err) => {
-          if (err) {
-            console.error(err);
-          }
-        };
-      },
     };
   },
 };

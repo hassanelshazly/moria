@@ -5,7 +5,7 @@ import Grid from "@material-ui/core/Grid";
 
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import 'emoji-mart/css/emoji-mart.css'
+import "emoji-mart/css/emoji-mart.css";
 const useStyles = makeStyles(() => ({
   table: {
     minWidth: 650,
@@ -44,32 +44,32 @@ const useStyles = makeStyles(() => ({
 }));
 
 function Message(props) {
-    const {key,messageText,messageDate , sender} = props;
-    const classes = useStyles();
+  const { key, messageText, messageDate, sender } = props;
+  const classes = useStyles();
 
-    return (
-        <ListItem key={key}>
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    className={ sender? classes.senderStyle : classes.receiverStyle}
-                    align={sender? "right":"left"}
-                    primary={messageText}
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText
-                    style={{ 
-                        paddingRight: sender? "15px" : "0px" , 
-                        paddingLeft: sender? "0px" : "15px" , 
-                }}
-                    align={sender? "right":"left"}
-                    secondary={messageDate}
-                  ></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-    )
+  return (
+    <ListItem key={key}>
+      <Grid container>
+        <Grid item xs={12}>
+          <ListItemText
+            className={sender ? classes.senderStyle : classes.receiverStyle}
+            align={sender ? "right" : "left"}
+            primary={messageText}
+          ></ListItemText>
+        </Grid>
+        <Grid item xs={12}>
+          <ListItemText
+            style={{
+              paddingRight: sender ? "15px" : "0px",
+              paddingLeft: sender ? "0px" : "15px",
+            }}
+            align={sender ? "right" : "left"}
+            secondary={messageDate}
+          ></ListItemText>
+        </Grid>
+      </Grid>
+    </ListItem>
+  );
 }
 
-export default Message
+export default Message;
