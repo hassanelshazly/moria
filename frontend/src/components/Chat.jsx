@@ -68,18 +68,20 @@ const useStyles = makeStyles((theme) => ({
   },
   pickerSpanStyling:{
     position:"absolute",
-    bottom:"23vh",
-    left:"400px",
+    bottom:"20vh",
+    zIndex:"1",
     [theme.breakpoints.up("md")]: {
-      left:"25vw",
+      left:"37.9vw",
 
     },
     [theme.breakpoints.down("md")]: {
-      left:"25vw",
+      left:"35vw",
 
     },
     [theme.breakpoints.down("sm")]: {
-      left:"0",
+      left:"10vw",
+      bottom:"22vh",
+
 
     },
   },
@@ -192,18 +194,7 @@ const Chat = () => {
 
   return (
     <div>
-      <Grid container>
-        <Grid item xs={12}>
-          <Paper elevation="2"  style={{borderRadius:"30px"}}>
-            <Typography
-              style={{ textAlign: "center", borderRadius: "50px" }}
-              variant="h4"
-            >
-              Chat
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      
 
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid item xs={3} className={classNames(classes.peopleList,classes.borderRight500)}>
