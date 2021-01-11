@@ -25,6 +25,15 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    coverUrl: {
+        type: String,
+    },
+    profileUrl: {
+        type: String,
+    },
+    birthDate: {
+        type: String,
+    },
     isActivated: {
         type: Boolean,
         default: false
@@ -54,7 +63,7 @@ const UserSchema = new mongoose.Schema({
             type: ObjectId,
             ref: "Post"
         }
-    ], 
+    ],
     groupChats: [
         {
             type: ObjectId,

@@ -8,7 +8,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-function uploadImage(imageSrc) {
+async function uploadImage(imageSrc) {
     let result = await cloudinary.v2.uploader.upload(imageSrc, {
         allowed_formats: ["jpg", "png"],
         public_id: "",

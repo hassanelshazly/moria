@@ -65,6 +65,20 @@ module.exports = {
                 ...args,
                 ...getAuthUser(context)
             });
+        },
+
+        changeCover(_, args, context) {
+            return User.changeCover({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        changeProfile(_, args, context) {
+            return User.changeProfile({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 

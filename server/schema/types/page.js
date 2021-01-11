@@ -6,6 +6,8 @@ const Page = gql`
         id:          ID!
         owner:       User!
         title:       String!
+        coverUrl:    String
+        profileUrl:  String
         description: String
         createdAt:   String
         followers:   [User]
@@ -26,7 +28,9 @@ const Page = gql`
         ): Page
 
         createPage(
-            title: String!
+            title: String!,
+            coverSrc:  String,
+            prfileSrc: String
         ): Page!
 
         deletePage(
@@ -34,13 +38,24 @@ const Page = gql`
         ): String
         
         createPagePost(
-            pageId: ID!, 
-            body: String!
+            pageId:   ID!, 
+            body:     String!
+            imageSrc: String
         ): Post!
         
         deletePagePost(
             postId: ID!
         ): String
+
+        changePageCover(
+            pageId:   ID!
+            coverSrc: String!
+        ): User
+
+        changePageProfile(
+            pageId:     ID!
+            profileSrc: String!
+        ): User
     }
 `;
 

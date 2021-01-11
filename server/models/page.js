@@ -6,7 +6,13 @@ const PageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    Description: {
+    coverUrl: {
+        type: String,
+    },
+    profileUrl: {
+        type: String,
+    },
+    description: {
         type: String
     },
     owner: {

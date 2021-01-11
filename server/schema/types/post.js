@@ -47,8 +47,6 @@ const Post = gql`
             postId: ID!, 
             commentId: ID!
         ): Post
-
-        uploadImage(url: String!): String
     }
 `;
 

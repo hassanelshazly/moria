@@ -18,9 +18,6 @@ const PostSchema = new mongoose.Schema({
     imageUrl: {
         type: String,
     },
-    imageId: {
-        type: String,
-    },
     page: {
         type: ObjectId,
         ref: 'Page'

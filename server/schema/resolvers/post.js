@@ -48,20 +48,6 @@ module.exports = {
             });
         },
 
-        async uploadImage(_, args, context) {
-            let result;
-            try {
-                result = await cloudinary.v2.uploader.upload(args.url, {
-                    allowed_formats: ["jpg", "png"],
-                    public_id: "",
-                    folder: "imgs",
-                });
-            } catch (e) {
-                return `Image could not be uploaded:${e.message}`;
-            }
-            console.log(result);
-            return `Successful-Photo URL: ${result.url}`;
-        }
     },
 
     Post: {

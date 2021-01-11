@@ -7,6 +7,10 @@ module.exports = {
     Query: {
         findPage(_, args) {
             return Page.findPage(args);
+        },
+
+        findAllPages(_, args) {
+            return Page.findAllPages(args);
         }
     },
 
@@ -34,14 +38,28 @@ module.exports = {
         },
 
         createPagePost(_, args, context) {
-            return Page.createPost({
+            return Page.createPagePost({
                 ...args,
                 ...getAuthUser(context)
             });
         },
 
         deletePagePost(_, args, context) {
-            return Page.deletePost({
+            return Page.deletePagePost({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        changePageCover(_, args, context) {
+            return Page.changePageCover({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        changePageProfile(_, args, context) {
+            return Page.changePageProfile({
                 ...args,
                 ...getAuthUser(context)
             });
@@ -50,12 +68,16 @@ module.exports = {
 
 
     Page: {
-        posts(parent, args) {
-            return Post.findPosts(parent);
+        owner(parent) {
+            return Page.findOwner({ id: parent.id })
         },
 
-        followers(parent, args) {
-            return parent.followers.length;
+        posts(parent) {
+            return Page.findPosts({ id: parent.id });
+        },
+
+        followers(parent) {
+            return Page.findFollowers({ id: parent.id });
         }
 
     }

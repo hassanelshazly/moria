@@ -6,6 +6,8 @@ const Group = gql`
         id:         ID!
         admin:      User!
         title:      String!
+        coverUrl:   String
+        profileUrl: String
         createdAt:  String
         members:    [User]
         posts:      [Post]
@@ -19,18 +21,20 @@ const Group = gql`
 
     extend type Mutation {
         createGroup(
-            title: String!, 
-            membersId: [ID!]!
+            title:     String!, 
+            membersId: [ID!]!,
+            coverSrc:  String
+            prfileSrc: String
         ): Group!
 
         deleteGroup(
-            groupId: ID!
+            groupId: ID!,
         ): String
 
         createGroupPost(
             groupId: ID!, 
             body: String!, 
-            imageUrl: String
+            imageSrc: String
         ): Post!
 
         deleteGroupPost(
@@ -51,6 +55,16 @@ const Group = gql`
             groupId: ID!
             membersId: [ID!]!
         ): Group!
+
+        changeGroupCover(
+            groupId:  ID!
+            coverSrc: String!
+        ): User
+
+        changeGroupProfile(
+            groupId:    ID!
+            profileSrc: String!
+        ): User
     }
 `;
 

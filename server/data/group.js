@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
-const GroupModel = require("../models/group");
 const User = require("./user");
 const Post = require("./post");
+const GroupModel = require("../models/group");
+const { uploadImage } = require("../util/image");
 
 GroupModel.statics.findGroup = async function (args) {
     const group = await Group.findById(groupId);
@@ -61,7 +62,7 @@ GroupModel.statics.findRequests = async function ({ id, userId }) {
 }
 
 GroupModel.statics.createGroup = async function (args) {
-    const { userId, title, membersId } = args;
+    const { userId, title, membersId, coverSrc, profileSrc } = args;
     if (!userId)
         throw new Error("User not authorized")
 
@@ -82,8 +83,48 @@ GroupModel.statics.createGroup = async function (args) {
         members: membersId
     });
 
+    if (coverSrc)
+        group.coverUrl = await uploadImage(coverSrc);
+
+    if (profileSrc)
+        group.profileUrl = await uploadImage(profileSrc);
+
     await group.save();
     return group
+}
+
+GroupModel.statics.changeGroupCover = async function (args) {
+    let { coverSrc, userId, groupId } = args;
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const group = await Group.findById(groupId);
+    if (!group)
+        throw new Error("Group not found");
+
+    if (group.admin != userId)
+        throw new Error("User not authoried");
+
+    group.coverUrl = await uploadImage(coverSrc);
+    return await group.save();
+}
+
+GroupModel.statics.changeGroupProfile = async function (args) {
+    let { profileSrc, userId, groupId } = args;
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const group = await Group.findById(groupId);
+    if (!group)
+        throw new Error("Group not found");
+
+    if (group.admin != userId)
+        throw new Error("User not authoried");
+
+    group.profileUrl = await uploadImage(profileSrc);
+    return await page.save();
 }
 
 GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {

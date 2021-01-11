@@ -8,6 +8,9 @@ const User = gql`
         email:      String!
         fullname:   String!
         createdAt:  String
+        coverUrl:   String
+        profileUrl: String
+        birthDate:  String
         token:      String
         followers:  [User]
         following:  [User]
@@ -31,10 +34,13 @@ const User = gql`
 
     extend type Mutation {
         register(
-            fullname: String!
-            username: String!
-            email:    String!
-            password: String!
+            fullname:  String!
+            username:  String!
+            email:     String!
+            password:  String!
+            birthDate: String
+            coverSrc:  String
+            prfileSrc: String
         ): User  
 
         login(
@@ -60,6 +66,14 @@ const User = gql`
 
         savePost(
             postId: ID!
+        ): User
+
+        changeCover(
+            coverSrc: String!
+        ): User
+
+        changeProfile(
+            profileSrc: String!
         ): User
     }
 `;

@@ -9,6 +9,7 @@ const Post = require("./post");
 const Notification = require("./notification");
 const { FOLLOW } = require("../util/constant");
 const { sendVerifyMail } = require("../util/mail");
+const { uploadImage } = require("../util/image");
 const { authFacebook, authGoogle } = require("../util/auth");
 
 UserModel.statics.findUser = function ({ username }) {
@@ -38,7 +39,7 @@ UserModel.statics.findTimeline = async function ({ userId }) {
 }
 
 UserModel.statics.follow = async function ({ userId, id }) {
-    if(id == userId)
+    if (id == userId)
         throw new Error("Really! Are you trying to follow youself?");
 
     const user = await User.findById(userId);
@@ -48,7 +49,7 @@ UserModel.statics.follow = async function ({ userId, id }) {
     const toFollow = await User.findById(id);
     if (!toFollow)
         throw new Error("User not found");
-        
+
     const created = await user.addOrRemoveFollowing(id);
     await toFollow.addOrRemoveFollower(userId);
 
@@ -155,6 +156,12 @@ UserModel.statics.register = async function (user) {
     user.password = await bcrypt.hash(password,
         parseInt(process.env.SALT_LENGTH));
 
+    if (user.coverSrc)
+        user.coverUrl = await uploadImage(user.coverSrc);
+
+    if (user.profileSrc)
+        user.profileUrl = await uploadImage(user.profileSrc);
+
     const newUser = new User(user);
     await newUser.save();
 
@@ -166,6 +173,24 @@ UserModel.statics.register = async function (user) {
     newUser.generateAuthToken();
 
     return newUser;
+}
+
+UserModel.statics.changeCover = async function ({ coverSrc, userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    user.coverUrl = await uploadImage(coverSrc);
+    return await user.save();
+}
+
+UserModel.statics.changeProfile = async function ({ profileSrc, userId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+        
+    user.profileUrl = await uploadImage(profileSrc);
+    return await user.save();
 }
 
 UserModel.statics.facebookLogin = async function ({ accessToken }) {

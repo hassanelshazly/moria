@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const PostModel = require("../models/post");
-const User = require("./user");
 const Notification = require("./notification");
+const { uploadImage } = require("../util/image");
 const { POST, LIKE, COMMENT } = require("../util/constant");
 
 PostModel.statics.findPost = async function ({ postId }) {
@@ -62,10 +62,14 @@ PostModel.statics.createPost = async function (args) {
         group: groupId,
         page: pageId
     });
+
+    if(args.imageSrc) 
+        post.imageUrl = await uploadImage(imageSrc);
+    
     await post.save();
     
     // TODO
-    // notifications to group pages
+    // notifications to group & pages
     await Notification.createNotification({
         post,
         content: contentType,
