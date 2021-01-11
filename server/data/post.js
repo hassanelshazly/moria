@@ -7,6 +7,8 @@ const { POST, LIKE, COMMENT } = require("../util/constant");
 
 PostModel.statics.findPost = async function ({ postId }) {
     const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not Found");
     await post.populate('user').execPopulate();
     return post;
 }
@@ -71,7 +73,7 @@ PostModel.statics.createComment = async function (args) {
     if (!post)
         throw new Error("Post not found");
 
-    post.comments.push({ user:userId, body });
+    post.comments.push({ user: userId, body });
     await post.save();
     await Notification.createNotification({
         post,
