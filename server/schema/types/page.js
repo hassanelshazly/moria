@@ -4,7 +4,7 @@ const Page = gql`
 
     type Page {
         id:         ID!
-        owner:      User
+        owner:      User!
         title:      String!
         desc:       String
         createdAt:  String

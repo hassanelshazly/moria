@@ -1,5 +1,6 @@
 const Group = require("../../data/group");
 const Post = require("../../data/post");
+const { getAuthUser } = require("../../util/auth");
 
 module.exports = {
 
@@ -15,6 +16,13 @@ module.exports = {
                 ...args,
                 ...getAuthUser(context)
             });
+        },
+
+        deleteGroup(_, args, context) {
+            return Group.deleteGroup({
+                ...args,
+                ...getAuthUser(context)
+            })
         },
 
         createGroupPost(_, args, context) {
