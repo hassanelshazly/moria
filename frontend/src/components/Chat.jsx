@@ -277,7 +277,7 @@ const Chat = () => {
               <Picker onSelect={addEmoji} />
             </span>
           )}
-          <Grid container style={{ padding: "20px" }}>
+          <Grid container style={{ padding: "20px" , display: currentReceiver=="#" ? "none": "block" }}>
             <Grid container spacing={isMobile ? 4 : 2}>
               <Grid xs={2} sm={1} align="left">
                 <Fab
