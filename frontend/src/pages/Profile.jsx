@@ -87,9 +87,9 @@ function Profile(props) {
       <ProfileHeader
         profile_user={{ id: user_id, username, fullname }}
         loading={loading}
-        followingCount={following.length}
-        followersCount={followers.length}
-        postsCount={posts.length}
+        followingCount={following ? following.length : 0}
+        followersCount={followers ? followers.length : 0}
+        postsCount={posts ? posts.length : 0}
       />
       <br />
       {posts && <Posts posts={posts} />}

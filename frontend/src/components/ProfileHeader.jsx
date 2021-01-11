@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
-import { makeStyles, useTheme, useMediaQuery } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "./Button";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
@@ -15,6 +15,7 @@ import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import Avatar from "../assets/images/avatar-0.png";
 
@@ -140,12 +141,6 @@ function ProfileHeader(props) {
     followingCount,
   } = props;
 
-  const isOwnProfile =
-    profile_user && user ? user.id === profile_user.id : null;
-  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
-    defaultMatches: true,
-  });
-
   const classes = useStyles();
   const theme = useTheme();
   const width = useWidth();
@@ -171,6 +166,12 @@ function ProfileHeader(props) {
     onError(error) {
       showSnackbar("error", error.message);
     },
+  });
+
+  const isOwnProfile =
+    profile_user && user ? user.id === profile_user.id : null;
+  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
+    defaultMatches: true,
   });
 
   let heightOffset = Math.round(0.3 * 480);
