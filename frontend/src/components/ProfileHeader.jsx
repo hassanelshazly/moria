@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles, useTheme, useMediaQuery } from "@material-ui/core/styles";
 import Button from "./Button";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
@@ -11,6 +11,7 @@ import Chip from "@material-ui/core/Chip";
 import EditIcon from "@material-ui/icons/Edit";
 import FaceIcon from "@material-ui/icons/Face";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
@@ -110,6 +111,20 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
   input: {
     display: "none",
   },
+  userDetailsStyling: {
+    marginTop: "24px",
+    textAlign: "center",
+    textTransform: "uppercase",
+    fontWeight: "bold",
+    marginRight: "10px",
+    [breakpoints.up("md")]: { fontSize: "14px" },
+    [breakpoints.down("md")]: { fontSize: "12px" },
+    [breakpoints.down("sm")]: { fontSize: "10px" },
+    [breakpoints.down("xs")]: { display: "none" },
+  },
+  userCountDetailsStyling: {
+    marginTop: "10px",
+  },
 }));
 
 function ProfileHeader(props) {
@@ -120,9 +135,16 @@ function ProfileHeader(props) {
     setDialog,
     setUser,
     showSnackbar,
+    postsCount,
+    followersCount,
+    followingCount,
   } = props;
+
   const isOwnProfile =
     profile_user && user ? user.id === profile_user.id : null;
+  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
+    defaultMatches: true,
+  });
 
   const classes = useStyles();
   const theme = useTheme();
@@ -294,28 +316,58 @@ function ProfileHeader(props) {
               )}
             </div>
             <div className={classes.details}>
-              <CardContent className={classes.content}>
-                {!loading ? (
-                  <Typography component="h1" variant="h5">
-                    {profile_user.fullname}
-                  </Typography>
-                ) : (
-                  <Skeleton
-                    animation="wave"
-                    width="30%"
-                    height={20}
-                    variant="rect"
-                    style={{ marginBottom: theme.spacing(1) }}
-                  />
-                )}
-                <Chip
-                  variant="outlined"
-                  size="small"
-                  icon={<FaceIcon />}
-                  label="Profile"
-                  color="primary"
-                />
-              </CardContent>
+              <Grid container>
+                <Grid item xs={isMobile ? 12 : 4}>
+                  <CardContent className={classes.content}>
+                    {!loading ? (
+                      <Typography component="h1" variant="h5">
+                        {profile_user.fullname}
+                      </Typography>
+                    ) : (
+                      <Skeleton
+                        animation="wave"
+                        width="30%"
+                        height={20}
+                        variant="rect"
+                        style={{ marginBottom: theme.spacing(1) }}
+                      />
+                    )}
+                    <Chip
+                      variant="outlined"
+                      size="small"
+                      icon={<FaceIcon />}
+                      label="Profile"
+                      color="primary"
+                    />
+                  </CardContent>
+                </Grid>
+                <Grid item xs={isMobile ? 0 : 8}>
+                  <div className={classes.userDetailsStyling}>
+                    <Grid container spacing={2}>
+                      <Grid xs={4} item>
+                        posts
+                        <br />
+                        <p className={classes.userCountDetailsStyling}>
+                          {postsCount}
+                        </p>
+                      </Grid>
+                      <Grid xs={4} item>
+                        followers
+                        <br />
+                        <p className={classes.userCountDetailsStyling}>
+                          {followersCount}
+                        </p>
+                      </Grid>
+                      <Grid xs={4} item>
+                        following <br />
+                        <p className={classes.userCountDetailsStyling}>
+                          {followingCount}
+                        </p>
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
+              </Grid>
               <div className={classes.controls}>
                 {isOwnProfile ? (
                   <Button color="red" onClick={handleAction}>
@@ -353,6 +405,9 @@ ProfileHeader.propTypes = {
   setDialog: PropTypes.func.isRequired,
   setUser: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
+  postsCount: PropTypes.number,
+  followersCount: PropTypes.number,
+  followingCount: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {

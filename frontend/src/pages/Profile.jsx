@@ -16,6 +16,12 @@ const GET_USER_POSTS = gql`
       id
       username
       fullname
+      followers {
+        id
+      }
+      following {
+        id
+      }
       posts {
         id
         user {
@@ -67,13 +73,23 @@ function Profile(props) {
   }
 
   const findUser = data ? data.findUser : {};
-  const { id: user_id, username, fullname, posts } = findUser;
+  const {
+    id: user_id,
+    username,
+    fullname,
+    posts,
+    followers,
+    following,
+  } = findUser;
 
   return (
     <React.Fragment>
       <ProfileHeader
         profile_user={{ id: user_id, username, fullname }}
         loading={loading}
+        followingCount={following.length}
+        followersCount={followers.length}
+        postsCount={posts.length}
       />
       <br />
       {posts && <Posts posts={posts} />}
