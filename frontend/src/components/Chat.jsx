@@ -1,11 +1,10 @@
-import React, { useRef, useEffect , useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 // import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -14,21 +13,14 @@ import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 import { useMediaQuery, useTheme } from "@material-ui/core";
-import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
-import 'emoji-mart/css/emoji-mart.css'
-import { Picker } from 'emoji-mart'
+import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
 
-
-import { gql, useQuery,useLazyQuery,useMutation  } from '@apollo/client';
+import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { useStateValue } from "./../state/store";
 
-
-
-
-
-
-
-import classNames from 'classnames'
+import classNames from "classnames";
 import Message from "./Message";
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -66,39 +58,38 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: "10px",
     borderRadius: "30px",
   },
-  pickerSpanStyling:{
-    position:"absolute",
-    bottom:"20vh",
-    zIndex:"1",
+  pickerSpanStyling: {
+    position: "absolute",
+    bottom: "20vh",
+    zIndex: "1",
     [theme.breakpoints.up("md")]: {
-      left:"37.9vw",
-
+      left: "37.9vw",
     },
     [theme.breakpoints.down("md")]: {
-      left:"35vw",
-
+      left: "35vw",
     },
     [theme.breakpoints.down("sm")]: {
-      left:"10vw",
-      bottom:"22vh",
-
-
+      left: "10vw",
+      bottom: "22vh",
     },
   },
   peopleList: {
     [theme.breakpoints.down("sm")]: {
-      display:"none"
+      display: "none",
     },
   },
 }));
-
 
 const GET_MESSAGES = gql`
   query GetMessages($receiver: ID!) {
     findMessages(toUserId: $receiver) {
       id
-      from
-      to
+      from {
+        id
+      }
+      to {
+        id
+      }
       body
       createdAt
     }
@@ -106,99 +97,106 @@ const GET_MESSAGES = gql`
 `;
 
 const SEND_MESSAGE = gql`
-  mutation ($receiver:ID!  , $text:String!) {
+  mutation($receiver: ID!, $text: String!) {
     sendMessage(toUserId: $receiver, body: $text) {
       id
-      from
-      to
+      from {
+        id
+      }
+      to {
+        id
+      }
       body
       createdAt
     }
-  } 
+  }
 `;
 const Chat = () => {
   const [{ user }] = useStateValue();
   const [addMessage] = useMutation(SEND_MESSAGE);
 
-  const res1 =  useQuery(GET_MESSAGES, {
-    variables: { receiver: user.id },
+  const res1 = useQuery(GET_MESSAGES, {
+    variables: { receiver: user ? user.id : null },
+    skip: !user,
   });
-  const messageArray=[];
-  if (res1.error ) return <p>{res1.error.message}</p>;
-  const [getRes2 , res2] =  useLazyQuery(GET_MESSAGES) 
- 
-  const [currentReceiver , setCurrentReceiver] = useState("#");
+  const messageArray = [];
+  if (res1.error) return <p>{res1.error.message}</p>;
+  if (!res1.data) return <p>No messages.</p>;
+  const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
+
+  const [currentReceiver, setCurrentReceiver] = useState("#");
 
   const classes = useStyles();
   const dummy = useRef();
   useEffect(() => {
     dummy.current.scrollIntoView({ behavior: "smooth" });
   }, []);
- 
-  const [newMessage , setNewMessage] = useState("");
-  const [showEmoji , setShowEmoji] = useState(false);
+
+  const [newMessage, setNewMessage] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'), {
-    defaultMatches: true
+  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
+    defaultMatches: true,
   });
-  const addEmoji = e => {
+  const addEmoji = (e) => {
     let emoji = e.native;
     setNewMessage(newMessage + emoji);
   };
 
-  const handleSendMessage = ()=>{
-    addMessage({ variables: { receiver: currentReceiver , text:newMessage } });
+  const handleSendMessage = () => {
+    addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
-  }
+  };
 
   // Dummy Data
-//   const user = {id:100 , fullname:"Ahmed Essam" , 
-//   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
-//   ,{id:3 , fullname:"Ali"},{id:4 , fullname:"Taha"}]};
-//   let messageArray = [
-//   {key:1 , text:`It is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-//   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} ,
-//   {key:2 , text:`It is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-//   purpose (injected humour and the like).`  , date:"09:30" ,sender:false} ,
-//   {key:3 , text:`It is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text,is a long established fact that a reader will be distracted by the readable content of 
-//   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-//   normal distribution of letters, as opposed to using 'Content here, content here', making it look 
-//   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum 
-//   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-//   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on 
-//   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} 
+  //   const user = {id:100 , fullname:"Ahmed Essam" ,
+  //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
+  //   ,{id:3 , fullname:"Ali"},{id:4 , fullname:"Taha"}]};
+  //   let messageArray = [
+  //   {key:1 , text:`It is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
+  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} ,
+  //   {key:2 , text:`It is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
+  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:false} ,
+  //   {key:3 , text:`It is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
+  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
+  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
+  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
+  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
+  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
+  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:true}
 
-// ]
+  // ]
 
   return (
     <div>
-      
-
       <Grid container component={Paper} className={classes.chatSection}>
-        <Grid item xs={3} className={classNames(classes.peopleList,classes.borderRight500)}>
-          
+        <Grid
+          item
+          xs={3}
+          className={classNames(classes.peopleList, classes.borderRight500)}
+        >
           <List>
             <ListItem button key={user.id}>
               <ListItemIcon>
@@ -218,89 +216,92 @@ const Chat = () => {
             />
           </Grid>
           <Divider />
-          <List > 
+          <List>
             {/* Online People */}
-            
 
-            {user.following.map(someuser=>(
-              
-              <ListItem button key={someuser.id} onClick={()=>{  
-                 setCurrentReceiver(someuser.id);
-                 getRes2( {variables: { receiver: someuser.id } } );
-                 if(!res1.loading)
-                 {
-                    res1.data.findMessages.forEach( x=>{
-                    if(x.from == someuser.id)
-                        {
-                            messageArray.push(x.findMessages)
+            {user.following.map((someuser) => (
+              <ListItem
+                button
+                key={someuser.id}
+                onClick={() => {
+                  setCurrentReceiver(someuser.id);
+                  getRes2({ variables: { receiver: someuser.id } });
+                  if (!res1.loading) {
+                    res1.data.findMessages.forEach((x) => {
+                      if (x.from.id == someuser.id) {
+                        messageArray.push(x.findMessages);
+                      }
+                    });
+                    if (res2.data && res2.data.findMessages) {
+                      res2.data.findMessages.forEach((x) => {
+                        if (x.from.id == user.id) {
+                          messageArray.push(x.findMessages);
                         }
-                        
-                    })
-                    if(res2.data && res2.data.findMessages )
-                    {
-                      res2.data.findMessages.forEach( x=>{
-                        if(x.from == user.id)
-                            {
-                                messageArray.push(x.findMessages)
-                            }
-                            
-                        })
+                      });
                     }
-                    messageArray.sort((a,b)=> a.createdAt <= b.createdAt);
-                 }
-              }}  >
-                  <ListItemIcon>
-                    <Avatar alt={someuser.fullname} src="" />
-                  </ListItemIcon>
-                  <ListItemText primary={someuser.fullname} >{someuser.fullname}</ListItemText>
+                    messageArray.sort((a, b) => a.createdAt <= b.createdAt);
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <Avatar alt={someuser.fullname} src="" />
+                </ListItemIcon>
+                <ListItemText primary={someuser.fullname}>
+                  {someuser.fullname}
+                </ListItemText>
               </ListItem>
             ))}
-           
-            
-
-
           </List>
         </Grid>
         <Grid item sm={12} md={9}>
-          <List className={classes.messageArea} onClick={()=>{setShowEmoji(false)}}>
-            
-            {messageArray.map(x=>(
-              <Message key={x.id} messageText={x.body} messageDate={x.createdAt} sender={x.from== user.id} />
+          <List
+            className={classes.messageArea}
+            onClick={() => {
+              setShowEmoji(false);
+            }}
+          >
+            {messageArray.map((x) => (
+              <Message
+                key={x.id}
+                messageText={x.body}
+                messageDate={x.createdAt}
+                sender={x.from.id == user.id}
+              />
             ))}
-            
+
             <div ref={dummy}></div>
           </List>
 
-          {showEmoji &&
-          <span className={classes.pickerSpanStyling}>
+          {showEmoji && (
+            <span className={classes.pickerSpanStyling}>
               <Picker onSelect={addEmoji} />
-          </span>}
+            </span>
+          )}
           <Grid container style={{ padding: "20px" }}>
-
-
-
-            <Grid container spacing={isMobile? 4 : 2}>
-              <Grid xs={2} sm={1} align="left" >
+            <Grid container spacing={isMobile ? 4 : 2}>
+              <Grid xs={2} sm={1} align="left">
                 <Fab
                   color="primary"
                   aria-label="emoji"
                   style={{ backgroundColor: "purple " }}
-                  onClick={()=>{setShowEmoji(!showEmoji)}}
+                  onClick={() => {
+                    setShowEmoji(!showEmoji);
+                  }}
                 >
-                  <EmojiEmotionsIcon   />
+                  <EmojiEmotionsIcon />
                 </Fab>
               </Grid>
-              <Grid item xs={8} sm={10} >
-
+              <Grid item xs={8} sm={10}>
                 <TextField
                   id="outlined-basic-email"
                   label="Type Something"
                   value={newMessage}
-                  onChange={e=>{setNewMessage(e.target.value)}}
+                  onChange={(e) => {
+                    setNewMessage(e.target.value);
+                  }}
                   fullWidth
                 />
               </Grid>
-            
 
               <Grid xs={2} sm={1} align="right">
                 <Fab
