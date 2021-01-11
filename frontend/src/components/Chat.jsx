@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -18,7 +19,7 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
 import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
-import { useStateValue } from "./../state/store";
+import { connect } from "react-redux";
 
 import classNames from "classnames";
 import Message from "./Message";
@@ -88,7 +89,12 @@ const GET_MESSAGES = gql`
         id
       }
       to {
-        id
+        ... on User {
+          id
+        }
+        ... on GroupChat {
+          id
+        }
       }
       body
       createdAt
@@ -104,15 +110,21 @@ const SEND_MESSAGE = gql`
         id
       }
       to {
-        id
+        ... on User {
+          id
+        }
+        ... on GroupChat {
+          id
+        }
       }
       body
       createdAt
     }
   }
 `;
-const Chat = () => {
-  const [{ user }] = useStateValue();
+
+const Chat = (props) => {
+  const { user } = props;
   const [addMessage] = useMutation(SEND_MESSAGE);
 
   const res1 = useQuery(GET_MESSAGES, {
@@ -321,4 +333,12 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+Chat.propTypes = {
+  user: PropTypes.any,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+export default connect(mapStateToProps)(Chat);

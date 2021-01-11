@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Switch, Route } from "react-router-dom";
 import {
   ApolloClient,
@@ -14,10 +15,11 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Chat from "./pages/Chat";
 
-import { useStateValue } from "./state/store";
+import { connect } from "react-redux";
+// TODO: Revise useMemo() and useCallback(). Should we use React.memo(). Correct data after network.
 
-function App() {
-  const [{ user }] = useStateValue();
+function App(props) {
+  const { user } = props;
 
   const httpLink = createHttpLink({
     uri: "http://localhost:4000/",
@@ -56,4 +58,12 @@ function App() {
   );
 }
 
-export default App;
+App.propTypes = {
+  user: PropTypes.any,
+};
+
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+export default connect(mapStateToProps)(App);

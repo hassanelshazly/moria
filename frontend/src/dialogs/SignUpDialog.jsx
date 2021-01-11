@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -10,7 +11,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
 import { gql, useMutation } from "@apollo/client";
-import { useStateValue } from "../state/store";
+import { connect } from "react-redux";
 import { setDialog, setUser, showSnackbar } from "../state/actions";
 
 const SIGN_UP = gql`
@@ -60,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUpDialog() {
+function SignUpDialog(props) {
   const classes = useStyles();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -69,16 +70,16 @@ export default function SignUpDialog() {
   const [password, setPassword] = useState("");
 
   // eslint-disable-next-line no-empty-pattern
-  const [{}, dispatch] = useStateValue();
+  const { setUser, setDialog, showSnackbar } = props;
   const [signUp] = useMutation(SIGN_UP, {
     onCompleted({ register: user }) {
-      dispatch(setUser(user));
+      setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
-      dispatch(setDialog(null));
-      dispatch(showSnackbar("success", "Successfully signed up"));
+      setDialog(null);
+      showSnackbar("success", "Successfully signed up");
     },
     onError(error) {
-      dispatch(showSnackbar("error", error.message));
+      showSnackbar("error", error.message);
     },
   });
 
@@ -185,7 +186,7 @@ export default function SignUpDialog() {
               component="button"
               variant="body2"
               onClick={() => {
-                dispatch(setDialog("sign-in"));
+                setDialog("sign-in");
               }}
             >
               Already have an account? Sign In
@@ -196,3 +197,20 @@ export default function SignUpDialog() {
     </Container>
   );
 }
+
+SignUpDialog.propTypes = {
+  setUser: PropTypes.func.isRequired,
+  setDialog: PropTypes.func.isRequired,
+  showSnackbar: PropTypes.func.isRequired,
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    setUser: (user) => dispatch(setUser(user)),
+    setDialog: (dialog) => dispatch(setDialog(dialog)),
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+
+export default connect(null, mapDispatchToProps)(SignUpDialog);
