@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const { Strategy: GoogleTokenStrategy } = require('passport-google-token');
-const cloudinary = require("cloudinary");
 
 function getAuthUser(context) {
     const authHeader = context.req?.headers.authorization;
@@ -75,13 +74,6 @@ function authGoogle(req, res) {
             })(req, res);
     });
 }
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 
 module.exports = {
     authGoogle,
