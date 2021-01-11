@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
@@ -124,6 +125,22 @@ const SEND_MESSAGE = gql`
   }
 `;
 
+const GET_FOLLOWERS = gql`
+  query GetFollowers($bla: String!)
+  {
+    findUser(username: $bla)
+    {
+      following
+      {
+        username
+        fullname
+        id
+      }
+    }
+  }
+`;
+
+
 const Chat = (props) => {
   const { user } = props;
   const classes = useStyles();
@@ -133,12 +150,20 @@ const Chat = (props) => {
   const [newMessage, setNewMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [filter, setFilter] = useState("");
+  const USERNAME = user.username;
 
+    
+    const {loading , error, data} =useQuery(GET_FOLLOWERS , {
+      variables: { bla: USERNAME}
+    });
   const res1 = useQuery(GET_MESSAGES, {
     variables: { receiver: user ? user.id : null },
     skip: !user,
   });
+
+
   const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
+
   const [addMessage] = useMutation(SEND_MESSAGE);
 
   useEffect(() => {
@@ -157,6 +182,8 @@ const Chat = (props) => {
   };
 
   const handleSendMessage = () => {
+    if(newMessage.trim()=="") return;
+    //console.log("Current Receiver  " + currentReceiver + " Text: " + newMessage);
     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
@@ -167,7 +194,8 @@ const Chat = (props) => {
 
   if (res1.error) return <p>{res1.error.message}</p>;
   if (!res1.data && !res1.loading) return <p>No messages.</p>;
-
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
   // Dummy Data
   //   const user = {id:100 , fullname:"Ahmed Essam" ,
   //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
@@ -239,8 +267,7 @@ const Chat = (props) => {
           <Divider />
           <List style={{ maxHeight: "460px", overflow: "auto" }}>
             {/* Online People */}
-
-            {user.following.map(
+            {data.findUser.following.map(
               (someuser) =>
                 someuser.fullname.includes(filter) && (
                   <ListItem
