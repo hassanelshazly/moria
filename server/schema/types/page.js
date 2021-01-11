@@ -9,7 +9,7 @@ const Page = gql`
         desc:       String
         createdAt:  String
         followers:  [User]
-        Posts:      [Post]
+        posts:      [Post]
     }
 
     extend type Query {
@@ -17,10 +17,11 @@ const Page = gql`
     }
 
     extend type Mutation {
-        followPage(postId: ID!):         Page
-        createPage(title: String!):    Page!
-        createPagePost(body: String!): Post!
-        deletePagePost(postId: ID!):   String
+        followPage(postId: ID!):        Page
+        createPage(title: String!):     Page!
+        deletePage(title: String!):      String
+        createPagePost(body: String!):  Post!
+        deletePagePost(postId: ID!):    String
     }
 `;
 

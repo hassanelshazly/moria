@@ -17,6 +17,7 @@ const Group = gql`
 
     extend type Mutation {
         createGroup(title: String!):    Group!
+        deleteGroup(title: String!):    String
         createGroupPost(body: String!): Post!
         deleteGroupPost(postId: ID!):   String
     }

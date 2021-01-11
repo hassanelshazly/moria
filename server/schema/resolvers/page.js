@@ -1,5 +1,6 @@
 const Page = require("../../data/page");
 const Post = require("../../data/post");
+const { getAuthUser } = require("../../util/auth");
 
 module.exports = {
 
@@ -20,6 +21,13 @@ module.exports = {
 
         createPage(_, args, context) {
             return Page.createPage({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        deletePage(_, args, context) {
+            return Page.deletePage({
                 ...args,
                 ...getAuthUser(context)
             });
