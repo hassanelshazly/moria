@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-// import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import List from "@material-ui/core/List";
@@ -13,6 +12,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
+
 import { useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
@@ -23,6 +23,7 @@ import { connect } from "react-redux";
 
 import classNames from "classnames";
 import Message from "./Message";
+
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
@@ -103,7 +104,7 @@ const GET_MESSAGES = gql`
 `;
 
 const SEND_MESSAGE = gql`
-  mutation($receiver: ID!, $text: String!) {
+  mutation SendMessage($receiver: ID!, $text: String!) {
     sendMessage(toUserId: $receiver, body: $text) {
       id
       from {
@@ -125,31 +126,31 @@ const SEND_MESSAGE = gql`
 
 const Chat = (props) => {
   const { user } = props;
-  const [addMessage] = useMutation(SEND_MESSAGE);
+  const classes = useStyles();
+  const theme = useTheme();
+  const dummy = useRef();
+  const [currentReceiver, setCurrentReceiver] = useState("#");
+  const [newMessage, setNewMessage] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [filter, setFilter] = useState("");
 
   const res1 = useQuery(GET_MESSAGES, {
     variables: { receiver: user ? user.id : null },
     skip: !user,
   });
-  const messageArray = [];
-  if (res1.error) return <p>{res1.error.message}</p>;
-  if (!res1.data) return <p>No messages.</p>;
   const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
+  const [addMessage] = useMutation(SEND_MESSAGE);
 
-  const [currentReceiver, setCurrentReceiver] = useState("#");
-
-  const classes = useStyles();
-  const dummy = useRef();
   useEffect(() => {
-    dummy.current.scrollIntoView({ behavior: "smooth" });
-  }, []);
+    if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
+  }, [dummy.current]);
 
-  const [newMessage, setNewMessage] = useState("");
-  const [showEmoji, setShowEmoji] = useState(false);
-  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
     defaultMatches: true,
   });
+
+  const messageArray = [];
+
   const addEmoji = (e) => {
     let emoji = e.native;
     setNewMessage(newMessage + emoji);
@@ -159,10 +160,14 @@ const Chat = (props) => {
     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
-  const [filter , setFilter] = useState("");
-  const handleSearchChange = (e)=>{
+
+  const handleSearchChange = (e) => {
     setFilter(e.target.value);
-  }
+  };
+
+  if (res1.error) return <p>{res1.error.message}</p>;
+  if (!res1.data && !res1.loading) return <p>No messages.</p>;
+
   // Dummy Data
   //   const user = {id:100 , fullname:"Ahmed Essam" ,
   //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
@@ -232,42 +237,44 @@ const Chat = (props) => {
             />
           </Grid>
           <Divider />
-          <List style={{ maxHeight:"460px" ,overflow:"auto"}}>
+          <List style={{ maxHeight: "460px", overflow: "auto" }}>
             {/* Online People */}
 
-            {user.following.map((someuser) => (
-              someuser.fullname.includes(filter) &&
-              <ListItem
-                button
-                key={someuser.id}
-                onClick={() => {
-                  setCurrentReceiver(someuser.id);
-                  getRes2({ variables: { receiver: someuser.id } });
-                  if (!res1.loading) {
-                    res1.data.findMessages.forEach((x) => {
-                      if (x.from.id == someuser.id) {
-                        messageArray.push(x.findMessages);
-                      }
-                    });
-                    if (res2.data && res2.data.findMessages) {
-                      res2.data.findMessages.forEach((x) => {
-                        if (x.from.id == user.id) {
-                          messageArray.push(x.findMessages);
+            {user.following.map(
+              (someuser) =>
+                someuser.fullname.includes(filter) && (
+                  <ListItem
+                    button
+                    key={someuser.id}
+                    onClick={() => {
+                      setCurrentReceiver(someuser.id);
+                      getRes2({ variables: { receiver: someuser.id } });
+                      if (!res1.loading) {
+                        res1.data.findMessages.forEach((x) => {
+                          if (x.from.id == someuser.id) {
+                            messageArray.push(x.findMessages);
+                          }
+                        });
+                        if (res2.data && res2.data.findMessages) {
+                          res2.data.findMessages.forEach((x) => {
+                            if (x.from.id == user.id) {
+                              messageArray.push(x.findMessages);
+                            }
+                          });
                         }
-                      });
-                    }
-                    messageArray.sort((a, b) => a.createdAt <= b.createdAt);
-                  }
-                }}
-              >
-                <ListItemIcon>
-                  <Avatar alt={someuser.fullname} src="" />
-                </ListItemIcon>
-                <ListItemText primary={someuser.fullname}>
-                  {someuser.fullname}
-                </ListItemText>
-              </ListItem>
-            ))}
+                        messageArray.sort((a, b) => a.createdAt <= b.createdAt);
+                      }
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Avatar alt={someuser.fullname} src="" />
+                    </ListItemIcon>
+                    <ListItemText primary={someuser.fullname}>
+                      {someuser.fullname}
+                    </ListItemText>
+                  </ListItem>
+                )
+            )}
           </List>
         </Grid>
         <Grid item sm={12} md={9}>
@@ -294,7 +301,13 @@ const Chat = (props) => {
               <Picker onSelect={addEmoji} />
             </span>
           )}
-          <Grid container style={{ padding: "20px" , display: currentReceiver=="#" ? "none": "block" }}>
+          <Grid
+            container
+            style={{
+              padding: "20px",
+              display: currentReceiver == "#" ? "none" : "block",
+            }}
+          >
             <Grid container spacing={isMobile ? 4 : 2}>
               <Grid xs={2} sm={1} align="left">
                 <Fab

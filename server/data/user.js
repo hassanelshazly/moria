@@ -8,7 +8,7 @@ const UserModel = require("../models/user");
 const Post = require("./post");
 const Notification = require("./notification");
 const { FOLLOW } = require("../util/constant");
-const { sendVerifyMail } = require("../util/mail");
+// const { sendVerifyMail } = require("../util/mail");
 const { authFacebook, authGoogle } = require("../util/auth");
 
 UserModel.statics.findUser = function ({ username }) {
@@ -162,7 +162,7 @@ UserModel.statics.register = async function (user) {
     newUser.activationToken = activationToken;
     await newUser.save();
 
-    sendVerifyMail(email, fullname, activationToken);
+    // sendVerifyMail(email, fullname, activationToken);
     newUser.generateAuthToken();
 
     return newUser;
