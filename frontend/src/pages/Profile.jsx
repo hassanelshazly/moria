@@ -3,12 +3,10 @@ import PropTypes from "prop-types";
 import ProfileHeader from "../components/ProfileHeader";
 import Posts from "../components/Posts";
 
-import { useRouteMatch, Redirect } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { connect } from "react-redux";
 import { showSnackbar } from "../state/actions";
-
-import useTraceUpdate from "../utils/useTraceUpdate";
 
 const GET_USER_POSTS = gql`
   query GetUserPosts($user_name: String!) {
@@ -28,8 +26,10 @@ const GET_USER_POSTS = gql`
           id
           username
           fullname
+          profileUrl
         }
         body
+        imageUrl
         createdAt
         likes {
           id
@@ -41,6 +41,7 @@ const GET_USER_POSTS = gql`
             id
             username
             fullname
+            profileUrl
           }
         }
         likeCount
@@ -51,7 +52,6 @@ const GET_USER_POSTS = gql`
 `;
 
 function Profile(props) {
-  useTraceUpdate(props);
   const { user, showSnackbar } = props;
 
   const match = useRouteMatch("/profile/:user_name");
@@ -69,30 +69,23 @@ function Profile(props) {
 
   if (error) {
     showSnackbar("error", error.message);
-    return <Redirect to="/" />;
+    return null;
   }
 
   const findUser = data ? data.findUser : {};
-  const {
-    id: user_id,
-    username,
-    fullname,
-    posts,
-    followers,
-    following,
-  } = findUser;
+  const { id, username, fullname, posts, followers, following } = findUser;
 
   return (
     <React.Fragment>
       <ProfileHeader
-        profile_user={{ id: user_id, username, fullname }}
+        profile_user={{ id, username, fullname, followers }}
         loading={loading}
         followingCount={following ? following.length : 0}
         followersCount={followers ? followers.length : 0}
         postsCount={posts ? posts.length : 0}
       />
       <br />
-      {posts && <Posts posts={posts} />}
+      {posts && <Posts type="profile" posts={posts} />}
     </React.Fragment>
   );
 }

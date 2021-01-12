@@ -8,7 +8,6 @@ const { ObjectId } = mongoose.Types;
 
 describe("Group", () => {
     before(async function () {
-        this.timeout(10000);
         try {
             await mongoose.connect(process.env.MONGO_URI_TEMP, {
                 useNewUrlParser: true,

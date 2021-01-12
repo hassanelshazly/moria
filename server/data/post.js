@@ -51,7 +51,7 @@ PostModel.statics.likePost = async function ({ postId, userId }) {
 }
 
 PostModel.statics.createPost = async function (args) {
-    const { userId, groupId, pageId } = args;
+    const { userId, imageSrc, groupId, pageId } = args;
     let contentType = POST;
     if (!userId)
         throw new Error("User not authorized");
@@ -63,7 +63,7 @@ PostModel.statics.createPost = async function (args) {
         page: pageId
     });
 
-    if (args.imageSrc)
+    if (imageSrc)
         post.imageUrl = await uploadImage(imageSrc);
 
     await post.save();

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -11,39 +11,44 @@ import Chip from "@material-ui/core/Chip";
 import EditIcon from "@material-ui/icons/Edit";
 import FaceIcon from "@material-ui/icons/Face";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import lottie from "lottie-web";
 
 import Avatar from "../assets/images/avatar-0.png";
 import CoverAnimation from "../assets/animations/laptop-working.json";
 
+import { Redirect } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
-const FOLLOW_USER = gql`
-  mutation FollowUser($user_id: ID!) {
-    follow(id: $user_id) {
+const DELETE_GROUP = gql`
+  mutation DelteGroup($group_id: ID!) {
+    deleteGroup(groupId: $group_id)
+  }
+`;
+
+const SEND_REQUEST = gql`
+  mutation SendRequest($group_id: ID!) {
+    sendRequest(groupId: $group_id) {
       id
     }
   }
 `;
 
 const CHANGE_COVER = gql`
-  mutation ChangeCover($image: String!) {
-    changeCover(coverSrc: $image) {
+  mutation ChangeCover($group_id: ID!, $image: String!) {
+    changeGroupCover(groupId: $group_id, coverSrc: $image) {
       id
     }
   }
 `;
 
 const CHANGE_IMAGE = gql`
-  mutation ChangeImage($image: String!) {
-    changeProfile(profileSrc: $image) {
+  mutation ChangeImage($group_id: ID!, $image: String!) {
+    changeGroupProfile(groupId: $group_id, profileSrc: $image) {
       id
     }
   }
@@ -127,52 +132,46 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   input: {
     display: "none",
   },
-  userDetailsStyling: {
-    marginTop: "24px",
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontWeight: "bold",
-    marginRight: "10px",
-    [breakpoints.up("md")]: { fontSize: "14px" },
-    [breakpoints.down("md")]: { fontSize: "12px" },
-    [breakpoints.down("sm")]: { fontSize: "10px" },
-    [breakpoints.down("xs")]: { display: "none" },
-  },
-  userCountDetailsStyling: {
-    marginTop: "10px",
-  },
 }));
 
-function ProfileHeader(props) {
+function GroupHeader(props) {
   const {
     user,
     setDialog,
     showSnackbar,
     fillForm,
-    profile_user,
+    id,
+    admin,
+    title,
+    coverUrl,
+    profileUrl,
+    members,
+    requests,
     loading,
-    postsCount,
-    followersCount,
-    followingCount,
   } = props;
 
-  const isOwnProfile =
-    user && profile_user ? user.id === profile_user.id : false;
-  const isFollowingProfile =
-    user && profile_user && profile_user.followers
-      ? profile_user.followers.some((el) => el.id === user.id)
-      : false;
+  const isAnAdmin = user && admin ? admin.id === user.id : false;
+  const isMember =
+    user && members ? members.some((el) => el.id === user.id) : false;
+  const isRequestee =
+    user && requests ? requests.some((el) => el.id === user.id) : false;
 
   const classes = useStyles();
   const theme = useTheme();
   const width = useWidth();
   const cardCover = useRef(null);
   const cardContent = useRef(null);
-  const [cover, setCover] = React.useState(null);
-  const [photo, setPhoto] = React.useState(null);
-  const [isFollowing, setIsFollowing] = React.useState(isFollowingProfile);
-  const [cardContentHeight, setCardContentHeight] = React.useState(0);
-  const [followUser] = useMutation(FOLLOW_USER, {
+  const [cover, setCover] = useState(coverUrl);
+  const [photo, setPhoto] = useState(profileUrl);
+  const [isAMember, setIsAMember] = useState(isMember);
+  const [isARequestee, setIsARequestee] = useState(isRequestee);
+  const [cardContentHeight, setCardContentHeight] = useState(0);
+  const [deleteGroup] = useMutation(DELETE_GROUP, {
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [sendRequest] = useMutation(SEND_REQUEST, {
     onError(error) {
       showSnackbar("error", error.message);
     },
@@ -186,10 +185,6 @@ function ProfileHeader(props) {
     onError(error) {
       showSnackbar("error", error.message);
     },
-  });
-
-  const isMobile = useMediaQuery(theme.breakpoints.only("xs"), {
-    defaultMatches: true,
   });
 
   let heightOffset = Math.round(0.3 * 480);
@@ -224,6 +219,7 @@ function ProfileHeader(props) {
       reader.onloadend = () => {
         changeCover({
           variables: {
+            group_id: id,
             image: reader.result,
           },
         });
@@ -244,6 +240,7 @@ function ProfileHeader(props) {
       reader.onloadend = () => {
         changeImage({
           variables: {
+            group_id: id,
             image: reader.result,
           },
         });
@@ -255,15 +252,22 @@ function ProfileHeader(props) {
   };
 
   const handlePost = () => {
-    fillForm("post", { type: "profile", id: user.username });
+    fillForm("post", { type: "group", id });
     setDialog("create-post");
   };
 
-  const handleFollowToggle = (event) => {
-    setIsFollowing(event.target.checked);
-    followUser({
+  const handleDelete = () => {
+    deleteGroup({ variables: { group_id: id } });
+    <Redirect to="/groups/" />;
+  };
+
+  const handleJoinToggle = (event) => {
+    const isJoin = event.target.checked;
+    setIsARequestee(isJoin);
+    setIsAMember(false);
+    sendRequest({
       variables: {
-        user_id: profile_user.id,
+        group_id: id,
       },
     });
   };
@@ -292,7 +296,7 @@ function ProfileHeader(props) {
             ref={cardCover}
           />
         )}
-        {isOwnProfile && (
+        {isAnAdmin && (
           <React.Fragment>
             <input
               accept="image/*"
@@ -320,7 +324,7 @@ function ProfileHeader(props) {
                   className={classes.photo}
                   image={photo ? URL.createObjectURL(photo) : Avatar}
                   loading="auto"
-                  title={profile_user ? profile_user.fullname : "Profile"}
+                  title={title ? title : "Group"}
                 />
               ) : (
                 <Skeleton
@@ -330,7 +334,7 @@ function ProfileHeader(props) {
                   height={theme.spacing(20)}
                 />
               )}
-              {isOwnProfile && (
+              {isAnAdmin && (
                 <React.Fragment>
                   <input
                     accept="image/*"
@@ -355,76 +359,52 @@ function ProfileHeader(props) {
               )}
             </div>
             <div className={classes.details}>
-              <Grid container>
-                <Grid item xs={isMobile ? 12 : 4}>
-                  <CardContent className={classes.content}>
-                    {!loading ? (
-                      <Typography component="h1" variant="h5">
-                        {profile_user ? profile_user.fullname : "Profile"}
-                      </Typography>
-                    ) : (
-                      <Skeleton
-                        animation="wave"
-                        width="30%"
-                        height={20}
-                        variant="rect"
-                        style={{ marginBottom: theme.spacing(1) }}
-                      />
-                    )}
-                    <Chip
-                      variant="outlined"
-                      size="small"
-                      icon={<FaceIcon />}
-                      label="Profile"
-                      color="primary"
-                    />
-                  </CardContent>
-                </Grid>
-                <Grid item xs={isMobile ? 0 : 8}>
-                  <div className={classes.userDetailsStyling}>
-                    <Grid container spacing={2}>
-                      <Grid xs={4} item>
-                        posts
-                        <br />
-                        <p className={classes.userCountDetailsStyling}>
-                          {postsCount}
-                        </p>
-                      </Grid>
-                      <Grid xs={4} item>
-                        followers
-                        <br />
-                        <p className={classes.userCountDetailsStyling}>
-                          {followersCount}
-                        </p>
-                      </Grid>
-                      <Grid xs={4} item>
-                        following <br />
-                        <p className={classes.userCountDetailsStyling}>
-                          {followingCount}
-                        </p>
-                      </Grid>
-                    </Grid>
-                  </div>
-                </Grid>
-              </Grid>
-              <div className={classes.controls}>
-                {isOwnProfile ? (
-                  <Button color="red" onClick={handlePost}>
-                    Post Now
-                  </Button>
+              <CardContent className={classes.content}>
+                {!loading ? (
+                  <Typography component="h1" variant="h5">
+                    {title ? title : "Group"}
+                  </Typography>
                 ) : (
-                  <span />
+                  <Skeleton
+                    animation="wave"
+                    width="30%"
+                    height={20}
+                    variant="rect"
+                    style={{ marginBottom: theme.spacing(1) }}
+                  />
                 )}
-                {!isOwnProfile && (
+                <Chip
+                  variant="outlined"
+                  size="small"
+                  icon={<FaceIcon />}
+                  label="Group"
+                  color="primary"
+                />
+              </CardContent>
+              <div className={classes.controls}>
+                <div>
+                  {isAMember && (
+                    <Button color="red" onClick={handlePost}>
+                      Post Now
+                    </Button>
+                  )}
+                  {isAnAdmin && (
+                    <Button color="blue" onClick={handleDelete}>
+                      Delete Group
+                    </Button>
+                  )}
+                </div>
+                {!isAMember && (
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={isFollowing}
-                        onChange={handleFollowToggle}
-                        name="isFollowing"
+                        checked={isAMember === true}
+                        intermediate={isARequestee === true}
+                        onChange={handleJoinToggle}
+                        name="isAMember"
                       />
                     }
-                    label={isFollowing ? "Following" : "Follow"}
+                    label={isAMember ? "Joined" : "Join"}
                   />
                 )}
               </div>
@@ -436,16 +416,19 @@ function ProfileHeader(props) {
   );
 }
 
-ProfileHeader.propTypes = {
-  profile_user: PropTypes.string,
-  loading: PropTypes.bool,
+GroupHeader.propTypes = {
   user: PropTypes.any,
   setDialog: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
   fillForm: PropTypes.func.isRequired,
-  postsCount: PropTypes.number,
-  followersCount: PropTypes.number,
-  followingCount: PropTypes.number,
+  id: PropTypes.any,
+  admin: PropTypes.any,
+  title: PropTypes.any,
+  coverUrl: PropTypes.any,
+  profileUrl: PropTypes.any,
+  members: PropTypes.any,
+  requests: PropTypes.anu,
+  loading: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
@@ -461,4 +444,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileHeader);
+export default connect(mapStateToProps, mapDispatchToProps)(GroupHeader);

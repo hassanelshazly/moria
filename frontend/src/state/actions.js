@@ -39,6 +39,14 @@ export function setSnackbar(open, messageInfo) {
   };
 }
 
+export function fillForm(form, fields) {
+  return {
+    type: actionTypes.FILL_FORM,
+    form,
+    fields,
+  };
+}
+
 export function setMenuAnchor(menu, anchor) {
   return {
     type: actionTypes.SET_MENU_ANCHOR,

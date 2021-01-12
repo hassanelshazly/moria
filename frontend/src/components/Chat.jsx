@@ -13,38 +13,52 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
+import { Redirect } from "react-router-dom";
 
-import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
+import { CircularProgress, Typography, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
-import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
 import { connect } from "react-redux";
-import lottie from 'lottie-web';
+import lottie from "lottie-web";
 import classNames from "classnames";
 import Message from "./Message";
 
+import MessageReceivedAnimation from "../assets/animations/message-received.json";
 
 const useImperativeQuery = (query) => {
   const { refetch } = useQuery(query, { skip: true });
-	
+
   const imperativelyCallQuery = (variables) => {
     return refetch(variables);
-  } 
-	
+  };
+
   return imperativelyCallQuery;
-}
+};
+
 const useStyles = makeStyles((theme) => ({
+  holder:{
+    position:"relative",
+  },
   table: {
     minWidth: 650,
   },
   chatSection: {
     width: "100%",
   },
-  container:{
-    width:"400px",
-    height:"400px"
+  container: {
+    position:"absolute",
+    width: "400px",
+    height: "400px",
+    [theme.breakpoints.down("md")]: {
+      position:"absolute",
+      top:"10vh",
+      left:"1.5vw",
+      width: "300px",
+     height: "300px",
+    },
   },
   headBG: {
     backgroundColor: "#rgb(44,225,210)",
@@ -92,7 +106,6 @@ const useStyles = makeStyles((theme) => ({
   },
   peopleList: {
     [theme.breakpoints.down("sm")]: {
-      display: "none",
     },
   },
 }));
@@ -140,12 +153,9 @@ const SEND_MESSAGE = gql`
 `;
 
 const GET_FOLLOWERS = gql`
-  query GetFollowers($bla: String!)
-  {
-    findUser(username: $bla)
-    {
-      following
-      {
+  query GetFollowers($bla: String!) {
+    findUser(username: $bla) {
+      following {
         username
         fullname
         id
@@ -153,20 +163,43 @@ const GET_FOLLOWERS = gql`
     }
   }
 `;
-
+const MESSAGE_SUBSCRIPTION = gql`
+  subscription onNewMessage {
+    newMessage {
+      id
+      body
+    }
+  }
+`;
 
 const Chat = (props) => {
-  const container = useRef(null);
-  useEffect(()=>{
-      lottie.loadAnimation({
-        container:container.current,
-        renderer:'svg',
-        autoplay:true,
-        loop:true,
-        animationData:require('./../message-received.json')
-      })
-  })
   const { user } = props;
+
+  if (user == null) {
+    return <Redirect to="/" />;
+  }
+  const {
+    data: subData,
+    loading: subLoading,
+    error: subError,
+  } = useSubscription(MESSAGE_SUBSCRIPTION);
+  if (!subLoading) {
+    console.log(subData);
+  }
+  const container = useRef(null);
+  useEffect(() => {
+    const anim = lottie.loadAnimation({
+      container: container.current,
+      renderer: "svg",
+      autoplay: true,
+      loop: true,
+      animationData: MessageReceivedAnimation,
+    });
+
+    return () => {
+      anim.destroy();
+    };
+  }, []);
   const classes = useStyles();
   const theme = useTheme();
   const dummy = useRef();
@@ -176,31 +209,29 @@ const Chat = (props) => {
   const [filter, setFilter] = useState("");
   const USERNAME = user.username;
 
-    
-    const {loading , error, data} =useQuery(GET_FOLLOWERS , {
-      variables: { bla: USERNAME}
-    });
+  const { loading, error, data } = useQuery(GET_FOLLOWERS, {
+    variables: { bla: USERNAME },
+  });
 
-
-  const callQuery= useImperativeQuery(GET_MESSAGES);
+  const callQuery = useImperativeQuery(GET_MESSAGES);
   // const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
 
   const [addMessage] = useMutation(SEND_MESSAGE);
 
-  const [messageArray , setMessageArray] = useState([]);
+  const [messageArray, setMessageArray] = useState([]);
   useEffect(() => {
     if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
-  }, [dummy.current , messageArray]);
+  }, [dummy.current, messageArray]);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
     defaultMatches: true,
   });
+ 
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSendMessage();
     }
-  }
-
+  };
 
   const addEmoji = (e) => {
     let emoji = e.native;
@@ -208,10 +239,10 @@ const Chat = (props) => {
   };
 
   const handleSendMessage = () => {
-    if(newMessage.trim()=="") return;
+    if (newMessage.trim() == "") return;
     // setMessageArray([...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
     //console.log("Current Receiver  " + currentReceiver + " Text: " + newMessage);
-     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
+    addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
 
@@ -219,19 +250,28 @@ const Chat = (props) => {
     setFilter(e.target.value);
   };
 
-  
-  if (loading) return <CircularProgress style={{width:"100px" , height:"100px" ,position:"absolute" , top:"50%" , left:"50%"}} 
-  color="primary" />
+  if (loading)
+    return (
+      <CircularProgress
+        style={{
+          width: "100px",
+          height: "100px",
+          position: "absolute",
+          top: isMobile? "40%" : "45%",
+          left: isMobile? "40%" : "45%",
+        }}
+        color="primary"
+      />
+    );
 
   if (error) return <p>Error :(</p>;
 
-
   return (
-    <div >
+    <div>
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid
           item
-          xs={3}
+          xs={isMobile? 12: 4}
           className={classNames(classes.peopleList, classes.borderRight500)}
         >
           <List>
@@ -258,23 +298,38 @@ const Chat = (props) => {
             {/* Online People */}
             {data.findUser.following.map(
               (someuser) =>
-                someuser.fullname.toLowerCase().includes(filter.toLowerCase()) && (
+                someuser.fullname
+                  .toLowerCase()
+                  .includes(filter.toLowerCase()) && (
                   <ListItem
                     button
                     key={someuser.id}
-                    style={{backgroundColor: currentReceiver == someuser.id ? "rgb(122 0 93 / 15%)" : "white"}}
-                    onClick={ async () => {
+                    style={{
+                      backgroundColor:
+                        currentReceiver == someuser.id
+                          ? "rgb(44 225 210 / 19%)"
+                          : "white",
+                    }}
+                    onClick={async () => {
                       setCurrentReceiver(someuser.id);
-                      const {data,error} = await callQuery({receiver:someuser.id})
-                      setMessageArray(messageArray=> [ ]);
+                      const { data, error } = await callQuery({
+                        receiver: someuser.id,
+                      });
+                      setMessageArray((messageArray) => []);
 
-                     // if(error) { return;}
+                      // if(error) { return;}
                       data.findMessages.forEach((x) => {
-
-                              setMessageArray(messageArray=> [...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
-                          });
-                        console.log(messageArray)
-                      
+                        setMessageArray((messageArray) => [
+                          ...messageArray,
+                          {
+                            id: x.id,
+                            createdAt: x.createdAt,
+                            body: x.body,
+                            sender: x.from.id == user.id,
+                          },
+                        ]);
+                      });
+                      console.log(messageArray);
                     }}
                   >
                     <ListItemIcon>
@@ -288,18 +343,25 @@ const Chat = (props) => {
             )}
           </List>
         </Grid>
-        <Grid item sm={12} md={9}>
+
+        {isMobile && <Grid xs={12} style={{margin:"10px 0" , }}>
+          <Divider />
+        </Grid>}
+        <Grid item xs={isMobile? 12: 8} className={classes.holder} >
           <List
             className={classes.messageArea}
             onClick={() => {
               setShowEmoji(false);
             }}
           >
-            {currentReceiver=="#" && 
-              <div className={classes.container} ref={container}> </div>
-            }
+            {currentReceiver == "#" && (
+              <div className={classes.container} ref={container}>
+                {" "}
+              </div>
+            )}
             {messageArray.map((x) => (
               <Message
+                ISSMALL={isMobile}
                 key={x.id}
                 messageText={x.body}
                 messageDate={x.createdAt}
@@ -318,8 +380,9 @@ const Chat = (props) => {
           <Grid
             container
             style={{
-              padding: "20px",
+              padding: "10px",
               display: currentReceiver == "#" ? "none" : "block",
+              
             }}
           >
             <Grid container spacing={isMobile ? 4 : 2}>

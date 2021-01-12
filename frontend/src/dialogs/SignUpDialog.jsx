@@ -31,12 +31,9 @@ const SIGN_UP = gql`
       username
       email
       fullname
+      profileUrl
       createdAt
       token
-      following {
-        id
-        username
-      }
     }
   }
 `;

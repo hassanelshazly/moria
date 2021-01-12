@@ -22,7 +22,7 @@ UserModel.statics.findAllUsers = function () {
 
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
-    let posts = await User.findPosts({ userId });
+    let posts = await User.findPosts({ id: userId });
     for (following of user.following)
         posts = posts.concat(await User.findPosts({ userId: following._id }));
     return posts;

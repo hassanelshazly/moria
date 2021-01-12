@@ -4,10 +4,9 @@ import CallToAction from "../components/CallToAction";
 import Grid from "@material-ui/core/Grid";
 import Posts from "../components/Posts";
 
-import { Redirect } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { connect } from "react-redux";
-import { setDialog, showSnackbar } from "../state/actions";
+import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
 const GET_FEED_POSTS = gql`
   query GetFeedPosts {
@@ -17,8 +16,10 @@ const GET_FEED_POSTS = gql`
         id
         username
         fullname
+        profileUrl
       }
       body
+      imageUrl
       createdAt
       likes {
         id
@@ -30,6 +31,7 @@ const GET_FEED_POSTS = gql`
           id
           username
           fullname
+          profileUrl
         }
       }
       likeCount
@@ -39,19 +41,22 @@ const GET_FEED_POSTS = gql`
 `;
 
 function Home(props) {
-  const { user, showSnackbar, setDialog } = props;
+  const { user, showSnackbar, setDialog, fillForm } = props;
   const { error, data } = useQuery(GET_FEED_POSTS, {
     skip: !user,
   });
 
   if (error) {
     showSnackbar("error", error.message);
-    return <Redirect to="/" />;
   }
 
   const handleAction = () => {
-    if (user) setDialog("create-post");
-    else setDialog("sign-in");
+    if (user) {
+      fillForm("post", { type: "profile", id: user.username });
+      setDialog("create-post");
+    } else {
+      setDialog("sign-in");
+    }
   };
 
   return (
@@ -69,7 +74,7 @@ function Home(props) {
       </Grid>
       {data && (
         <Grid item xs={12}>
-          <Posts posts={data.findTimeline} />
+          <Posts type="profile" posts={data.findTimeline} />
         </Grid>
       )}
     </Grid>
@@ -80,6 +85,7 @@ Home.propTypes = {
   user: PropTypes.any,
   setDialog: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
+  fillForm: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -91,6 +97,7 @@ function mapDispatchToProps(dispatch) {
     setDialog: (dialog) => dispatch(setDialog(dialog)),
     showSnackbar: (variant, message) =>
       dispatch(showSnackbar(variant, message)),
+    fillForm: (form, fields) => dispatch(fillForm(form, fields)),
   };
 }
 

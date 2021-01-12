@@ -11,6 +11,7 @@ import CreateIcon from "@material-ui/icons/Create";
 import CreatePostDialog from "../dialogs/CreatePostDialog";
 import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import Drawer from "@material-ui/core/Drawer";
 import FaceIcon from "@material-ui/icons/Face";
 import GroupIcon from "@material-ui/icons/Group";
@@ -37,12 +38,10 @@ import SignInDialog from "../dialogs/SignInDialog";
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import Switch from "@material-ui/core/Switch";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -55,7 +54,6 @@ import {
 } from "../state/actions";
 
 const drawerWidth = 240;
-export let isItDark = false;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -527,13 +525,19 @@ function DrawerItems() {
         id: "/group/",
         icon: <GroupIcon />,
         text: "My Group",
-        action: () => history.push("/"),
+        action: () => history.push("/group/"),
       },
       {
         id: "/chat/",
         icon: <ChatIcon />,
         text: "Chat",
-        action: () => history.push("/chat"),
+        action: () => history.push("/chat/"),
+      },
+      {
+        id: "/discovery/",
+        icon: <EmojiPeopleIcon />,
+        text: "Discovery",
+        action: () => history.push("/discovery/"),
       },
     ];
 
@@ -551,23 +555,6 @@ function DrawerItems() {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-        <Divider />
-        <FormControlLabel
-          style={{ marginLeft: "7px", marginTop: "10px" }}
-          value="top"
-          control={
-            <Switch
-              color="primary"
-              checked={isItDark}
-              onChange={() => {
-                isItDark ^= 1;
-                console.log(isItDark);
-              }}
-            />
-          }
-          label="Dark"
-          labelPlacement="top"
-        />
       </List>
     );
   }, [classes]);
@@ -579,6 +566,7 @@ export default function MainNav(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [searchFocus, setSearchFocus] = React.useState(false);
+
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
 

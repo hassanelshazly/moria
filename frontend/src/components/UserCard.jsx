@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -9,6 +10,9 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
+import  { Redirect,useHistory  } from 'react-router-dom'
+import { gql, useMutation } from "@apollo/client";
+
 import anon from "../assets/images/anonymous.png";
 
 const useStyles = makeStyles({
@@ -32,12 +36,29 @@ const useStyles = makeStyles({
     width: "100%",
   },
 });
+const FOLLOW_USER = gql`
+  mutation FollowUser($user_id: ID!) {
+    follow(id: $user_id) {
+      id
+    }
+  }
+`;
+
+function useForceUpdate(){
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update the state to force render
+}
 
 export default function UserCard(props) {
-  const { name } = props;
+  const { fullname ,id,username,canFollow} = props;
+  let history = useHistory();
+
+
+  const PROFILE_LINK = `/profile/${username}`;
   const classes = useStyles();
+  const [followUser] = useMutation(FOLLOW_USER);
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} key={id}>
       <CardActionArea>
         <CardMedia
           className={classes.cardmediaStyling}
@@ -53,7 +74,7 @@ export default function UserCard(props) {
             component="h2"
             className={classes.nameStyling}
           >
-            {name}
+            {fullname}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -64,6 +85,11 @@ export default function UserCard(props) {
             size="small"
             color="primary"
             className={classes.buttonStyling}
+            onClick={()=>{
+              console.log(PROFILE_LINK);
+              history.push(PROFILE_LINK);
+
+            }}
           >
             View
           </Button>
@@ -73,8 +99,19 @@ export default function UserCard(props) {
             size="small"
             color="primary"
             className={classes.buttonStyling}
+            onClick={ ()=>{
+              useForceUpdate()
+              followUser({
+                variables: {
+                  user_id: id,
+                }
+              });
+            }}
+            style={{
+              color: canFollow? "blue" :"red"
+            }}
           >
-            Follow
+           {canFollow? "Follow":"Unfollow"} 
           </Button>
         </Grid>
       </CardActions>

@@ -13,23 +13,29 @@ import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Link from "@material-ui/core/Link";
+import { Link as RouterLink } from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
-import { red } from "@material-ui/core/colors";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FilledInput from "@material-ui/core/FilledInput";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import SendIcon from "@material-ui/icons/Send";
 import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { red } from "@material-ui/core/colors";
 import { formatDistance } from "date-fns";
 
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
-import { showSnackbar } from "../state/actions";
+import { setMenuAnchor, showSnackbar } from "../state/actions";
+
+import uuidv4 from "../utils/uuid";
 
 const ADD_COMMENT = gql`
   mutation AddComment($post_id: ID!, $text: String!) {
@@ -47,19 +53,29 @@ const LIKE_POST = gql`
   }
 `;
 
-function uuidv4() {
-  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-    (
-      c ^
-      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-    ).toString(16)
-  );
-}
+const DELETE_NORMAL_POST = gql`
+  mutation DeletePost($post_id: ID!) {
+    deletePost(postId: $post_id)
+  }
+`;
+
+const DELETE_GROUP_POST = gql`
+  mutation DeleteGroupPost($group_id: ID!, $post_id: ID!) {
+    deleteGroupPost(groupId: $group_id, postId: $post_id)
+  }
+`;
+
+const DELETE_PAGE_POST = gql`
+  mutation DeletePagePost($page_id: ID!, $post_id: ID!) {
+    deletePagePost(pageId: $page_id, postId: $post_id)
+  }
+`;
 
 const userPropTypes = {
   id: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
   fullname: PropTypes.string.isRequired,
+  profileUrl: PropTypes.string.isRequired,
 };
 
 const useCommentStyles = makeStyles(() => ({
@@ -71,19 +87,18 @@ const useCommentStyles = makeStyles(() => ({
 function Comment(props) {
   const classes = useCommentStyles();
   const {
-    user: { fullname: user_name },
-    user_photo,
+    user: { fullname: user_name, profileUrl },
     body,
   } = props;
 
   return (
     <ListItem alignItems="flex-start">
       <ListItemAvatar>
-        {user_photo ? (
-          <Avatar src={user_photo} alt={user_name} />
+        {profileUrl ? (
+          <Avatar src={profileUrl} alt={user_name} />
         ) : (
           <Avatar aria-label="avatar" className={classes.avatar}>
-            {user_name[0]}
+            {user_name.length > 0 ? user_name[0] : "A"}
           </Avatar>
         )}
       </ListItemAvatar>
@@ -96,7 +111,6 @@ const commentPropTypes = {
   id: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   user: PropTypes.exact(userPropTypes).isRequired,
-  user_photo: PropTypes.string,
 };
 
 Comment.propTypes = commentPropTypes;
@@ -104,7 +118,9 @@ Comment.propTypes = commentPropTypes;
 function CommentInputSender(props) {
   const classes = usePostStyles();
   const {
-    user: { id, username, fullname },
+    post_id,
+    user: { id, username, fullname, profileUrl },
+    setCommentsState,
     showSnackbar,
   } = props;
   const [text, setText] = useState("");
@@ -114,10 +130,7 @@ function CommentInputSender(props) {
     },
   });
 
-  const { post_id, setCommentsState } = props;
-  const user_photo = null;
-
-  const handleChange = (event) => {
+  const handleTextChange = (event) => {
     setText(event.target.value);
   };
 
@@ -129,7 +142,11 @@ function CommentInputSender(props) {
       },
     });
     setCommentsState((prevState) => [
-      { id: uuidv4(), body: text, user: { id, username, fullname } },
+      {
+        id: uuidv4(),
+        body: text,
+        user: { id, username, fullname, profileUrl },
+      },
       ...prevState,
     ]);
     setText("");
@@ -138,11 +155,11 @@ function CommentInputSender(props) {
   return (
     <ListItem alignItems="flex-start">
       <ListItemAvatar>
-        {user_photo ? (
-          <Avatar src={user_photo} alt={fullname} />
+        {profileUrl ? (
+          <Avatar src={profileUrl} alt={fullname} />
         ) : (
           <Avatar aria-label="avatar" className={classes.avatar}>
-            {fullname[0]}
+            {fullname.length > 0 ? fullname[0] : "A"}
           </Avatar>
         )}
       </ListItemAvatar>
@@ -153,11 +170,11 @@ function CommentInputSender(props) {
             id="comment-input"
             fullWidth
             value={text}
-            onChange={handleChange}
+            onChange={handleTextChange}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label="send comment"
                   onClick={handleCommentSend}
                   edge="end"
                 >
@@ -174,8 +191,8 @@ function CommentInputSender(props) {
 
 const commentInputPropTypes = {
   post_id: PropTypes.string.isRequired,
-  setCommentsState: PropTypes.func.isRequired,
   user: PropTypes.any,
+  setCommentsState: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
 };
 
@@ -222,26 +239,54 @@ const usePostStyles = makeStyles((theme) => ({
 }));
 
 function PostViewer(props) {
+  const {
+    type,
+    thingId,
+    current_user,
+    id,
+    user: { username, fullname: user_name, profileUrl },
+    createdAt,
+    imageUrl,
+    body,
+    comments,
+    likes,
+    handlePostDelete,
+    showSnackbar,
+  } = props;
+
   const classes = usePostStyles();
-  const [expanded, setExpanded] = React.useState(false);
-  const { current_user, showSnackbar } = props;
   const [likePost] = useMutation(LIKE_POST, {
     onError(error) {
       showSnackbar("error", error.message);
     },
   });
+  const [deleteNormalPost] = useMutation(DELETE_NORMAL_POST, {
+    onCompleted() {
+      handlePostDelete(id);
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [deleteGroupPost] = useMutation(DELETE_GROUP_POST, {
+    onCompleted() {
+      handlePostDelete(id);
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [deletePagePost] = useMutation(DELETE_PAGE_POST, {
+    onCompleted() {
+      handlePostDelete(id);
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
 
-  const {
-    id,
-    user: { fullname: user_name },
-    user_photo,
-    createdAt,
-    image,
-    body,
-    comments,
-    likes,
-  } = props;
-
+  const [expanded, setExpanded] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const [likeState, setLikeState] = useState(
     likes.some((el) => el.id === current_user.id)
   );
@@ -249,6 +294,43 @@ function PostViewer(props) {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    switch (type) {
+      case "profile":
+        deleteNormalPost({
+          variables: {
+            post_id: id,
+          },
+        });
+        break;
+      case "group":
+        deleteGroupPost({
+          variables: {
+            group_id: thingId,
+            post_id: id,
+          },
+        });
+        break;
+      case "page":
+        deletePagePost({
+          variables: {
+            page_id: thingId,
+            post_id: id,
+          },
+        });
+        break;
+    }
+    setMenuAnchor(null);
   };
 
   const handleLikeToggle = () => {
@@ -264,27 +346,42 @@ function PostViewer(props) {
     <Card elevation={25}>
       <CardHeader
         avatar={
-          user_photo ? (
-            <Avatar src={user_photo} aria-label={user_name} />
+          profileUrl ? (
+            <Avatar src={profileUrl} aria-label={user_name} />
           ) : (
             <Avatar aria-label="avatar" className={classes.avatar}>
-              {user_name[0]}
+              {user_name.length > 0 ? user_name[0] : "A"}
             </Avatar>
           )
         }
         action={
-          <IconButton aria-label="more">
-            <MoreVertIcon />
-          </IconButton>
+          <React.Fragment>
+            <IconButton aria-label="more" onClick={handleMenuClick}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="more-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+            </Menu>
+          </React.Fragment>
         }
-        title={user_name}
-        subheader={formatDistance(
-          new Date(Number(createdAt, 10) * 1000),
-          new Date()
-        )}
+        title={
+          <Link
+            component={RouterLink}
+            to={`/profile/${encodeURIComponent(username)}`}
+          >
+            {user_name}
+          </Link>
+        }
+        subheader={formatDistance(new Date(Number(createdAt, 10)), new Date())}
       />
-      {image && (
-        <CardMedia className={classes.media} image={image} title={body} />
+      {imageUrl && (
+        <CardMedia className={classes.media} image={imageUrl} title={body} />
       )}
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
@@ -332,6 +429,8 @@ function PostViewer(props) {
 }
 
 const postPropTypes = {
+  type: PropTypes.string,
+  thingId: PropTypes.string,
   id: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   commentCount: PropTypes.number.isRequired,
@@ -339,9 +438,9 @@ const postPropTypes = {
   createdAt: PropTypes.string.isRequired,
   likeCount: PropTypes.number.isRequired,
   likes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  handlePostDelete: PropTypes.func.isRequired,
   user: PropTypes.exact(userPropTypes),
-  user_photo: PropTypes.string,
-  image: PropTypes.string,
+  imageUrl: PropTypes.string,
   current_user: PropTypes.any,
   showSnackbar: PropTypes.func.isRequired,
 };
@@ -362,11 +461,22 @@ function mapPostDispatchToProps(dispatch) {
 const Post = connect(mapPostStateToProps, mapPostDispatchToProps)(PostViewer);
 
 function Posts(props) {
+  const [posts, setPosts] = useState(props.posts);
+
+  const handleDeletePost = (id) => {
+    setPosts((posts) => posts.filter((el) => el.id !== id));
+  };
+
   return (
     <Grid container spacing={2}>
-      {props.posts.map((post) => (
+      {posts.map((post) => (
         <Grid key={post.id} item xs={12}>
-          <Post {...post} />
+          <Post
+            type={props.type}
+            thingID={props.thingId}
+            {...post}
+            handlePostDelete={handleDeletePost}
+          />
         </Grid>
       ))}
     </Grid>
@@ -375,6 +485,8 @@ function Posts(props) {
 
 const postsPropTypes = {
   posts: PropTypes.arrayOf(PropTypes.exact(postPropTypes)),
+  type: PropTypes.string,
+  thingId: PropTypes.string,
 };
 
 Posts.propTypes = postsPropTypes;

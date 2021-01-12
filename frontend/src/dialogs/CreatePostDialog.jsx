@@ -12,13 +12,30 @@ import FaceIcon from "@material-ui/icons/Face";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
+import { useHistory } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
-const ADD_POST = gql`
-  mutation AddPost($text: String!) {
-    createPost(body: $text) {
+const ADD_PROFILE_POST = gql`
+  mutation AddProfilePost($text: String!, $image: String) {
+    createPost(body: $text, imageSrc: $image) {
+      id
+    }
+  }
+`;
+
+const ADD_GROUP_POST = gql`
+  mutation AddGroupPost($group_id: ID!, $text: String!, $image: String) {
+    createGroupPost(groupId: $group_id, body: $text, imageSrc: $image) {
+      id
+    }
+  }
+`;
+
+const ADD_PAGE_POST = gql`
+  mutation AddPagePost($page_id: ID!, $text: String!, $image: String) {
+    createPagePost(pageId: $page_id, body: $text, imageSrc: $image) {
       id
     }
   }
@@ -73,17 +90,36 @@ function CreatePostDialog(props) {
   const classes = useStyles();
   const theme = useTheme();
   const width = useWidth();
+  const history = useHistory();
   const cardContent = useRef(null);
-  const [media, setMedia] = React.useState(null);
   const [text, setText] = React.useState("");
+  const [media, setMedia] = React.useState(null);
   const [cardContentHeight, setCardContentHeight] = React.useState(0);
 
   // eslint-disable-next-line no-empty-pattern
-  const { setDialog, showSnackbar } = props;
-  const [addPost] = useMutation(ADD_POST, {
+  const { postForm, setDialog, showSnackbar } = props;
+  const [addProfilePost] = useMutation(ADD_PROFILE_POST, {
     onCompleted() {
       setDialog(null);
-      showSnackbar("success", "Successfully posted");
+      history.push(`/profile/${encodeURIComponent(postForm.id)}`);
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [addGroupPost] = useMutation(ADD_GROUP_POST, {
+    onCompleted() {
+      setDialog(null);
+      history.push(`/group/${encodeURIComponent(postForm.id)}`);
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [addPagePost] = useMutation(ADD_PAGE_POST, {
+    onCompleted() {
+      setDialog(null);
+      history.push(`/page/${encodeURIComponent(postForm.id)}`);
     },
     onError(error) {
       showSnackbar("error", error.message);
@@ -98,18 +134,55 @@ function CreatePostDialog(props) {
 
   useEffect(() => {
     setCardContentHeight(cardContent.current.offsetHeight);
-  }, [cardContent]);
+  });
 
   const handlePost = () => {
-    addPost({
-      variables: {
-        text,
-      },
-    });
+    if (media) {
+      const reader = new FileReader();
+      reader.readAsDataURL(media);
+      reader.onloadend = () => {
+        switch (postForm.type) {
+          case "porfile":
+            addProfilePost({ variables: { text, image: reader.result } });
+            break;
+          case "group":
+            addGroupPost({
+              variables: { group_id: postForm.id, text, image: reader.result },
+            });
+            break;
+          case "page":
+            addPagePost({
+              variables: { page_id: postForm.id, text, image: reader.result },
+            });
+            break;
+        }
+      };
+      reader.onerror = () => {
+        showSnackbar("Something went wrong!");
+      };
+    } else {
+      console.log(postForm.type);
+      switch (postForm.type) {
+        case "profile":
+          addProfilePost({ variables: { text } });
+          break;
+        case "group":
+          addGroupPost({
+            variables: { group_id: postForm.id, text },
+          });
+          break;
+        case "page":
+          addPagePost({
+            variables: { page_id: postForm.id, text },
+          });
+          break;
+      }
+    }
   };
 
   const handleMediaChange = (event) => {
-    setMedia(event.target.files[0]);
+    const files = event.target.files;
+    if (files.length > 0) setMedia(files[0]);
   };
 
   const handleTextChange = (event) => {
@@ -189,8 +262,13 @@ function CreatePostDialog(props) {
 
 CreatePostDialog.propTypes = {
   label: PropTypes.string,
+  postForm: PropTypes.any,
   setDialog: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return { postForm: state.forms.post };
 };
 
 function mapDispatchToProps(dispatch) {
@@ -201,4 +279,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(CreatePostDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePostDialog);
