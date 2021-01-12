@@ -13,13 +13,14 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
+import  { Redirect } from 'react-router-dom'
 
 import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
-import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
 import { connect } from "react-redux";
 import lottie from 'lottie-web';
 import classNames from "classnames";
@@ -153,9 +154,29 @@ const GET_FOLLOWERS = gql`
     }
   }
 `;
+const MESSAGE_SUBSCRIPTION = gql`
+  subscription onNewMessage {
+    newMessage {
+      id
+      body
+    }
+  }
+`;
 
 
 const Chat = (props) => {
+  const { user } = props;
+
+  if(user==null)
+  {
+    return <Redirect to='/'  />
+
+  }
+  const {data:subData , loading:subLoading , error:subError} = useSubscription(MESSAGE_SUBSCRIPTION);
+  if(!subLoading)
+  {
+    console.log(subData);
+  }
   const container = useRef(null);
   useEffect(()=>{
       lottie.loadAnimation({
@@ -165,8 +186,7 @@ const Chat = (props) => {
         loop:true,
         animationData:require('./../message-received.json')
       })
-  })
-  const { user } = props;
+  } , []);
   const classes = useStyles();
   const theme = useTheme();
   const dummy = useRef();
