@@ -59,12 +59,12 @@ const Group = gql`
         changeGroupCover(
             groupId:  ID!
             coverSrc: String!
-        ): User
+        ): Group
 
         changeGroupProfile(
             groupId:    ID!
             profileSrc: String!
-        ): User
+        ): Group
     }
 `;
 
