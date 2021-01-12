@@ -152,7 +152,7 @@ PageModel.statics.deletePagePost = async function (args) {
 
     const pIdx = page.posts.findIndex(post => post._id == postId);
 
-    if (pIdx == -1 || page.posts[pIdx].user != userId)
+    if (pIdx == -1 || page.owner != userId)
         throw new Error("User not authorized");
 
     page.posts.splice(pIdx, 1);
