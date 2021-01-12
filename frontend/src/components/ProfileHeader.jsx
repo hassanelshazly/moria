@@ -214,6 +214,7 @@ function ProfileHeader(props) {
     };
   }, []);
 
+  // eslint-disable-next-line no-unused-vars
   const handleCoverChange = (event) => {
     setCover(event.target.files[0]);
   };
@@ -259,26 +260,8 @@ function ProfileHeader(props) {
         }}
         className={classes.card}
       >
-        {isOwnProfile && (
-          <React.Fragment>
-            <input
-              accept="image/*"
-              className={classes.input}
-              id="cover-edit-button"
-              type="file"
-              onChange={handleCoverChange}
-            />
-            <label
-              className={classes.mediaEditLabel}
-              htmlFor="cover-edit-button"
-            >
-              <IconButton aria-label="edit-cover" component="span">
-                <EditIcon className={classes.mediaEditIcon} />
-              </IconButton>
-            </label>
-          </React.Fragment>
-        )}
-                <div className={classes.container} ref={container}></div>
+      
+        <div className={classes.container} ref={container}></div>
 
 
 
