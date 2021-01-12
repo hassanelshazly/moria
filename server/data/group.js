@@ -4,6 +4,7 @@ const User = require("./user");
 const Post = require("./post");
 const GroupModel = require("../models/group");
 const { uploadImage } = require("../util/image");
+const { getAuthUser } = require("../util/auth");
 
 GroupModel.statics.findGroup = async function (args) {
     const group = await Group.findById(groupId);
@@ -25,37 +26,44 @@ GroupModel.statics.findAdmin = async function ({ id }) {
     return group.admin;
 }
 
-GroupModel.statics.findMembers = async function ({ id, userId }) {
+GroupModel.statics.findMembers = async function ({ id }) {
     const group = await Group.findById(id);
     if (!group)
         throw new Error("Group not found");
-
-    if (!group.members.includes(userId) && group.admin != userId)
-        throw new Error("User not authorized");
 
     await group.populate('members').execPopulate();
     return group.members;
 }
 
-GroupModel.statics.findPosts = async function ({ id, userId }) {
+GroupModel.statics.findPosts = async function ({ id, context }) {
+    try {
+        var { userId } = getAuthUser(context);
+    } catch (err) {
+        return null;
+    }
     const group = await Group.findById(id);
     if (!group)
         throw new Error("Group not found");
 
     if (!group.members.includes(userId) && group.admin != userId)
-        throw new Error("User not authorized");
+        return null;
 
     await group.populate('posts').execPopulate();
     return group.posts;
 }
 
-GroupModel.statics.findRequests = async function ({ id, userId }) {
+GroupModel.statics.findRequests = async function ({ id, context }) {
+    try {
+        var { userId } = getAuthUser(context);
+    } catch (err) {
+        return null;
+    }
     const group = await Group.findById(id);
     if (!group)
         throw new Error("Group not found");
 
     if (group.admin != userId)
-        throw new Error("User not authorized");
+        return null;
 
     await group.populate('requests').execPopulate();
     return group.requests;

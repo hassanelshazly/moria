@@ -3,15 +3,16 @@ const { gql } = require('apollo-server');
 const Group = gql`
 
     type Group {
-        id:         ID!
-        admin:      User!
-        title:      String!
-        coverUrl:   String
-        profileUrl: String
-        createdAt:  String
-        members:    [User]
-        posts:      [Post]
-        requests:   [User]
+        id:           ID!
+        admin:        User!
+        title:        String!
+        coverUrl:     String
+        profileUrl:   String
+        membersCount: Int!
+        createdAt:    String
+        members:      [User]
+        posts:        [Post]
+        requests:     [User]
     }
 
     extend type Query {

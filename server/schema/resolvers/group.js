@@ -88,21 +88,25 @@ module.exports = {
         posts(parent, args, context) {
             return Group.findPosts({
                 id: parent.id,
-                ...getAuthUser(context)
+                context
             });
         },
 
         members(parent, args, context) {
             return Group.findMembers({
                 id: parent.id,
-                ...getAuthUser(context)
+                context
             });
+        },
+
+        membersCount(parent, args, context) {
+            return parent.members.length;
         },
 
         requests(parent, args, context) {
             return Group.findRequests({
                 id: parent.id,
-                ...getAuthUser(context)
+                context
             });
         }
     }
