@@ -262,7 +262,7 @@ const Chat = (props) => {
                   <ListItem
                     button
                     key={someuser.id}
-                    style={{backgroundColor: currentReceiver == someuser.id ? "rgb(122 0 93 / 15%)" : "white"}}
+                    style={{backgroundColor: currentReceiver == someuser.id ? "rgb(44 225 210 / 19%)" : "white"}}
                     onClick={ async () => {
                       setCurrentReceiver(someuser.id);
                       const {data,error} = await callQuery({receiver:someuser.id})

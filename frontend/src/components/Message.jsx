@@ -31,9 +31,16 @@ const useStyles = makeStyles(() => ({
     paddingTop: "10px",
     paddingBottom: "10px",
     borderRadius: "30px",
+    width:"max-content",
+    float:"right",
+    maxWidth:"500px",
+    overflow:"hidden"
   },
   receiverStyle: {
     backgroundColor: "#E0DBDA",
+    width:"max-content",
+    maxWidth:"500px",
+    overflow:"hidden",
     color: "black",
     paddingRight: "20px",
     paddingLeft: "15px",
