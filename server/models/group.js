@@ -28,14 +28,8 @@ const GroupSchema = new mongoose.Schema({
     ],
     requests: [
         {
-            user: {
-                type: ObjectId,
-                ref: "User"
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now()
-            }
+            type: ObjectId,
+            ref: "User"
         }
     ],
     posts: [
