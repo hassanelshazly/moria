@@ -43,7 +43,7 @@ PageModel.statics.findFollowers = async function ({ id }) {
     return page.followers;
 }
 
-PageModel.statics.followPage = async function (pageId, userId) {
+PageModel.statics.followPage = async function ( {pageId, userId} ) {
     if (!userId)
         throw new Error("User not authorized");
 

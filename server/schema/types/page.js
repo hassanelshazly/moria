@@ -45,6 +45,7 @@ const Page = gql`
         
         deletePagePost(
             postId: ID!
+            pageId: ID!
         ): String
 
         changePageCover(
