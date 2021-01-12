@@ -38,7 +38,7 @@ describe("Post", () => {
         await User.deleteOne({ username: testUsername });
     });
 
-    describe("#creatPost()", () => {
+    describe("#createPost()", () => {
         beforeEach(async () => {
             await Post.deleteMany({ user : testUserId });
         });
@@ -62,6 +62,7 @@ describe("Post", () => {
 
         it("Not Providing Id", async () => {
             try {
+                await Post.deleteMany({ user : testUserId });
                 const post = await Post.createPost({
                     body: testPostBody
                 });
@@ -139,12 +140,12 @@ describe("Post", () => {
             assert.strictEqual(post.likes[0]._id, testUserId);
 
             post = await Post.likePost({
-                userId: new ObjectId(testUserId),
-                postId: new ObjectId(testPostId)
+                userId: testUserId,
+                postId: testPostId
             });
 
             assert.ok(post);
-            assert.strictEqual(post.likes.length, 1);
+            assert.strictEqual(post.likes.length, 0);
         });
     });
 });

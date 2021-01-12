@@ -2,12 +2,13 @@ const dotenv = require('dotenv').config()
 const assert = require('assert')
 const mongoose = require('mongoose')
 const User = require("../data/user")
+const Post = require("../data/user")
 const Group = require("../data/group")
 const { ObjectId } = mongoose.Types;
 
 describe("Group", () => {
     before(async function () {
-        this.timeout(5000);
+        this.timeout(10000);
         try {
             await mongoose.connect(process.env.MONGO_URI_TEMP, {
                 useNewUrlParser: true,
@@ -20,86 +21,107 @@ describe("Group", () => {
 
         testName = "Test User";
         testUsername = "testuserusernamerandomone";
+        testMembername = "testmemberuserusernamerandomone";
         testEmail = "testuserusernamerandomone@gmail.com";
+        testMemberEmail = "testmemberusernamerandomone@gmail.com";
         testPassword = "123456789";
 
-        const user = await User.register({
-            fullname: testName,
-            username: testUsername,
-            email: testEmail,
-            password: testPassword,
-        })
-        testUserId = user._id;
-
-        testGroupTitle = "thistitleisfortesingpurposandwhateverthisthinguse";
-    })
-
-after(async () => {
-    await User.deleteOne({ username: testUsername })
-})
-
-describe("#creatGroup()", () => {
-    beforeEach(async () => {
-        await Group.deleteMany({ admin : testUserId });
-    });
-
-    afterEach(async () => {
-        await Group.deleteMany({ admin : testUserId });
-    });
-
-    it("Normal Group Creation", async () => {
-        const group = await Group.createGroup({
-            title:  testGroupTitle,
-            adminId: testUserId
-        })
-        assert.ok(group)
-
-        const dbGroup= await Group.findById(group._id);
-        assert.ok(dbGroup)
-
-        assert.strictEqual(group.title, dbGroup.title);
-    })
-
-    it("Not Providing Id", async () => {
+        let user;
+        let member
         try {
-            const group = await Group.createGroup({
-                title: testGroupTitle
-            })
-            assert.fail("Group Without userId has been accepted");
-        } catch {
-            const group = await Group.findOne({ title: testGroupTitle });
-            if (group)
-                assert.fail("Wrong data has been stored in db");
+            user = await User.register({
+                fullname: testName,
+                username: testUsername,
+                email: testEmail,
+                password: testPassword,
+            });
+
+            member = await User.register({
+                fullname: testName,
+                username: testMembername,
+                email: testMemberEmail,
+                password: testPassword,
+            });
+        } catch (err) {
+            await User.deleteOne({ username: testUsername })
+            await User.deleteOne({ username: testMembername })
+            assert.fail(err);
         }
-    })
-})
+        testUserId = user._id;
+        testGroupTitle = "Group Title";
 
-describe("#createGroupPost()", async () => {
-    beforeEach(async () => {
-        const group = await Group.createGroupPost({
-            title: testGroupTitle,
-            adminId: testUserId
+        testMembersId = [member._id];
+    })
+
+    after(async () => {
+        await User.deleteOne({ username: testUsername })
+        await User.deleteOne({ username: testMembername })
+    })
+
+    describe("#creatGroup()", () => {
+        beforeEach(async () => {
+            await Group.deleteMany({ admin: testUserId });
+        });
+
+        afterEach(async () => {
+            await Group.deleteMany({ admin: testUserId });
+        });
+
+        it("Normal Group Creation", async () => {
+            const group = await Group.createGroup({
+                title: testGroupTitle,
+                userId: testUserId,
+                membersId: testMembersId
+            })
+            assert.ok(group)
+
+            const dbGroup = await Group.findById(group._id);
+            assert.ok(dbGroup)
+
+            assert.strictEqual(group.title, dbGroup.title);
         })
 
-        testGroupId = group._id;
+        it("Not Providing Id", async () => {
+            try {
+                const group = await Group.createGroup({
+                    title: testGroupTitle
+                })
+                assert.fail("Group Without userId has been accepted");
+            } catch {
+                const group = await Group.findOne({ title: testGroupTitle });
+                if (group)
+                    assert.fail("Wrong data has been stored in db");
+            }
+        })
     })
 
-    afterEach(async () => {
-        await Group.deleteMany({ admin : testUserId });
-    })
+    describe("#createGroupPost()", async () => {
+        beforeEach(async () => {
+            const group = await Group.createGroup({
+                title: testGroupTitle,
+                userId: testUserId,
+                membersId: testMembersId
+            })
 
-
-    it("Normal Group Post Creation", async () => {
-        const group = await Post.createGroupPost({
-            adminId: testUserId,
-            groupId: testGroupId,
-            title: testGroupTitle
+            testGroupId = group._id;
         })
 
-        assert.ok(group);
-        assert.strictEqual(group.posts.length, 1);
-        assert.strictEqual(group.posts[0].body, testGroupTitle);
+        afterEach(async () => {
+            await Post.deleteMany({ user: testUserId });
+            await Group.deleteMany({ admin: testUserId });
+        })
+
+
+        it("Normal Group Post Creation", async () => {
+            const post = await Group.createGroupPost({
+                userId: testUserId,
+                groupId: testGroupId,
+                body: testGroupTitle
+            })
+
+            assert.ok(post);
+            assert.strictEqual(post.body, testGroupTitle);
+        })
     })
-})
 
 })

@@ -2,6 +2,7 @@ const postResolvers = require('./post');
 const userResolvers = require('./user');
 const pageResolvers = require("./page");
 const groupResolvers = require("./group");
+const searchResolvers = require("./search");
 const messageResolvers = require('./message');
 const groupChatResolvers = require("./chat");
 const notificationResolvers = require('./notification');
@@ -12,6 +13,7 @@ module.exports = {
         ...userResolvers.Query,
         ...pageResolvers.Query,
         ...groupResolvers.Query,
+        ...searchResolvers.Query,
         ...messageResolvers.Query,
         ...groupChatResolvers.Query,
         ...notificationResolvers.Query
@@ -50,5 +52,9 @@ module.exports = {
 
     UserGroup: {
         ...messageResolvers.UserGroup
+    },
+
+    SearchUnion: {
+        ...searchResolvers.SearchUnion
     }
 };

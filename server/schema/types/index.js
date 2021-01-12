@@ -4,6 +4,7 @@ const { Post } = require("./post");
 const { User } = require("./user");
 const { Page } = require("./page");
 const { Group } = require("./group");
+const { Search } = require("./search");
 const { Message } = require("./message");
 const { Notification } = require("./notification");
 const { GroupChat } = require("./chat");
@@ -23,6 +24,7 @@ const typeDefs = gql`
     ${User}
     ${Page}
     ${Group} 
+    ${Search}
     ${Message}
     ${GroupChat}
     ${Notification}
