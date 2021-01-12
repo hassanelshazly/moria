@@ -75,12 +75,14 @@ GroupChatModel.statics.createGroupChat = async function (args) {
     if (!user)
         throw new Error("User not found");
 
-    const members = membersId.map(async memberId => {
-        const member = await User.findById(memberId);
-        if (!member)
-            throw new Error("Member not found");
-        return member;
-    });
+    const members = await Promise.all(
+        membersId.map(async memberId => {
+            const member = await User.findById(memberId);
+            if (!member)
+                throw new Error("Member not found");
+            return member;
+        })
+    );
 
     const groupChat = new GroupChat({
         title,
@@ -93,7 +95,6 @@ GroupChatModel.statics.createGroupChat = async function (args) {
     await user.save();
 
     for (member of members) {
-        member = await member;
         member.groupChats.push(groupChat._id);
         await member.save();
     }

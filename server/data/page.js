@@ -4,7 +4,6 @@ const Post = require("./post");
 const User = require("./user");
 const PageModel = require("../models/page");
 const { uploadImage } = require("../util/image");
-const { User } = require("../schema/types/user");
 
 PageModel.statics.findPage = async function ({ pageId }) {
     const page = await Page.findById(pageId);
@@ -128,7 +127,7 @@ PageModel.statics.deletePage = async function ({ pageId, userId }) {
 
 
 PageModel.statics.createPagePost = async function (args) {
-    const { pageId, body, userId } = args;
+    const { pageId, userId } = args;
     if (!userId)
         throw new Error("User not authorized")
 
@@ -136,13 +135,13 @@ PageModel.statics.createPagePost = async function (args) {
     if (!page)
         throw new Error("Page not found");
 
-    if (group.owner != userId)
+    if (page.owner != userId)
         throw new Error("User not authorized")
 
     const post = await Post.createPost(args);
     page.posts.push(post._id);
     await page.save();
-    return await page.save();
+    return post;
 }
 
 PageModel.statics.deletePagePost = async function (args) {

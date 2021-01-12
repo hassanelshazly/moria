@@ -70,12 +70,14 @@ GroupModel.statics.createGroup = async function (args) {
     if (!user)
         throw new Error("User not found");
 
-    const members = membersId.map(async memberId => {
-        const member = await User.findById(memberId);
-        if (!member)
-            throw new Error("Member not found");
-        return member;
-    });
+    const members = await Promise.all(
+        membersId.map(async memberId => {
+            const member = await User.findById(memberId);
+            if (!member)
+                throw new Error("Member not found");
+            return member;
+        })
+    );
 
     const group = new Group({
         title,
@@ -90,7 +92,12 @@ GroupModel.statics.createGroup = async function (args) {
         group.profileUrl = await uploadImage(profileSrc);
 
     await group.save();
-    return group
+
+    await user.addOrRemoveGroup(group._id); 
+    for (member of members)
+        await member.addOrRemoveGroup(group._id); 
+
+    return group;
 }
 
 GroupModel.statics.changeGroupCover = async function (args) {
