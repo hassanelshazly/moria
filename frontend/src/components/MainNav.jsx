@@ -11,6 +11,7 @@ import CreateIcon from "@material-ui/icons/Create";
 import CreatePostDialog from "../dialogs/CreatePostDialog";
 import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import Drawer from "@material-ui/core/Drawer";
 import FaceIcon from "@material-ui/icons/Face";
 import GroupIcon from "@material-ui/icons/Group";
@@ -527,13 +528,19 @@ function DrawerItems() {
         id: "/group/",
         icon: <GroupIcon />,
         text: "My Group",
-        action: () => history.push("/"),
+        action: () => history.push("/group/"),
       },
       {
         id: "/chat/",
         icon: <ChatIcon />,
         text: "Chat",
-        action: () => history.push("/chat"),
+        action: () => history.push("/chat/"),
+      },
+      {
+        id: "/discovery/",
+        icon: <EmojiPeopleIcon />,
+        text: "Discovery",
+        action: () => history.push("/discovery/"),
       },
     ];
 

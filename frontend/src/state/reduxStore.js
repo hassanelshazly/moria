@@ -41,6 +41,14 @@ export function setSnackbar(open, messageInfo) {
   };
 }
 
+export function fillForm(form, fields) {
+  return {
+    type: actionTypes.FILL_FORM,
+    form,
+    fields,
+  };
+}
+
 export function setMenuAnchor(menu, anchor) {
   return {
     type: actionTypes.SET_MENU_ANCHOR,
@@ -54,6 +62,12 @@ export const initialState = {
   dialog: null,
   snackbar: { queue: [], open: false, messageInfo: undefined },
   menus: { account: null },
+  forms: {
+    post: {
+      type: "",
+      id: "",
+    },
+  },
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -102,6 +116,15 @@ export const rootReducer = (state = initialState, action) => {
           messageInfo: action.messageInfo
             ? action.messageInfo
             : state.snackbar.messageInfo,
+        },
+      };
+
+    case actionTypes.FILL_FORM:
+      return {
+        ...state,
+        forms: {
+          ...state.forms,
+          [action.form]: action.fields,
         },
       };
 

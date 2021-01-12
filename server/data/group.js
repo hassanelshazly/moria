@@ -6,7 +6,7 @@ const GroupModel = require("../models/group");
 const { uploadImage } = require("../util/image");
 const { getAuthUser } = require("../util/auth");
 
-GroupModel.statics.findGroup = async function (args) {
+GroupModel.statics.findGroup = async function ({ groupId }) {
     const group = await Group.findById(groupId);
     if (!group)
         throw new Error("Group not found");

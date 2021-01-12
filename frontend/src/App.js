@@ -13,13 +13,16 @@ import MainNav from "./components/MainNav";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Groups from "./pages/Groups";
+import Group from "./pages/Group";
 import Chat from "./pages/Chat";
+import Discovery from "./pages/Discovery";
 
 import { connect } from "react-redux";
 // TODO: Revise useMemo() and useCallback(). Should we use React.memo(). Correct data after network.
 
 function App(props) {
-  const { user } = props;
+  const { token } = props;
 
   const httpLink = createHttpLink({
     uri: "http://localhost:4000/",
@@ -29,7 +32,7 @@ function App(props) {
     return {
       headers: {
         ...headers,
-        authorization: user ? `Bearer ${user.token}` : "",
+        authorization: token ? `Bearer ${token}` : "",
       },
     };
   });
@@ -49,8 +52,17 @@ function App(props) {
           <Route path="/profile/">
             <Profile />
           </Route>
+          <Route exact path="/group/">
+            <Groups />
+          </Route>
+          <Route path="/group/:id/">
+            <Group />
+          </Route>
           <Route path="/chat/">
             <Chat />
+          </Route>
+          <Route path="/discovery/">
+            <Discovery />
           </Route>
         </Switch>
       </MainNav>
@@ -59,11 +71,11 @@ function App(props) {
 }
 
 App.propTypes = {
-  user: PropTypes.any,
+  token: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
-  return { user: state.user };
+  return { token: state.user ? state.user.token : null };
 };
 
 export default connect(mapStateToProps)(App);
