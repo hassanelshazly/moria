@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import PropTypes from "prop-types";
-import { Grid, makeStyles, Typography } from "@material-ui/core";
+import { CircularProgress, Grid, makeStyles, Typography } from "@material-ui/core";
 import UserCard from "./UserCard";
 
 import { gql, useQuery } from "@apollo/client";
@@ -52,8 +52,23 @@ function Discovery(props) {
   const {loading:followersLoading , error:followersError, data:followersData} =useQuery(GET_FOLLOWERS , {
     variables: { bla: user?user.username:""}
   });
+  
 
-  if (loading || followersLoading ) return <p>Loading...</p>;
+  if (loading || followersLoading ) 
+    {return (
+      <CircularProgress
+        style={{
+          width: "100px",
+          height: "100px",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+        }}
+        color="primary"
+      />
+    );
+      }
+
   if (error) return `Error! ${error.message}`;
   if(followersError) return `Error! ${followersError.message}`;
 
