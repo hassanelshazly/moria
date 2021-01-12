@@ -6,7 +6,7 @@ const GroupModel = require("../models/group");
 const { uploadImage } = require("../util/image");
 const { getAuthUser } = require("../util/auth");
 
-GroupModel.statics.findGroup = async function (args) {
+GroupModel.statics.findGroup = async function ( {groupId} ) {
     const group = await Group.findById(groupId);
     if (!group)
         throw new Error("Group not found");
@@ -140,7 +140,7 @@ GroupModel.statics.acceptRequest = async function ({ groupId, userId, memberId }
     if (group.admin != userId)
         throw new Error("User not authoried");
 
-    if (!group.requests.includes(userId))
+    if (!group.requests.includes(memberId))
         throw new Error("User hasn't join");
 
     await group.addOrRemoveRequest(memberId);
@@ -171,7 +171,7 @@ GroupModel.statics.addMembers = async function ({ groupId, userId, membersId }) 
 
     for (member of members) {
         await member.addOrRemoveGroup(group._id);
-        await group.addOrRemoveMember(userId);
+        await group.addOrRemoveMember(member._id);
     }
     return group;
 }
@@ -207,7 +207,7 @@ GroupModel.statics.changeGroupProfile = async function (args) {
         throw new Error("User not authoried");
 
     group.profileUrl = await uploadImage(profileSrc);
-    return await page.save();
+    return await group.save();
 }
 
 GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {
@@ -254,7 +254,11 @@ GroupModel.statics.deleteGroupPost = async function (args) {
 
     const pIdx = group.posts.findIndex(post => post._id == postId);
 
-    if (pIdx == -1 || group.posts[pIdx].user != userId || group.admin != userId)
+    if (pIdx == -1)
+        throw new Error("Post not found");
+
+    const post = await Post.findById(group.posts[pIdx]);
+    if (post.user != userId && group.admin != userId)
         throw new Error("User not authorized");
 
     group.posts.splice(pIdx, 1);
