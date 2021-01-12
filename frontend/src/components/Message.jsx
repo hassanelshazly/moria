@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     overflowY: "auto",
   },
   senderStyle: {
-    backgroundColor: "purple",
+    backgroundColor: "rgb(44,225,210)",
     color: "white",
     paddingRight: "20px",
     paddingLeft: "15px",

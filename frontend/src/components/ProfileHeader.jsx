@@ -16,6 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import lottie from "lottie-web";
 
 import Avatar from "../assets/images/avatar-0.png";
 
@@ -38,6 +39,12 @@ const UPLOAD_IMAGE = gql`
 `;
 
 const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
+  container:{
+    marginBottom:"150px",
+    position:"relative",
+    top:"-90px",
+    right:""
+  },
   relative: { position: "relative" },
   card: {
     margin: "auto",
@@ -71,7 +78,7 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
     borderRadius: spacing(0.5),
     backgroundColor: "#ffffff",
     position: "absolute",
-    top: "70%",
+    top: "83%",
     left: "2%",
     width: "96%",
     padding: spacing(3),
@@ -129,6 +136,16 @@ const useStyles = makeStyles(({ spacing, breakpoints, shape }) => ({
 }));
 
 function ProfileHeader(props) {
+  const container = useRef(null);
+  useEffect(()=>{
+    lottie.loadAnimation({
+      container:container.current,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      animationData:require("../laptop-working.json")
+    })
+  } , [])
   const {
     profile_user,
     loading,
@@ -145,6 +162,7 @@ function ProfileHeader(props) {
   const theme = useTheme();
   const width = useWidth();
   const cardContent = useRef(null);
+  // eslint-disable-next-line no-unused-vars
   const [cover, setCover] = React.useState(null);
   const [photo, setPhoto] = React.useState(null);
   const [isFollowing, setIsFollowing] = React.useState(
@@ -260,19 +278,10 @@ function ProfileHeader(props) {
             </label>
           </React.Fragment>
         )}
-        <CardMedia
-          component="img"
-          className={classes.cardCover}
-          onError={() => {
-            if (cover) setCover(null);
-          }}
-          src={
-            cover
-              ? URL.createObjectURL(cover)
-              : "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1404&q=80"
-          }
-          alt={cover ? cover.name : "Post Photo"}
-        />
+                <div className={classes.container} ref={container}></div>
+
+
+
         <CardContent ref={cardContent} className={classes.cardContent}>
           <Card className={classes.innerCard} elevation={0}>
             <div className={classes.relative}>
