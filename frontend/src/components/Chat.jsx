@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
@@ -13,17 +14,27 @@ import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 
-import { useMediaQuery, useTheme } from "@material-ui/core";
+import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 
 import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
-
+import lottie from 'lottie-web';
 import classNames from "classnames";
 import Message from "./Message";
 
+
+const useImperativeQuery = (query) => {
+  const { refetch } = useQuery(query, { skip: true });
+	
+  const imperativelyCallQuery = (variables) => {
+    return refetch(variables);
+  } 
+	
+  return imperativelyCallQuery;
+}
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
@@ -31,8 +42,12 @@ const useStyles = makeStyles((theme) => ({
   chatSection: {
     width: "100%",
   },
+  container:{
+    width:"400px",
+    height:"400px"
+  },
   headBG: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#rgb(44,225,210)",
   },
   borderRight500: {
     borderRight: "1px solid #e0e0e0",
@@ -43,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "auto",
   },
   senderStyle: {
-    backgroundColor: "purple",
+    backgroundColor: "rgb(44,225,210)",
     color: "white",
     paddingRight: "20px",
     paddingLeft: "15px",
@@ -124,7 +139,33 @@ const SEND_MESSAGE = gql`
   }
 `;
 
+const GET_FOLLOWERS = gql`
+  query GetFollowers($bla: String!)
+  {
+    findUser(username: $bla)
+    {
+      following
+      {
+        username
+        fullname
+        id
+      }
+    }
+  }
+`;
+
+
 const Chat = (props) => {
+  const container = useRef(null);
+  useEffect(()=>{
+      lottie.loadAnimation({
+        container:container.current,
+        renderer:'svg',
+        autoplay:true,
+        loop:true,
+        animationData:require('./../message-received.json')
+      })
+  })
   const { user } = props;
   const classes = useStyles();
   const theme = useTheme();
@@ -133,23 +174,33 @@ const Chat = (props) => {
   const [newMessage, setNewMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [filter, setFilter] = useState("");
+  const USERNAME = user.username;
 
-  const res1 = useQuery(GET_MESSAGES, {
-    variables: { receiver: user ? user.id : null },
-    skip: !user,
-  });
-  const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
+    
+    const {loading , error, data} =useQuery(GET_FOLLOWERS , {
+      variables: { bla: USERNAME}
+    });
+
+
+  const callQuery= useImperativeQuery(GET_MESSAGES);
+  // const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
+
   const [addMessage] = useMutation(SEND_MESSAGE);
 
+  const [messageArray , setMessageArray] = useState([]);
   useEffect(() => {
     if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
-  }, [dummy.current]);
+  }, [dummy.current , messageArray]);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
     defaultMatches: true,
   });
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  }
 
-  const messageArray = [];
 
   const addEmoji = (e) => {
     let emoji = e.native;
@@ -157,7 +208,10 @@ const Chat = (props) => {
   };
 
   const handleSendMessage = () => {
-    addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
+    if(newMessage.trim()=="") return;
+    // setMessageArray([...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
+    //console.log("Current Receiver  " + currentReceiver + " Text: " + newMessage);
+     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
 
@@ -165,52 +219,15 @@ const Chat = (props) => {
     setFilter(e.target.value);
   };
 
-  if (res1.error) return <p>{res1.error.message}</p>;
-  if (!res1.data && !res1.loading) return <p>No messages.</p>;
+  
+  if (loading) return <CircularProgress style={{width:"100px" , height:"100px" ,position:"absolute" , top:"50%" , left:"50%"}} 
+  color="primary" />
 
-  // Dummy Data
-  //   const user = {id:100 , fullname:"Ahmed Essam" ,
-  //   following:[ {id:1 , fullname:"Khaled"},{id:2 , fullname:"Hassan"}
-  //   ,{id:3 , fullname:"Ali"},{id:4 , fullname:"Taha"}]};
-  //   let messageArray = [
-  //   {key:1 , text:`It is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
-  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:true} ,
-  //   {key:2 , text:`It is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
-  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:false} ,
-  //   {key:3 , text:`It is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text,is a long established fact that a reader will be distracted by the readable content of
-  //   a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less
-  //   normal distribution of letters, as opposed to using 'Content here, content here', making it look
-  //   like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum
-  //   as their default model text and a search for 'lorem ipsum' will uncover many web sites still in
-  //   their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on
-  //   purpose (injected humour and the like).`  , date:"09:30" ,sender:true}
+  if (error) return <p>Error :(</p>;
 
-  // ]
 
   return (
-    <div>
+    <div >
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid
           item
@@ -239,31 +256,25 @@ const Chat = (props) => {
           <Divider />
           <List style={{ maxHeight: "460px", overflow: "auto" }}>
             {/* Online People */}
-
-            {user.following.map(
+            {data.findUser.following.map(
               (someuser) =>
-                someuser.fullname.includes(filter) && (
+                someuser.fullname.toLowerCase().includes(filter.toLowerCase()) && (
                   <ListItem
                     button
                     key={someuser.id}
-                    onClick={() => {
+                    style={{backgroundColor: currentReceiver == someuser.id ? "rgb(122 0 93 / 15%)" : "white"}}
+                    onClick={ async () => {
                       setCurrentReceiver(someuser.id);
-                      getRes2({ variables: { receiver: someuser.id } });
-                      if (!res1.loading) {
-                        res1.data.findMessages.forEach((x) => {
-                          if (x.from.id == someuser.id) {
-                            messageArray.push(x.findMessages);
-                          }
-                        });
-                        if (res2.data && res2.data.findMessages) {
-                          res2.data.findMessages.forEach((x) => {
-                            if (x.from.id == user.id) {
-                              messageArray.push(x.findMessages);
-                            }
+                      const {data,error} = await callQuery({receiver:someuser.id})
+                      setMessageArray(messageArray=> [ ]);
+
+                     // if(error) { return;}
+                      data.findMessages.forEach((x) => {
+
+                              setMessageArray(messageArray=> [...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
                           });
-                        }
-                        messageArray.sort((a, b) => a.createdAt <= b.createdAt);
-                      }
+                        console.log(messageArray)
+                      
                     }}
                   >
                     <ListItemIcon>
@@ -284,12 +295,15 @@ const Chat = (props) => {
               setShowEmoji(false);
             }}
           >
+            {currentReceiver=="#" && 
+              <div className={classes.container} ref={container}> </div>
+            }
             {messageArray.map((x) => (
               <Message
                 key={x.id}
                 messageText={x.body}
                 messageDate={x.createdAt}
-                sender={x.from.id == user.id}
+                sender={x.sender}
               />
             ))}
 
@@ -313,7 +327,7 @@ const Chat = (props) => {
                 <Fab
                   color="primary"
                   aria-label="emoji"
-                  style={{ backgroundColor: "purple " }}
+                  style={{ backgroundColor: "rgb(44,225,210)" }}
                   onClick={() => {
                     setShowEmoji(!showEmoji);
                   }}
@@ -330,6 +344,7 @@ const Chat = (props) => {
                     setNewMessage(e.target.value);
                   }}
                   fullWidth
+                  onKeyPress={handleKeyPress}
                 />
               </Grid>
 
@@ -337,7 +352,7 @@ const Chat = (props) => {
                 <Fab
                   color="primary"
                   aria-label="add"
-                  style={{ backgroundColor: "purple " }}
+                  style={{ backgroundColor: "rgb(44,225,210)" }}
                   onClick={handleSendMessage}
                 >
                   <SendIcon />
