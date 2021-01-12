@@ -41,6 +41,41 @@ module.exports = {
                 ...args,
                 ...getAuthUser(context)
             });
+        },
+
+        sendRequest(_, args, context) {
+            return Group.sendRequest({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        acceptRequest(_, args, context) {
+            return Group.acceptRequest({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        addMembers(_, args, context) {
+            return Group.addMembers({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        changeGroupCover(_, args, context) {
+            return Group.changeGroupCover({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
+        changeGroupProfile(_, args, context) {
+            return Group.changeGroupProfile({
+                ...args,
+                ...getAuthUser(context)
+            });
         }
     },
 

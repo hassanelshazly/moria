@@ -93,10 +93,78 @@ GroupModel.statics.createGroup = async function (args) {
 
     await group.save();
 
-    await user.addOrRemoveGroup(group._id); 
+    await user.addOrRemoveGroup(group._id);
     for (member of members)
-        await member.addOrRemoveGroup(group._id); 
+        await member.addOrRemoveGroup(group._id);
 
+    return group;
+}
+
+GroupModel.statics.sendRequest = async function ({ groupId, userId }) {
+    const group = await Group.findById(groupId);
+    if (!group)
+        throw new Error("Group not found");
+
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    if (group.members.includes(userId))
+        throw new Error("User already a member");
+
+    await group.addOrRemoveRequest(userId);
+    return group;
+}
+
+GroupModel.statics.acceptRequest = async function ({ groupId, userId, memberId }) {
+    const group = await Group.findById(groupId);
+    if (!group)
+        throw new Error("Group not found");
+
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const member = await User.findById(memberId);
+    if (!member)
+        throw new Error("Member not found");
+
+    if (group.admin != userId)
+        throw new Error("User not authoried");
+
+    if (!group.requests.includes(userId))
+        throw new Error("User hasn't join");
+
+    await group.addOrRemoveRequest(memberId);
+    await group.addOrRemoveMember(memberId);
+    return group;
+}
+
+GroupModel.statics.addMembers = async function ({ groupId, userId, membersId }) {
+    const group = await Group.findById(groupId);
+    if (!group)
+        throw new Error("Group not found");
+
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    if (group.admin != userId)
+        throw new Error("User not authoried");
+
+    const members = await Promise.all(
+        membersId.map(async memberId => {
+            const member = await User.findById(memberId);
+            if (!member)
+                throw new Error("Member not found");
+            return member;
+        })
+    );
+
+    for (member of members) {
+        await member.addOrRemoveGroup(group._id);
+        await group.addOrRemoveMember(userId);
+    }
     return group;
 }
 
@@ -182,6 +250,22 @@ GroupModel.statics.deleteGroupPost = async function (args) {
     group.posts.splice(pIdx, 1);
     await group.save();
     return await Post.deletePost(args);
+}
+
+GroupModel.methods.addOrRemoveRequest = async function (userId) {
+    if (this.requests.includes(userId))
+        this.requests = this.requests.filter(request => request != userId);
+    else
+        this.requests.push(userId);
+    await this.save();
+}
+
+GroupModel.methods.addOrRemoveMember = async function (userId) {
+    if (this.members.includes(userId))
+        this.members = this.members.filter(member => member != userId);
+    else
+        this.members.push(userId);
+    await this.save();
 }
 
 
