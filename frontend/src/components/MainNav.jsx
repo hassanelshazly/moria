@@ -38,12 +38,10 @@ import SignInDialog from "../dialogs/SignInDialog";
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import Switch from "@material-ui/core/Switch";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -56,7 +54,6 @@ import {
 } from "../state/actions";
 
 const drawerWidth = 240;
-export let isItDark = false;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -558,23 +555,6 @@ function DrawerItems() {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-        <Divider />
-        <FormControlLabel
-          style={{ marginLeft: "7px", marginTop: "10px" }}
-          value="top"
-          control={
-            <Switch
-              color="primary"
-              checked={isItDark}
-              onChange={() => {
-                isItDark ^= 1;
-                console.log(isItDark);
-              }}
-            />
-          }
-          label="Dark"
-          labelPlacement="top"
-        />
       </List>
     );
   }, [classes]);
@@ -586,6 +566,7 @@ export default function MainNav(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [searchFocus, setSearchFocus] = React.useState(false);
+
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
 

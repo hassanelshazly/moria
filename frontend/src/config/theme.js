@@ -1,9 +1,7 @@
 import { createMuiTheme } from "@material-ui/core/styles";
-import { isItDark } from "./../components/MainNav";
 
 const theme = createMuiTheme({
   palette: {
-    type: isItDark ? "dark" : "light",
     primary: {
       light: "#21CBF3",
       main: "#2196F3",
