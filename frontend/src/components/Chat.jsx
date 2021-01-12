@@ -13,7 +13,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
-import  { Redirect } from 'react-router-dom'
+import { Redirect } from "react-router-dom";
 
 import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
@@ -22,20 +22,21 @@ import { Picker } from "emoji-mart";
 
 import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
 import { connect } from "react-redux";
-import lottie from 'lottie-web';
+import lottie from "lottie-web";
 import classNames from "classnames";
 import Message from "./Message";
 
+import MessageReceivedAnimation from "../assets/animations/message-received.json";
 
 const useImperativeQuery = (query) => {
   const { refetch } = useQuery(query, { skip: true });
-	
+
   const imperativelyCallQuery = (variables) => {
     return refetch(variables);
-  } 
-	
+  };
+
   return imperativelyCallQuery;
-}
+};
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
@@ -43,9 +44,9 @@ const useStyles = makeStyles((theme) => ({
   chatSection: {
     width: "100%",
   },
-  container:{
-    width:"400px",
-    height:"400px"
+  container: {
+    width: "400px",
+    height: "400px",
   },
   headBG: {
     backgroundColor: "#rgb(44,225,210)",
@@ -141,12 +142,9 @@ const SEND_MESSAGE = gql`
 `;
 
 const GET_FOLLOWERS = gql`
-  query GetFollowers($bla: String!)
-  {
-    findUser(username: $bla)
-    {
-      following
-      {
+  query GetFollowers($bla: String!) {
+    findUser(username: $bla) {
+      following {
         username
         fullname
         id
@@ -163,30 +161,34 @@ const MESSAGE_SUBSCRIPTION = gql`
   }
 `;
 
-
 const Chat = (props) => {
   const { user } = props;
 
-  if(user==null)
-  {
-    return <Redirect to='/'  />
-
+  if (user == null) {
+    return <Redirect to="/" />;
   }
-  const {data:subData , loading:subLoading , error:subError} = useSubscription(MESSAGE_SUBSCRIPTION);
-  if(!subLoading)
-  {
+  const {
+    data: subData,
+    loading: subLoading,
+    error: subError,
+  } = useSubscription(MESSAGE_SUBSCRIPTION);
+  if (!subLoading) {
     console.log(subData);
   }
   const container = useRef(null);
-  useEffect(()=>{
-      lottie.loadAnimation({
-        container:container.current,
-        renderer:'svg',
-        autoplay:true,
-        loop:true,
-        animationData:require('./../message-received.json')
-      })
-  } , []);
+  useEffect(() => {
+    const anim = lottie.loadAnimation({
+      container: container.current,
+      renderer: "svg",
+      autoplay: true,
+      loop: true,
+      animationData: MessageReceivedAnimation,
+    });
+
+    return () => {
+      anim.destroy();
+    };
+  }, []);
   const classes = useStyles();
   const theme = useTheme();
   const dummy = useRef();
@@ -196,31 +198,28 @@ const Chat = (props) => {
   const [filter, setFilter] = useState("");
   const USERNAME = user.username;
 
-    
-    const {loading , error, data} =useQuery(GET_FOLLOWERS , {
-      variables: { bla: USERNAME}
-    });
+  const { loading, error, data } = useQuery(GET_FOLLOWERS, {
+    variables: { bla: USERNAME },
+  });
 
-
-  const callQuery= useImperativeQuery(GET_MESSAGES);
+  const callQuery = useImperativeQuery(GET_MESSAGES);
   // const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
 
   const [addMessage] = useMutation(SEND_MESSAGE);
 
-  const [messageArray , setMessageArray] = useState([]);
+  const [messageArray, setMessageArray] = useState([]);
   useEffect(() => {
     if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
-  }, [dummy.current , messageArray]);
+  }, [dummy.current, messageArray]);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
     defaultMatches: true,
   });
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSendMessage();
     }
-  }
-
+  };
 
   const addEmoji = (e) => {
     let emoji = e.native;
@@ -228,10 +227,10 @@ const Chat = (props) => {
   };
 
   const handleSendMessage = () => {
-    if(newMessage.trim()=="") return;
+    if (newMessage.trim() == "") return;
     // setMessageArray([...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
     //console.log("Current Receiver  " + currentReceiver + " Text: " + newMessage);
-     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
+    addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
     setNewMessage("");
   };
 
@@ -239,15 +238,24 @@ const Chat = (props) => {
     setFilter(e.target.value);
   };
 
-  
-  if (loading) return <CircularProgress style={{width:"100px" , height:"100px" ,position:"absolute" , top:"50%" , left:"50%"}} 
-  color="primary" />
+  if (loading)
+    return (
+      <CircularProgress
+        style={{
+          width: "100px",
+          height: "100px",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+        }}
+        color="primary"
+      />
+    );
 
   if (error) return <p>Error :(</p>;
 
-
   return (
-    <div >
+    <div>
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid
           item
@@ -278,23 +286,38 @@ const Chat = (props) => {
             {/* Online People */}
             {data.findUser.following.map(
               (someuser) =>
-                someuser.fullname.toLowerCase().includes(filter.toLowerCase()) && (
+                someuser.fullname
+                  .toLowerCase()
+                  .includes(filter.toLowerCase()) && (
                   <ListItem
                     button
                     key={someuser.id}
-                    style={{backgroundColor: currentReceiver == someuser.id ? "rgb(44 225 210 / 19%)" : "white"}}
-                    onClick={ async () => {
+                    style={{
+                      backgroundColor:
+                        currentReceiver == someuser.id
+                          ? "rgb(44 225 210 / 19%)"
+                          : "white",
+                    }}
+                    onClick={async () => {
                       setCurrentReceiver(someuser.id);
-                      const {data,error} = await callQuery({receiver:someuser.id})
-                      setMessageArray(messageArray=> [ ]);
+                      const { data, error } = await callQuery({
+                        receiver: someuser.id,
+                      });
+                      setMessageArray((messageArray) => []);
 
-                     // if(error) { return;}
+                      // if(error) { return;}
                       data.findMessages.forEach((x) => {
-
-                              setMessageArray(messageArray=> [...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
-                          });
-                        console.log(messageArray)
-                      
+                        setMessageArray((messageArray) => [
+                          ...messageArray,
+                          {
+                            id: x.id,
+                            createdAt: x.createdAt,
+                            body: x.body,
+                            sender: x.from.id == user.id,
+                          },
+                        ]);
+                      });
+                      console.log(messageArray);
                     }}
                   >
                     <ListItemIcon>
@@ -315,9 +338,11 @@ const Chat = (props) => {
               setShowEmoji(false);
             }}
           >
-            {currentReceiver=="#" && 
-              <div className={classes.container} ref={container}> </div>
-            }
+            {currentReceiver == "#" && (
+              <div className={classes.container} ref={container}>
+                {" "}
+              </div>
+            )}
             {messageArray.map((x) => (
               <Message
                 key={x.id}
