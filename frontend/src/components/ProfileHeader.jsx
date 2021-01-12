@@ -163,13 +163,15 @@ function ProfileHeader(props) {
       ? profile_user.followers.some((el) => el.id === user.id)
       : false;
 
+  console.log(profile_user.profileUrl);
+
   const classes = useStyles();
   const theme = useTheme();
   const width = useWidth();
   const cardCover = useRef(null);
   const cardContent = useRef(null);
-  const [cover, setCover] = React.useState(null);
-  const [photo, setPhoto] = React.useState(null);
+  const [cover, setCover] = React.useState(profile_user.coverUrl);
+  const [photo, setPhoto] = React.useState(profile_user.profileUrl);
   const [isFollowing, setIsFollowing] = React.useState(isFollowingProfile);
   const [cardContentHeight, setCardContentHeight] = React.useState(0);
   const [followUser] = useMutation(FOLLOW_USER, {
@@ -197,6 +199,12 @@ function ProfileHeader(props) {
   if (width === "xs") heightOffset = Math.round(0.3 * 240);
 
   useEffect(() => {
+    setCover(profile_user.coverUrl);
+    setPhoto(profile_user.profileUrl);
+    setIsFollowing(isFollowingProfile);
+  }, [profile_user.coverUrl, profile_user.profileUrl, isFollowingProfile]);
+
+  useEffect(() => {
     setCardContentHeight(cardContent.current.offsetHeight);
   });
 
@@ -217,7 +225,7 @@ function ProfileHeader(props) {
   const handleCoverChange = (event) => {
     const files = event.target.files;
     if (files.length > 0) {
-      setCover(files[0]);
+      setCover(URL.createObjectURL(files[0]));
 
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -237,7 +245,7 @@ function ProfileHeader(props) {
   const handlePhotoChange = (event) => {
     const files = event.target.files;
     if (files.length > 0) {
-      setPhoto(files[0]);
+      setPhoto(URL.createObjectURL(files[0]));
 
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -283,7 +291,7 @@ function ProfileHeader(props) {
             onError={() => {
               if (cover) setCover(null);
             }}
-            src={URL.createObjectURL(cover)}
+            src={cover}
             alt={cover.name}
           />
         ) : (
@@ -318,7 +326,7 @@ function ProfileHeader(props) {
                 <CardMedia
                   component="img"
                   className={classes.photo}
-                  image={photo ? URL.createObjectURL(photo) : Avatar}
+                  image={photo ? photo : Avatar}
                   loading="auto"
                   title={profile_user ? profile_user.fullname : "Profile"}
                 />

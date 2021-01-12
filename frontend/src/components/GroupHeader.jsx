@@ -192,6 +192,13 @@ function GroupHeader(props) {
   if (width === "xs") heightOffset = Math.round(0.3 * 240);
 
   useEffect(() => {
+    setCover(coverUrl);
+    setPhoto(profileUrl);
+    setIsAMember(isMember);
+    setIsARequestee(isRequestee);
+  }, [coverUrl, profileUrl, isMember, isRequestee]);
+
+  useEffect(() => {
     setCardContentHeight(cardContent.current.offsetHeight);
   });
 
@@ -212,7 +219,7 @@ function GroupHeader(props) {
   const handleCoverChange = (event) => {
     const files = event.target.files;
     if (files.length > 0) {
-      setCover(files[0]);
+      setCover(URL.createObjectURL(files[0]));
 
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -233,7 +240,7 @@ function GroupHeader(props) {
   const handlePhotoChange = (event) => {
     const files = event.target.files;
     if (files.length > 0) {
-      setPhoto(files[0]);
+      setPhoto(URL.createObjectURL(files[0]));
 
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -287,7 +294,7 @@ function GroupHeader(props) {
             onError={() => {
               if (cover) setCover(null);
             }}
-            src={URL.createObjectURL(cover)}
+            src={cover}
             alt={cover.name}
           />
         ) : (
@@ -322,7 +329,7 @@ function GroupHeader(props) {
                 <CardMedia
                   component="img"
                   className={classes.photo}
-                  image={photo ? URL.createObjectURL(photo) : Avatar}
+                  image={photo ? photo : Avatar}
                   loading="auto"
                   title={title ? title : "Group"}
                 />

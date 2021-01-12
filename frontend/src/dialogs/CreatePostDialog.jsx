@@ -161,7 +161,6 @@ function CreatePostDialog(props) {
         showSnackbar("Something went wrong!");
       };
     } else {
-      console.log(postForm.type);
       switch (postForm.type) {
         case "profile":
           addProfilePost({ variables: { text } });
