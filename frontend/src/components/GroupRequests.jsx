@@ -37,7 +37,6 @@ const useStyles = makeStyles(() => ({
 function GroupRequests(props) {
   const { group_id, requests, loading, showSnackbar } = props;
   const classes = useStyles();
-  console.log(requests);
   const [requestsState, setRequestsState] = useState(requests);
   const [acceptRequest] = useMutation(ACCEPT_REQUEST, {
     onError(error) {
