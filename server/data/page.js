@@ -43,7 +43,7 @@ PageModel.statics.findFollowers = async function ({ id }) {
     return page.followers;
 }
 
-PageModel.statics.followPage = async function ( {pageId, userId} ) {
+PageModel.statics.followPage = async function ({ pageId, userId }) {
     if (!userId)
         throw new Error("User not authorized");
 
@@ -118,8 +118,8 @@ PageModel.statics.deletePage = async function ({ pageId, userId }) {
     if (!userId || userId != page.owner)
         throw new Error("User not authorized");
 
-    // TODO
-    // delete posts
+    for (post of page.posts)
+        await Post.findByIdAndDelete(post);
 
     await page.delete();
     return "Page deleted successfully!";
