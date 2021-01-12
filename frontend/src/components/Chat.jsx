@@ -15,7 +15,7 @@ import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 import { Redirect } from "react-router-dom";
 
-import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
+import { CircularProgress, Typography, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
@@ -37,7 +37,11 @@ const useImperativeQuery = (query) => {
 
   return imperativelyCallQuery;
 };
+
 const useStyles = makeStyles((theme) => ({
+  holder:{
+    position:"relative",
+  },
   table: {
     minWidth: 650,
   },
@@ -45,8 +49,16 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   container: {
+    position:"absolute",
     width: "400px",
     height: "400px",
+    [theme.breakpoints.down("md")]: {
+      position:"absolute",
+      top:"10vh",
+      left:"1.5vw",
+      width: "300px",
+     height: "300px",
+    },
   },
   headBG: {
     backgroundColor: "#rgb(44,225,210)",
@@ -94,7 +106,6 @@ const useStyles = makeStyles((theme) => ({
   },
   peopleList: {
     [theme.breakpoints.down("sm")]: {
-      display: "none",
     },
   },
 }));
@@ -215,6 +226,7 @@ const Chat = (props) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
     defaultMatches: true,
   });
+ 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       handleSendMessage();
@@ -245,8 +257,8 @@ const Chat = (props) => {
           width: "100px",
           height: "100px",
           position: "absolute",
-          top: "50%",
-          left: "50%",
+          top: isMobile? "40%" : "45%",
+          left: isMobile? "40%" : "45%",
         }}
         color="primary"
       />
@@ -259,7 +271,7 @@ const Chat = (props) => {
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid
           item
-          xs={3}
+          xs={isMobile? 12: 4}
           className={classNames(classes.peopleList, classes.borderRight500)}
         >
           <List>
@@ -331,7 +343,11 @@ const Chat = (props) => {
             )}
           </List>
         </Grid>
-        <Grid item sm={12} md={9}>
+
+        {isMobile && <Grid xs={12} style={{margin:"10px 0" , }}>
+          <Divider />
+        </Grid>}
+        <Grid item xs={isMobile? 12: 8} className={classes.holder} >
           <List
             className={classes.messageArea}
             onClick={() => {
@@ -345,6 +361,7 @@ const Chat = (props) => {
             )}
             {messageArray.map((x) => (
               <Message
+                ISSMALL={isMobile}
                 key={x.id}
                 messageText={x.body}
                 messageDate={x.createdAt}
@@ -363,8 +380,9 @@ const Chat = (props) => {
           <Grid
             container
             style={{
-              padding: "20px",
+              padding: "10px",
               display: currentReceiver == "#" ? "none" : "block",
+              
             }}
           >
             <Grid container spacing={isMobile ? 4 : 2}>
