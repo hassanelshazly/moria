@@ -3,15 +3,16 @@ const { gql } = require('apollo-server');
 const Page = gql`
 
     type Page {
-        id:          ID!
-        owner:       User!
-        title:       String!
-        coverUrl:    String
-        profileUrl:  String
-        description: String
-        createdAt:   String
-        followers:   [User]
-        posts:       [Post]
+        id:             ID!
+        owner:          User!
+        title:          String!
+        coverUrl:       String
+        profileUrl:     String
+        description:    String
+        createdAt:      String
+        followers:      [User]
+        followersCount: Int!
+        posts:          [Post]
     }
 
     extend type Query {
