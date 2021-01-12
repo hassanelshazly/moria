@@ -1,7 +1,6 @@
 const Post = require("../../data/post");
 const User = require("../../data/user");
 const { getAuthUser } = require("../../util/auth");
-const cloudinary = require("cloudinary");
 
 module.exports = {
 
