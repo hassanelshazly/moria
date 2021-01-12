@@ -63,19 +63,21 @@ PostModel.statics.createPost = async function (args) {
         page: pageId
     });
 
-    if(args.imageSrc) 
+    if (args.imageSrc)
         post.imageUrl = await uploadImage(imageSrc);
-    
+
     await post.save();
-    
+
     // TODO
     // notifications to group & pages
-    await Notification.createNotification({
-        post,
-        content: contentType,
-        contentId: post._id,
-        author: post.user
-    });
+    if (!groupId && !pageId) {
+        await Notification.createNotification({
+            post,
+            content: contentType,
+            contentId: post._id,
+            author: post.user
+        });
+    }
     await post.populate('user').execPopulate();
     return post;
 }
@@ -141,7 +143,7 @@ PostModel.statics.deleteComment = async function (args) {
 
 PostModel.methods.addOrRemoveLike = async function ({ userId }) {
     if (this.likes.includes(userId)) {
-        this.likes = this.likes.filter(like => like != userId);
+        this.likes = this.likes.filter(like => toString(like) != toString(userId));
         await this.save();
         await Notification.deleteMany({
             content: LIKE,
