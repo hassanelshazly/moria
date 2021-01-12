@@ -266,7 +266,7 @@ function GroupHeader(props) {
 
   const handleDelete = () => {
     deleteGroup({ variables: { group_id: id } });
-    <Redirect to="/groups/" />;
+    <Redirect to="/group/" />;
   };
 
   const handleJoinToggle = (event) => {
