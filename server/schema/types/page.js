@@ -51,12 +51,12 @@ const Page = gql`
         changePageCover(
             pageId:   ID!
             coverSrc: String!
-        ): User
+        ): Page
 
         changePageProfile(
             pageId:     ID!
             profileSrc: String!
-        ): User
+        ): Page
     }
 `;
 
