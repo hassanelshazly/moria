@@ -79,7 +79,8 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
     zIndex: 1,
   },
   mediaEditIcon: {
-    color: "white",
+    background: "GhostWhite",
+    margin: spacing(1),
   },
   cardContent: {
     boxShadow: "0 16px 40px -12.125px rgba(0,0,0,0.3)",
@@ -313,8 +314,12 @@ function ProfileHeader(props) {
               className={classes.mediaEditLabel}
               htmlFor="cover-edit-button"
             >
-              <IconButton aria-label="edit-cover" component="span">
-                <EditIcon className={classes.mediaEditIcon} />
+              <IconButton
+                className={classes.mediaEditIcon}
+                aria-label="edit-cover"
+                component="span"
+              >
+                <EditIcon />
               </IconButton>
             </label>
           </React.Fragment>
