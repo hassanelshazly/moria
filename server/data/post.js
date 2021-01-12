@@ -105,7 +105,7 @@ PostModel.statics.deletePost = async function ({ postId, userId }) {
     if (!post)
         throw new Error("Post not found");
 
-    if (!groupId || !userId || userId != post.userId)
+    if ((userId != post.user) && !post.group)
         throw new Error("User not authorized");
 
     await post.delete();
