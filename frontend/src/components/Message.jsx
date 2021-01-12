@@ -61,6 +61,7 @@ function Message(props) {
           <ListItemText
             className={sender ? classes.senderStyle : classes.receiverStyle}
             align={sender ? "right" : "left"}
+            style={{width: props.ISSMALL ? "240px" : "max-content"}}
             primary={messageText}
           ></ListItemText>
         </Grid>
