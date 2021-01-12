@@ -5,7 +5,6 @@ const User = require("../data/user");
 
 describe("User", () => {
     before(async function () {
-        this.timeout(5000);
         try {
             await mongoose.connect(process.env.MONGO_URI_TEMP, {
                 useNewUrlParser: true,
