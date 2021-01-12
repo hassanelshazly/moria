@@ -70,14 +70,16 @@ GroupModel.statics.findRequests = async function ({ id, context }) {
 }
 
 GroupModel.statics.createGroup = async function (args) {
-    const { userId, title, membersId, coverSrc, profileSrc } = args;
+    let { userId, title, membersId, coverSrc, profileSrc } = args;
     if (!userId)
         throw new Error("User not authorized")
 
-    const user = await User.findById(userId);
-    if (!user)
-        throw new Error("User not found");
+    // const user = await User.findById(userId);
+    // if (!user)
+    //     throw new Error("User not found");
 
+    membersId.push(userId);
+    membersId = [...new Set(membersId)];
     const members = await Promise.all(
         membersId.map(async memberId => {
             const member = await User.findById(memberId);
@@ -100,8 +102,6 @@ GroupModel.statics.createGroup = async function (args) {
         group.profileUrl = await uploadImage(profileSrc);
 
     await group.save();
-
-    await user.addOrRemoveGroup(group._id);
     for (member of members)
         await member.addOrRemoveGroup(group._id);
 
@@ -159,6 +159,11 @@ GroupModel.statics.addMembers = async function ({ groupId, userId, membersId }) 
 
     if (group.admin != userId)
         throw new Error("User not authoried");
+
+    if (membersId.includes(userId))
+        throw new Error("You can't remove your self, It's your group");
+
+    membersId = [...new Set(membersId)];
 
     const members = await Promise.all(
         membersId.map(async memberId => {
@@ -218,8 +223,8 @@ GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {
     if (!userId || userId != group.admin)
         throw new Error("User not authorized");
 
-    // TDOD
-    // delete posts
+    for(post of group.posts)
+        await Post.findByIdAndDelete(post);
 
     await group.delete();
     return "Group deleted successfully!";
@@ -276,7 +281,8 @@ GroupModel.methods.addOrRemoveRequest = async function (userId) {
 
 GroupModel.methods.addOrRemoveMember = async function (userId) {
     if (this.members.includes(userId))
-        this.members = this.members.filter(member => member != userId);
+        this.members = this.members.filter(member =>
+            toString(member) != toString(userId));
     else
         this.members.push(userId);
     await this.save();
