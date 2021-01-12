@@ -6,6 +6,7 @@ const Post = gql`
         id:           ID!
         user:         User!
         body:         String!
+        imageUrl:     String
         createdAt:    String!
         likes:        [User]
         comments:     [Comment]

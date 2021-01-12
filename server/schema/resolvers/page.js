@@ -78,6 +78,10 @@ module.exports = {
 
         followers(parent) {
             return Page.findFollowers({ id: parent.id });
+        },
+
+        followersCount(parent) {
+            return parent.followers.length;
         }
 
     }
