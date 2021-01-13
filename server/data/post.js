@@ -35,7 +35,7 @@ PostModel.statics.findComments = async function ({ id }) {
         throw new Error("Post not Found");
 
     await post.populate('comments.user').execPopulate();
-    return post.comments;
+    return post.comments.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PostModel.statics.likePost = async function ({ postId, userId }) {

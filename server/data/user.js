@@ -17,15 +17,15 @@ UserModel.statics.findUser = function ({ username }) {
 }
 
 UserModel.statics.findAllUsers = function () {
-    return User.find({});
+    return User.find({}).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
     let posts = await User.findPosts({ id: userId });
     for (following of user.following)
-        posts = posts.concat(await User.findPosts({ userId: following._id }));
-    return posts;
+        posts = posts.concat(await User.findPosts({ id: following._id }));
+    return posts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.follow = async function ({ userId, id }) {
@@ -79,7 +79,9 @@ UserModel.statics.findPosts = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('posts').execPopulate();
-    return user.posts.filter(post => !(post.group || post.page));
+    return user.posts
+        .filter(post => !(post.group || post.page))
+        .sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findFollowers = async function ({ id }) {
@@ -88,7 +90,7 @@ UserModel.statics.findFollowers = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('followers').execPopulate();
-    return user.followers;
+    return user.followers.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findFollowing = async function ({ id }) {
@@ -97,7 +99,7 @@ UserModel.statics.findFollowing = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('following').execPopulate();
-    return user.following;
+    return user.following.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findSavedPosts = async function ({ id }) {
@@ -106,7 +108,7 @@ UserModel.statics.findSavedPosts = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('savedPosts').execPopulate();
-    return user.savedPosts;
+    return user.savedPosts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findPages = async function ({ id }) {
@@ -115,7 +117,7 @@ UserModel.statics.findPages = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('pages').execPopulate();
-    return user.pages;
+    return user.pages.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findGroups = async function ({ id }) {
@@ -124,7 +126,7 @@ UserModel.statics.findGroups = async function ({ id }) {
         throw new Error("User not found");
 
     await user.populate('groups').execPopulate();
-    return user.groups;
+    return user.groups.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.login = async function ({ username, password }) {
@@ -346,7 +348,7 @@ UserModel.statics.findNotifications = async function ({ userId }) {
             }
         ]
     }).execPopulate();
-    return user.notifications;
+    return user.notifications.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 const User = mongoose.model("User", UserModel);

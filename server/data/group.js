@@ -14,7 +14,7 @@ GroupModel.statics.findGroup = async function ({ groupId }) {
 }
 
 GroupModel.statics.findAllGroups = async function (args) {
-    return await Group.find({});
+    return await Group.find({}).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 GroupModel.statics.findAdmin = async function ({ id }) {
@@ -49,7 +49,7 @@ GroupModel.statics.findPosts = async function ({ id, context }) {
         return null;
 
     await group.populate('posts').execPopulate();
-    return group.posts;
+    return group.posts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 GroupModel.statics.findRequests = async function ({ id, context }) {

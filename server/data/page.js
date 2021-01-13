@@ -13,7 +13,7 @@ PageModel.statics.findPage = async function ({ pageId }) {
 }
 
 PageModel.statics.findAllPages = async function () {
-    return await Page.find({});
+    return await Page.find({}).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PageModel.statics.findOwner = async function ({ id }) {
@@ -31,7 +31,7 @@ PageModel.statics.findPosts = async function ({ id }) {
         throw new Error("Page not Found");
 
     await page.populate('posts').execPopulate();
-    return page.posts;
+    return page.posts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PageModel.statics.findFollowers = async function ({ id }) {
