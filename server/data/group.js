@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
-
+const Notification = require("./notification");
 const User = require("./user");
 const Post = require("./post");
 const GroupModel = require("../models/group");
 const { uploadImage } = require("../util/image");
 const { getAuthUser } = require("../util/auth");
+const {
+    GROUP_ADD,
+    GROUP_POST,
+    GROUP_REQUEST
+} = require("../util/constant");
 
 GroupModel.statics.findGroup = async function ({ groupId }) {
     const group = await Group.findById(groupId);
@@ -93,7 +98,7 @@ GroupModel.statics.createGroup = async function (args) {
     const group = new Group({
         title,
         admin: userId,
-        members: membersId
+        // members: membersId
     });
 
     if (coverSrc)
@@ -103,8 +108,10 @@ GroupModel.statics.createGroup = async function (args) {
         group.profileUrl = await uploadImage(profileSrc);
 
     await group.save();
-    for (member of members)
+    for (member of members) {
         await member.addOrRemoveGroup(group._id);
+        await group.addOrRemoveMember(member._id);
+    }
 
     return group;
 }
@@ -250,9 +257,16 @@ GroupModel.statics.createGroupPost = async function (args) {
         throw new Error("User not authorized")
 
     const post = await Post.createPost(args);
-
     group.posts.push(post._id);
     await group.save();
+
+    await Notification.createNotification({
+        group,
+        content: GROUP_POST,
+        contentId: post._id,
+        author: userId
+    });
+
     return post;
 }
 
@@ -274,26 +288,63 @@ GroupModel.statics.deleteGroupPost = async function (args) {
 
     group.posts.splice(pIdx, 1);
     await group.save();
-    return await Post.deletePost(args);
+    const result = await Post.deletePost(args);
+
+    await Notification.deleteMany({
+        content: GROUP_POST,
+        contentId: post._id,
+        author: userId
+    });
+
+    return result;
 }
 
 GroupModel.methods.addOrRemoveRequest = async function (userId) {
-    if (this.requests.includes(userId))
+    if (this.requests.includes(userId)) {
         this.requests = this.requests.filter(request =>
             request.toString() != userId.toString());
-    else
+        await this.save();
+        await Notification.deleteMany({
+            content: GROUP_REQUEST,
+            contentId: this._id,
+            author: userId
+        });
+    }
+    else {
         this.requests.push(userId);
-    await this.save();
+        await this.save();
+        await Notification.createNotification({
+            group,
+            content: GROUP_REQUEST,
+            contentId: this._id,
+            author: userId
+        });
+    }
 }
 
 GroupModel.methods.addOrRemoveMember = async function (userId) {
-    // console.log(member != ObjectId(userId))
-    if (this.members.includes(userId))
+    if (this.members.includes(userId)) {
         this.members = this.members.filter(member =>
             member.toString() != userId.toString());
-    else
+        await this.save();
+        await Notification.deleteMany({
+            user: userId,
+            content: GROUP_ADD,
+            contentId: this._id,
+            author: this.admin
+        });
+    }
+    else {
         this.members.push(userId);
-    await this.save();
+        await this.save();
+        await Notification.createNotification({
+            group: this,
+            user: userId,
+            content: GROUP_ADD,
+            contentId: this._id,
+            author: this.admin
+        });
+    }
 }
 
 
