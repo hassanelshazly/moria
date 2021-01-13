@@ -282,7 +282,7 @@ const Chat = (props) => {
     );
 
   if (error) return <p>Error :(</p>;
-    if (!subLoading && subData &&  subData.newMessage.id != messageArray[messageArray.length - 1].id) { //subData.newMessage.body
+    if (!subLoading && subData!=null &&  subData.newMessage.id != messageArray[messageArray.length - 1].id) { //subData.newMessage.body
       if(subData.newMessage.from.id != user.id)
         {play();}
       setMessageArray((messageArray) => [
