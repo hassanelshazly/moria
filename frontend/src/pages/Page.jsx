@@ -60,8 +60,18 @@ const GET_PAGE_DATA = gql`
   }
 `;
 
+const GET_SAVED_POSTS = gql`
+  query GetSavedPosts($user_name: String!) {
+    findUser(username: $user_name) {
+      savedPosts {
+        id
+      }
+    }
+  }
+`;
+
 function Page(props) {
-  const { showSnackbar } = props;
+  const { user, showSnackbar } = props;
   const { id } = useParams();
 
   const { loading, error, data } = useQuery(GET_PAGE_DATA, {
@@ -69,13 +79,27 @@ function Page(props) {
       page_id: id,
     },
   });
+  const {
+    loading: loadingSaved,
+    error: errorSaved,
+    data: dataSaved,
+  } = useQuery(GET_SAVED_POSTS, {
+    variables: {
+      user_name: user ? user.username : undefined,
+    },
+    skip: !user,
+  });
 
   if (error) {
     showSnackbar("error", error.message);
     return null;
   }
+  if (errorSaved) {
+    showSnackbar("error", errorSaved.message);
+  }
 
   const findPage = data ? data.findPage : {};
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
   const { owner, title, coverUrl, profileUrl, followers, posts } = findPage;
 
   return (
@@ -87,10 +111,12 @@ function Page(props) {
         coverUrl={coverUrl}
         profileUrl={profileUrl}
         followers={followers}
-        loading={loading}
+        loading={loading || loadingSaved}
       />
       <br />
-      {posts && <Posts type="page" thingId={id} posts={posts} />}
+      {posts && (
+        <Posts type="page" thingId={id} posts={posts} savedPosts={savedPosts} />
+      )}
     </React.Fragment>
   );
 }
@@ -100,6 +126,10 @@ Page.propTypes = {
   showSnackbar: PropTypes.func.isRequired,
 };
 
+const mapStateToProps = (state) => ({
+  user: state.user,
+});
+
 function mapDispatchToProps(dispatch) {
   return {
     showSnackbar: (variant, message) =>
@@ -107,4 +137,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(Page);
+export default connect(mapStateToProps, mapDispatchToProps)(Page);

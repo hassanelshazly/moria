@@ -26,9 +26,10 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import SendIcon from "@material-ui/icons/Send";
 import ShareIcon from "@material-ui/icons/Share";
+import StarIcon from "@material-ui/icons/Star";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { red } from "@material-ui/core/colors";
+import { red, yellow } from "@material-ui/core/colors";
 import { formatDistance } from "date-fns";
 
 import { gql, useMutation } from "@apollo/client";
@@ -48,6 +49,14 @@ const ADD_COMMENT = gql`
 const LIKE_POST = gql`
   mutation LikePost($post_id: ID!) {
     likePost(postId: $post_id) {
+      id
+    }
+  }
+`;
+
+const SAVE_POST = gql`
+  mutation SavePost($post_id: ID!) {
+    savePost(postId: $post_id) {
       id
     }
   }
@@ -236,6 +245,9 @@ const usePostStyles = makeStyles((theme) => ({
     width: "100%",
     backgroundColor: theme.palette.background.paper,
   },
+  count: {
+    marginRight: theme.spacing(0.5),
+  },
 }));
 
 function PostViewer(props) {
@@ -250,6 +262,7 @@ function PostViewer(props) {
     body,
     comments,
     likes,
+    saved,
     likeCount,
     handlePostDelete,
     showSnackbar,
@@ -259,6 +272,11 @@ function PostViewer(props) {
 
   const classes = usePostStyles();
   const [likePost] = useMutation(LIKE_POST, {
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
+  const [savePost] = useMutation(SAVE_POST, {
     onError(error) {
       showSnackbar("error", error.message);
     },
@@ -291,14 +309,16 @@ function PostViewer(props) {
   const [expanded, setExpanded] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [likeState, setLikeState] = useState(isLiking);
+  const [savedState, setSavedState] = useState(saved);
   const [commentsState, setCommentsState] = useState(comments);
   const [likeCountState, setLikeCountState] = useState(likeCount);
 
   useEffect(() => {
     setLikeState(isLiking);
     setCommentsState(comments);
+    setSavedState(saved);
     setLikeCountState(likeCount);
-  }, [isLiking, comments, likeCount]);
+  }, [isLiking, comments, saved, likeCount]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -351,6 +371,15 @@ function PostViewer(props) {
       likeState ? prevState - 1 : prevState + 1
     );
     setLikeState((prevState) => !prevState);
+  };
+
+  const handleSaveToggle = () => {
+    savePost({
+      variables: {
+        post_id: id,
+      },
+    });
+    setSavedState((prevState) => !prevState);
   };
 
   return (
@@ -407,7 +436,14 @@ function PostViewer(props) {
             }}
           />
         </IconButton>
-        {likeCountState}
+        <Typography className={classes.count}>{likeCountState}</Typography>
+        <IconButton aria-label="like" onClick={handleSaveToggle}>
+          <StarIcon
+            style={{
+              color: savedState ? yellow[600] : "rgba(0, 0, 0, 0.54)",
+            }}
+          />
+        </IconButton>
         <IconButton aria-label="share">
           <ShareIcon />
         </IconButton>
@@ -449,6 +485,7 @@ const postPropTypes = {
   comments: PropTypes.arrayOf(PropTypes.exact(commentPropTypes)).isRequired,
   createdAt: PropTypes.string.isRequired,
   likeCount: PropTypes.number.isRequired,
+  saved: PropTypes.bool,
   likes: PropTypes.arrayOf(PropTypes.string).isRequired,
   handlePostDelete: PropTypes.func.isRequired,
   user: PropTypes.exact(userPropTypes),
@@ -488,6 +525,11 @@ function Posts(props) {
             thingID={props.thingId}
             {...post}
             handlePostDelete={handleDeletePost}
+            saved={
+              props.savedPosts
+                ? props.savedPosts.some((el) => el.id === post.id)
+                : false
+            }
           />
         </Grid>
       ))}
@@ -497,6 +539,7 @@ function Posts(props) {
 
 const postsPropTypes = {
   posts: PropTypes.arrayOf(PropTypes.exact(postPropTypes)),
+  savedPosts: PropTypes.arrayOf(PropTypes.exact(postPropTypes)),
   type: PropTypes.string,
   thingId: PropTypes.string,
 };
