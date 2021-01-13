@@ -223,7 +223,7 @@ const Chat = (props) => {
     if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
   }, [dummy.current, messageArray]);
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("xs"), {
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
     defaultMatches: true,
   });
  
