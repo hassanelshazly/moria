@@ -51,7 +51,7 @@ function Pages(props) {
   const classes = useStyles();
 
   const handleCreatePage = () => {
-    setDialog("create-group");
+    setDialog("create-page");
   };
 
   const { loading, error, data } = useQuery(GET_PAGES);

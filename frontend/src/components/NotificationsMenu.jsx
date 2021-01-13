@@ -95,7 +95,7 @@ function NotificationsMenu(props) {
                 <>
                   <FavoriteTwoTone className={classes.icon} />{" "}
                   <Typography>
-                    {`${author.fullname} liked a post you are following.`}
+                    {`${author.fullname} liked your post.`}
                   </Typography>{" "}
                 </>
               );

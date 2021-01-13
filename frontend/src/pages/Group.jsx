@@ -66,6 +66,16 @@ const GET_GROUP_DATA = gql`
   }
 `;
 
+const GET_SAVED_POSTS = gql`
+  query GetSavedPosts($user_name: String!) {
+    findUser(username: $user_name) {
+      savedPosts {
+        id
+      }
+    }
+  }
+`;
+
 function Group(props) {
   const { user, showSnackbar } = props;
   const { id } = useParams();
@@ -75,9 +85,23 @@ function Group(props) {
       group_id: id,
     },
   });
+  const {
+    loading: loadingSaved,
+    error: errorSaved,
+    data: dataSaved,
+  } = useQuery(GET_SAVED_POSTS, {
+    variables: {
+      user_name: user ? user.username : undefined,
+    },
+    skip: !user,
+  });
 
   if (error) {
     showSnackbar("error", error.message);
+    return null;
+  }
+  if (errorSaved) {
+    showSnackbar("error", errorSaved.message);
     return null;
   }
 
@@ -93,6 +117,7 @@ function Group(props) {
   } = findGroup;
 
   const isAnAdmin = user && admin ? admin.id === user.id : null;
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
 
   return (
     <React.Fragment>
@@ -104,7 +129,7 @@ function Group(props) {
         profileUrl={profileUrl}
         members={members}
         requests={requests}
-        loading={loading}
+        loading={loading || loadingSaved}
       />
       {isAnAdmin && requests.length > 0 && (
         <React.Fragment>
@@ -113,7 +138,14 @@ function Group(props) {
         </React.Fragment>
       )}
       <br />
-      {posts && <Posts type="group" thingId={id} posts={posts} />}
+      {posts && (
+        <Posts
+          type="group"
+          thingId={id}
+          posts={posts}
+          savedPosts={savedPosts}
+        />
+      )}
     </React.Fragment>
   );
 }

@@ -16,6 +16,7 @@ import MainNav from "./components/MainNav";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import SavedPosts from "./pages/SavedPosts";
 import Pages from "./pages/Pages";
 import Page from "./pages/Page";
 import Groups from "./pages/Groups";
@@ -29,7 +30,7 @@ import { connect } from "react-redux";
 function App(props) {
   const { token } = props;
 
-  let httpLink = createHttpLink({
+  const httpLink = createHttpLink({
     uri: "http://localhost:4000",
   });
 
@@ -42,14 +43,12 @@ function App(props) {
     };
   });
 
-  httpLink = authLink.concat(httpLink);
-
   const wsLink = new WebSocketLink({
     uri: `ws://localhost:4000/graphql`,
     options: {
       reconnect: true,
       connectionParams: {
-        authToken: token,
+        authorization: `Bearer ${token}`,
       },
     },
   });
@@ -63,7 +62,7 @@ function App(props) {
       );
     },
     wsLink,
-    httpLink
+    authLink.concat(httpLink)
   );
 
   const apolloClient = new ApolloClient({
@@ -80,6 +79,9 @@ function App(props) {
           </Route>
           <Route path="/profile/">
             <Profile />
+          </Route>
+          <Route path="/saved/">
+            <SavedPosts />
           </Route>
           <Route exact path="/page/">
             <Pages />

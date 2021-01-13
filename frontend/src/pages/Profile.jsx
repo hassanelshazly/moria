@@ -53,6 +53,16 @@ const GET_USER_POSTS = gql`
   }
 `;
 
+const GET_SAVED_POSTS = gql`
+  query GetSavedPosts($user_name: String!) {
+    findUser(username: $user_name) {
+      savedPosts {
+        id
+      }
+    }
+  }
+`;
+
 function Profile(props) {
   const { user, showSnackbar } = props;
 
@@ -68,13 +78,28 @@ function Profile(props) {
     },
     skip: !user,
   });
+  const {
+    loading: loadingSaved,
+    error: errorSaved,
+    data: dataSaved,
+  } = useQuery(GET_SAVED_POSTS, {
+    variables: {
+      user_name: user ? user.username : undefined,
+    },
+    skip: !user,
+  });
 
   if (error) {
     showSnackbar("error", error.message);
     return null;
   }
+  if (errorSaved) {
+    showSnackbar("error", errorSaved.message);
+    return null;
+  }
 
   const findUser = data ? data.findUser : {};
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
   const {
     id,
     username,
@@ -97,13 +122,13 @@ function Profile(props) {
           profileUrl,
           coverUrl,
         }}
-        loading={loading}
+        loading={loading || loadingSaved}
         followingCount={following ? following.length : 0}
         followersCount={followers ? followers.length : 0}
         postsCount={posts ? posts.length : 0}
       />
       <br />
-      {posts && <Posts type="profile" posts={posts} />}
+      {posts && <Posts type="profile" posts={posts} savedPosts={savedPosts} />}
     </React.Fragment>
   );
 }
