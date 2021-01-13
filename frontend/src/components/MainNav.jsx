@@ -424,10 +424,7 @@ function MainMenu(props) {
           open={isNotificationsMenuOpen}
           onClose={handleMenuClose("notifications")}
         >
-          <NotificationsMenu
-            closeMenu={handleMenuClose("notifications")}
-            open={isNotificationsMenuOpen}
-          />
+          <NotificationsMenu closeMenu={handleMenuClose("notifications")} />
         </Menu>
         <Menu
           anchorEl={menus.account}
