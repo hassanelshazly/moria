@@ -13,7 +13,7 @@ PageModel.statics.findPage = async function ({ pageId }) {
 }
 
 PageModel.statics.findAllPages = async function () {
-    return await Page.find({});
+    return (await Page.find({})).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PageModel.statics.findOwner = async function ({ id }) {
@@ -31,7 +31,7 @@ PageModel.statics.findPosts = async function ({ id }) {
         throw new Error("Page not Found");
 
     await page.populate('posts').execPopulate();
-    return page.posts;
+    return page.posts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PageModel.statics.findFollowers = async function ({ id }) {
@@ -150,7 +150,8 @@ PageModel.statics.deletePagePost = async function (args) {
     if (!page)
         throw new Error("Page not found");
 
-    const pIdx = page.posts.findIndex(post => post._id == postId);
+    const pIdx = page.posts.findIndex(post =>
+        post.toString() == postId.toString());
 
     if (pIdx == -1 || page.owner != userId)
         throw new Error("User not authorized");
@@ -162,7 +163,8 @@ PageModel.statics.deletePagePost = async function (args) {
 
 PageModel.methods.addOrRemoveFollower = async function (userId) {
     if (this.followers.includes(userId))
-        this.followers = this.followers.filter(follower => follower != userId);
+        this.followers = this.followers.filter(follower =>
+            follower.toString() != userId.toString());
     else
         this.followers.push(userId);
     await this.save();

@@ -39,6 +39,16 @@ module.exports = {
         }
     },
 
+    Message: {
+        to(parent) {
+            return Message.findTo({ id: parent.id });
+        },
+
+        from(parent) {
+            return Message.findFrom({ id: parent.id })
+        }
+    },
+
     UserGroup: {
         __resolveType(obj, context, info) {
             if (obj.username) {

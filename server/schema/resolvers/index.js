@@ -50,8 +50,16 @@ module.exports = {
         ...groupResolvers.Group
     },
 
+    Message: {
+        ...messageResolvers.Message
+    },
+
     UserGroup: {
         ...messageResolvers.UserGroup
+    },
+
+    GroupChat: {
+        ...groupChatResolvers.GroupChat
     },
 
     SearchUnion: {
