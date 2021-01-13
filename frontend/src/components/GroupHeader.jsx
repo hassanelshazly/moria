@@ -411,7 +411,7 @@ function GroupHeader(props) {
                     control={
                       <Checkbox
                         checked={isAMember === true}
-                        intermediate={isARequestee === true}
+                        indeterminate={isARequestee === true}
                         onChange={handleJoinToggle}
                         name="isAMember"
                       />
