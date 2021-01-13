@@ -12,6 +12,8 @@ import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 import  { Redirect,useHistory  } from 'react-router-dom'
 import { gql, useMutation } from "@apollo/client";
+import {  showSnackbar  } from "../state/actions";
+import { connect } from "react-redux";
 
 import anon from "../assets/images/anonymous.png";
 
@@ -44,20 +46,35 @@ const FOLLOW_USER = gql`
   }
 `;
 
-function useForceUpdate(){
-  const [value, setValue] = useState(0); // integer state
-  return () => setValue(value => value + 1); // update the state to force render
-}
 
-export default function UserCard(props) {
+
+function UserCard(props) {
   const { fullname ,id,username,canFollow} = props;
   let history = useHistory();
 
 
   const PROFILE_LINK = `/profile/${username}`;
   const classes = useStyles();
-  const [followUser] = useMutation(FOLLOW_USER);
-  return (
+  
+  const [followUser] = useMutation(FOLLOW_USER, {
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  }); 
+  const [currentIsFollowing , setCurrentIsFollowing]= useState(props.canFollow);
+  const useForceUpdate = () =>{
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue(value => value + 1); // update the state to force render
+  }
+  const handleFollowToggle = (id) => {
+    followUser({
+      variables: {
+        user_id: id,
+      },
+    });
+
+  };
+   return (
     <Card className={classes.root} key={id}>
       <CardActionArea>
         <CardMedia
@@ -86,7 +103,6 @@ export default function UserCard(props) {
             color="primary"
             className={classes.buttonStyling}
             onClick={()=>{
-              console.log(PROFILE_LINK);
               history.push(PROFILE_LINK);
 
             }}
@@ -100,21 +116,30 @@ export default function UserCard(props) {
             color="primary"
             className={classes.buttonStyling}
             onClick={ ()=>{
-              useForceUpdate()
-              followUser({
-                variables: {
-                  user_id: id,
-                }
-              });
+              handleFollowToggle(id);
+              setCurrentIsFollowing(currentIsFollowing=> !currentIsFollowing);
             }}
             style={{
-              color: canFollow? "blue" :"red"
+              color: currentIsFollowing? "blue" :"red"
             }}
           >
-           {canFollow? "Follow":"Unfollow"} 
+           {currentIsFollowing? "Follow":"Unfollow"} 
           </Button>
         </Grid>
       </CardActions>
     </Card>
   );
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    
+    showSnackbar: (variant, message) =>
+      dispatch(showSnackbar(variant, message)),
+  };
+}
+const mapStateToProps = (state) => {
+  return { user: state.user };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserCard);
