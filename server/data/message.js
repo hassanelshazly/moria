@@ -24,10 +24,6 @@ MessageModel.statics.sendMessage = async function (args) {
     });
 
     await message.save();
-    await message.populate('to')
-        .populate('from')
-        .execPopulate();
-
     await pubSub.publish(NEW_MESSAGE, { newMessage: message });
     return message;
 }
@@ -45,12 +41,27 @@ MessageModel.statics.findMessages = async function (args) {
         .or([
             { $and: [{ to: userId }, { from: toUserId }] },
             { $and: [{ to: toUserId }, { from: userId }] }
-        ])
-        .populate('to')
-        .populate('from')
-        .sort({ createdAt: 'ASC' });
+        ]).sort({ createdAt: 'ASC' });
 
     return messages;
+}
+
+MessageModel.statics.findTo = async function ({ id }) {
+    const message = await Message.findById(id);
+    if (!message)
+        throw new Error("Message not found");
+
+    await message.populate('to').execPopulate();
+    return message.to;
+}
+
+MessageModel.statics.findFrom = async function ({ id }) {
+    const message = await Message.findById(id);
+    if (!message)
+        throw new Error("Message not found");
+
+    await message.populate('from').execPopulate();
+    return message.from;
 }
 
 const Message = mongoose.model("Message", MessageModel);

@@ -26,4 +26,19 @@ module.exports = {
             });
         }
     },
+
+    GroupChat: {
+        admin(parent) {
+            return GroupChat.findAdmin({ id: parent.id });
+        },
+
+        members(parent) {
+            return GroupChat.findMembers({ id: parent.id });
+        },
+
+        messages(parent) {
+            return GroupChat.findMessages({ id: parent.id });
+        }
+    }
+
 }

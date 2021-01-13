@@ -30,41 +30,49 @@ GroupChatModel.statics.sendGroupMessage = async function (args) {
     });
 
     await message.save();
-    await message.populate('to')
-        .populate('from')
-        .execPopulate();
 
     await pubSub.publish(NEW_MESSAGE, { newMessage: message });
     return message;
 }
 
-GroupChatModel.statics.findGroupChats = async function (args) {
-    let { userId } = args;
+GroupChatModel.statics.findGroupChats = async function ({ userId }) {
     if (!userId)
         throw new Error("User not authorized");
 
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
-
-    await user.populate({
-        path: 'groupChats',
-        populate: [
-            { path: 'admin' },
-            { path: 'members' },
-            {
-                path: 'messages',
-                populate: [
-                    { path: 'to' },
-                    { path: 'from' },
-                ]
-
-            }
-        ]
-    }).execPopulate();
-
+    await user.populate('groupChats').execPopulate();
     return user.groupChats;
 }
+
+GroupChatModel.statics.findAdmin = async function ({ id }) {
+    const chat = await GroupChat.findById(id);
+    if (!chat)
+        throw new Error("GroupChat not found");
+
+    await chat.populate('admin').execPopulate();
+    return chat.admin;
+}
+
+GroupChatModel.statics.findMembers = async function ({ id }) {
+    const chat = await GroupChat.findById(id);
+    if (!chat)
+        throw new Error("GroupChat not found");
+
+    await chat.populate('members').execPopulate();
+    return chat.members;
+}
+
+GroupChatModel.statics.findMessages = async function ({ id }) {
+    const chat = await GroupChat.findById(id);
+    if (!chat)
+        throw new Error("GroupChat not found");
+
+    await chat.populate('messages').execPopulate();
+    return chat.messages;
+}
+
 
 GroupChatModel.statics.createGroupChat = async function (args) {
     let { title, userId, membersId } = args;
@@ -98,10 +106,6 @@ GroupChatModel.statics.createGroupChat = async function (args) {
         member.groupChats.push(groupChat._id);
         await member.save();
     }
-
-    await groupChat.populate('admin')
-        .populate('members')
-        .execPopulate();
 
     return groupChat;
 }

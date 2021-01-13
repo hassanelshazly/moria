@@ -4,10 +4,11 @@ const GroupChat = gql`
 
     type GroupChat {
         id:        ID!
+        title:     String!
         admin:     User!
         members:   [User]
         messages:  [Message]
-        createdAt: String!
+        createdAt:  String!
     }
 
     extend type Query {
