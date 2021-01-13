@@ -282,7 +282,8 @@ UserModel.methods.generateAuthToken = function () {
 
 UserModel.methods.addOrRemoveFollower = async function (userId) {
     if (this.followers.includes(userId))
-        this.followers = this.followers.filter(follower => follower != userId);
+        this.followers = this.followers.filter(follower =>
+            follower.toString() != userId.toString());
     else
         this.followers.push(userId);
     await this.save();
@@ -290,7 +291,8 @@ UserModel.methods.addOrRemoveFollower = async function (userId) {
 
 UserModel.methods.addOrRemovePage = async function (pageId) {
     if (this.pages.includes(pageId))
-        this.pages = this.pages.filter(page => page != pageId);
+        this.pages = this.pages.filter(page =>
+            page.toString() != pageId.toString());
     else
         this.pages.push(pageId);
     await this.save();
@@ -298,7 +300,8 @@ UserModel.methods.addOrRemovePage = async function (pageId) {
 
 UserModel.methods.addOrRemoveGroup = async function (groupId) {
     if (this.groups.includes(groupId))
-        this.groups = this.groups.filter(group => group != groupId);
+        this.groups = this.groups.filter(group =>
+            group.toString() != groupId.toString());
     else
         this.groups.push(groupId);
     await this.save();
@@ -307,7 +310,8 @@ UserModel.methods.addOrRemoveGroup = async function (groupId) {
 UserModel.methods.addOrRemoveFollowing = async function (userId) {
     let created = false;
     if (this.following.includes(userId)) {
-        this.following = this.following.filter(following => following != userId);
+        this.following = this.following.filter(following =>
+            following.toString() != userId.toString());
         created = false;
     }
     else {
@@ -321,7 +325,8 @@ UserModel.methods.addOrRemoveFollowing = async function (userId) {
 UserModel.methods.saveOrUnSavePost = async function (postId) {
     let created = false;
     if (this.savedPosts.includes(postId)) {
-        this.savedPosts = this.savedPosts.filter(post => post != postId);
+        this.savedPosts = this.savedPosts.filter(post =>
+            post.toString() != postId.toString());
         created = false;
     }
     else {

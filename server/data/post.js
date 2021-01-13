@@ -125,7 +125,8 @@ PostModel.statics.deleteComment = async function (args) {
     if (!post)
         throw new Error("Post not found");
 
-    const cIdx = post.comments.findIndex(comment => comment._id == commentId);
+    const cIdx = post.comments.findIndex(comment =>
+        comment.toString() == commentId.toString());
 
     if (cIdx == -1 || post.comments[cIdx].userId != userId)
         throw new Error("User not authorized");
@@ -143,7 +144,8 @@ PostModel.statics.deleteComment = async function (args) {
 
 PostModel.methods.addOrRemoveLike = async function ({ userId }) {
     if (this.likes.includes(userId)) {
-        this.likes = this.likes.filter(like => toString(like) != toString(userId));
+        this.likes = this.likes.filter(like =>
+            like.toString() != userId.toString());
         await this.save();
         await Notification.deleteMany({
             content: LIKE,

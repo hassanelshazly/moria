@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 
 const User = require("./user");
 const Post = require("./post");
@@ -223,7 +224,7 @@ GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {
     if (!userId || userId != group.admin)
         throw new Error("User not authorized");
 
-    for(post of group.posts)
+    for (post of group.posts)
         await Post.findByIdAndDelete(post);
 
     await group.delete();
@@ -257,7 +258,8 @@ GroupModel.statics.deleteGroupPost = async function (args) {
     if (!group)
         throw new Error("Group not found");
 
-    const pIdx = group.posts.findIndex(post => post._id == postId);
+    const pIdx = group.posts.findIndex(post =>
+        post.toString() == postId.toString());
 
     if (pIdx == -1)
         throw new Error("Post not found");
@@ -273,16 +275,18 @@ GroupModel.statics.deleteGroupPost = async function (args) {
 
 GroupModel.methods.addOrRemoveRequest = async function (userId) {
     if (this.requests.includes(userId))
-        this.requests = this.requests.filter(request => request != userId);
+        this.requests = this.requests.filter(request =>
+            request.toString() != userId.toString());
     else
         this.requests.push(userId);
     await this.save();
 }
 
 GroupModel.methods.addOrRemoveMember = async function (userId) {
+    // console.log(member != ObjectId(userId))
     if (this.members.includes(userId))
         this.members = this.members.filter(member =>
-            toString(member) != toString(userId));
+            member.toString() != userId.toString());
     else
         this.members.push(userId);
     await this.save();

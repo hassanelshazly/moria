@@ -14,7 +14,10 @@ module.exports = {
         },
 
         findPosts(_, args) {
-            return User.findPosts(args);
+            return User.findPosts({
+                ...args,
+                id: args.userId
+            });
         },
 
         findTimeline(_, args, context) {

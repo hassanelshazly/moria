@@ -150,7 +150,8 @@ PageModel.statics.deletePagePost = async function (args) {
     if (!page)
         throw new Error("Page not found");
 
-    const pIdx = page.posts.findIndex(post => post._id == postId);
+    const pIdx = page.posts.findIndex(post =>
+        post.toString() == postId.toString());
 
     if (pIdx == -1 || page.owner != userId)
         throw new Error("User not authorized");
@@ -162,7 +163,8 @@ PageModel.statics.deletePagePost = async function (args) {
 
 PageModel.methods.addOrRemoveFollower = async function (userId) {
     if (this.followers.includes(userId))
-        this.followers = this.followers.filter(follower => follower != userId);
+        this.followers = this.followers.filter(follower =>
+            follower.toString() != userId.toString());
     else
         this.followers.push(userId);
     await this.save();
