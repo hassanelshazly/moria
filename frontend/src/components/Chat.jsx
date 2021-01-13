@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
@@ -164,12 +165,17 @@ const GET_FOLLOWERS = gql`
   }
 `;
 const MESSAGE_SUBSCRIPTION = gql`
-  subscription onNewMessage {
-    newMessage {
+subscription onNewMessage {
+  newMessage {
+    id
+    body
+    from{
       id
-      body
     }
+    createdAt
   }
+}
+
 `;
 
 const Chat = (props) => {
@@ -183,9 +189,9 @@ const Chat = (props) => {
     loading: subLoading,
     error: subError,
   } = useSubscription(MESSAGE_SUBSCRIPTION);
-  if (!subLoading) {
-    console.log(subData);
-  }
+  
+  if(subError) console.log (subError)
+  
   const container = useRef(null);
   useEffect(() => {
     const anim = lottie.loadAnimation({
@@ -217,7 +223,6 @@ const Chat = (props) => {
   // const [getRes2, res2] = useLazyQuery(GET_MESSAGES);
 
   const [addMessage] = useMutation(SEND_MESSAGE);
-
   const [messageArray, setMessageArray] = useState([]);
   useEffect(() => {
     if (dummy.current) dummy.current.scrollIntoView({ behavior: "smooth" });
@@ -265,7 +270,19 @@ const Chat = (props) => {
     );
 
   if (error) return <p>Error :(</p>;
-
+    if (!subLoading && subData &&  subData.newMessage.id != messageArray[messageArray.length - 1].id) { //subData.newMessage.body
+      setMessageArray((messageArray) => [
+        ...messageArray,
+        {
+          id: subData.newMessage.id,
+          createdAt: subData.newMessage.createdAt,
+          body: subData.newMessage.body,
+          sender: subData.newMessage.from.id == user.id,
+        },
+      ]);
+      
+      // console.log(subData.newMessage)
+    }
   return (
     <div>
       <Grid container component={Paper} className={classes.chatSection}>
@@ -329,7 +346,7 @@ const Chat = (props) => {
                           },
                         ]);
                       });
-                      console.log(messageArray);
+                      // console.log(messageArray);
                     }}
                   >
                     <ListItemIcon>
@@ -429,9 +446,6 @@ const Chat = (props) => {
   );
 };
 
-Chat.propTypes = {
-  user: PropTypes.any,
-};
 
 const mapStateToProps = (state) => {
   return { user: state.user };

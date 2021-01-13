@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
     overflow:"hidden",
     color: "black",
     paddingRight: "20px",
-    paddingLeft: "15px",
+    paddingLeft: "20px",
     paddingTop: "10px",
     paddingBottom: "10px",
     borderRadius: "30px",
@@ -61,7 +61,7 @@ function Message(props) {
           <ListItemText
             className={sender ? classes.senderStyle : classes.receiverStyle}
             align={sender ? "right" : "left"}
-            style={{width: props.ISSMALL ? "240px" : "max-content"}}
+            style={{maxWidth: props.ISSMALL ? "240px" : "500px"}}
             primary={messageText}
           ></ListItemText>
         </Grid>
