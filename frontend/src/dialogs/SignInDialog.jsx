@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
+import GoogleIcon from "mdi-material-ui/Google";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import MuiLink from "@material-ui/core/Link";
@@ -14,9 +15,25 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, setUser, showSnackbar } from "../state/actions";
 
+import GoogleLogin from "react-google-login";
+
 const SIGN_IN = gql`
   mutation SignIn($userName: String!, $password: String!) {
     login(username: $userName, password: $password) {
+      id
+      username
+      email
+      fullname
+      profileUrl
+      createdAt
+      token
+    }
+  }
+`;
+
+const GOOGLE_SIGN_IN = gql`
+  mutation GoogleSignIn($token: String!) {
+    loginUsingGoogle(accessToken: $token) {
       id
       username
       email
@@ -43,6 +60,19 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(4),
   },
+  facebook: {
+    backgroundColor: "#3c5a99",
+    color: theme.palette.getContrastText("#3c5a99"),
+    marginBottom: theme.spacing(2),
+  },
+  google: {
+    backgroundColor: "#4285f4",
+    color: theme.palette.getContrastText("#4285f4"),
+    marginBottom: theme.spacing(2),
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: 0,
+    },
+  },
   submit: {
     margin: theme.spacing(2, 0),
   },
@@ -66,6 +96,17 @@ function SignInDialog(props) {
       showSnackbar("error", error.message);
     },
   });
+  const [googleSignIn] = useMutation(GOOGLE_SIGN_IN, {
+    onCompleted({ loginUsingGoogle: user }) {
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      setDialog(null);
+      showSnackbar("success", "Successfully signed in");
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
 
   function handleEmailSignIn() {
     signIn({
@@ -75,6 +116,10 @@ function SignInDialog(props) {
       },
     });
   }
+
+  const responseGoogle = (response) => {
+    googleSignIn({ variables: { token: response.accessToken } });
+  };
 
   return (
     <Container maxWidth="xs">
@@ -86,6 +131,27 @@ function SignInDialog(props) {
           Sign-In
         </Typography>
         <Grid className={classes.form} container spacing={2}>
+          <Grid item xs={12}>
+            <GoogleLogin
+              clientId="394688971696-793pnb23udgrrc64eqj29437d356ql90.apps.googleusercontent.com"
+              render={(renderProps) => (
+                <Button
+                  className={classes.google}
+                  variant="contained"
+                  fullWidth
+                  endIcon={<GoogleIcon />}
+                  onClick={renderProps.onClick}
+                  disabled={renderProps.disabled}
+                >
+                  Google
+                </Button>
+              )}
+              buttonText="Google"
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle}
+              cookiePolicy={"single_host_origin"}
+            />
+          </Grid>
           <Grid item xs={12}>
             <TextField
               variant="outlined"
