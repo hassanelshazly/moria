@@ -126,7 +126,7 @@ PostModel.statics.deleteComment = async function (args) {
         throw new Error("Post not found");
 
     const cIdx = post.comments.findIndex(comment =>
-        comment.toString() == commentId.toString());
+        comment._id.toString() == commentId.toString());
 
     if (cIdx == -1 || post.comments[cIdx].user != userId)
         throw new Error("User not authorized");
