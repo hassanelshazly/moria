@@ -1,0 +1,557 @@
+[33mcommit a3e31725b7a0c43950e636857e375d25fdb39dc6[m[33m ([m[1;36mHEAD -> [m[1;32mtest[m[33m, [m[1;31morigin/test[m[33m)[m
+Author: hosniadel666 <hosniadel666>
+Date:   Wed Jan 13 19:52:32 2021 +0200
+
+    Edit Page testing
+
+[33mcommit b75643c17cf32968d2d14bbd2d8e7f18542e5bb2[m
+Author: hosniadel666 <hosniadel666>
+Date:   Wed Jan 13 19:38:49 2021 +0200
+
+    Add page test
+
+[33mcommit 7ba1f4e34cf74a43b094436e8bf78a709372db68[m
+Author: hosniadel666 <hosniadel666>
+Date:   Wed Jan 13 00:35:51 2021 +0200
+
+    Add sendMessage test
+
+[33mcommit 5b45a03fe0e27d11320214de149e993bc23db69a[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Wed Jan 13 00:10:51 2021 +0200
+
+    Revert "Adding Dark Mode (Switch isnt working yet!)"
+    
+    This reverts commit 626d15a9306e311a65d8f933975dededd0b03354.
+
+[33mcommit 1e18802756c6c8bb2a10ad394dbbbe3767a237a7[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Wed Jan 13 00:06:34 2021 +0200
+
+    Revert "Dark Mode Switcher"
+    
+    This reverts commit 4be323e3d1c67be4ff05763f3b29b2a27a755c4b.
+
+[33mcommit 70424b2f3c05390356696adfb1c7d2f562145aa7[m
+Merge: bb426f0 abbb02f
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 23:49:45 2021 +0200
+
+    Solve conflicts
+
+[33mcommit bb426f06ae00d02b487c13b906c0cb9291555de4[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 23:48:34 2021 +0200
+
+    Mega commit
+
+[33mcommit abbb02f0b9c9ae126eab9a98687f5ee00b989eba[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 23:47:34 2021 +0200
+
+    Chat for small screens
+
+[33mcommit 6edca423b795b7850f097548c1259295c3356225[m
+Merge: 40abece 67d0ecf
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 23:42:12 2021 +0200
+
+    Merge branch 'master' into frontend
+
+[33mcommit 67d0ecf65ca8e59da99e0ae298e202aaef591fc3[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 22:59:19 2021 +0200
+
+    Add imageUrl
+
+[33mcommit a6bc123f460011a5baabf1e17300b4454bffde23[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 22:42:25 2021 +0200
+
+    Add followersCount to pages
+
+[33mcommit 5cc78516f4ed57dfd19c94c9e833bd7d1deb9d78[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 22:38:45 2021 +0200
+
+    Increase timeout for all tests
+
+[33mcommit 61a73bce4667469819f54377056416920a77be95[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 22:16:54 2021 +0200
+
+    Discovery Loader
+
+[33mcommit 4be323e3d1c67be4ff05763f3b29b2a27a755c4b[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 22:11:24 2021 +0200
+
+    Dark Mode Switcher
+
+[33mcommit 40abeceb05195b03045859b471a88de0c1f33a4f[m
+Merge: 679e1fa 09c67eb
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 21:37:26 2021 +0200
+
+    Merge branch 'master' into frontend
+
+[33mcommit 09c67eb07f069be147c95287c27cb824bf6020a4[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 20:40:13 2021 +0200
+
+    Increase timeout for all tests
+
+[33mcommit e516a0380bb3ce749037303a1646e6be23e91726[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 20:29:53 2021 +0200
+
+    Update group schema
+
+[33mcommit c9b2640fc60bb7a64092292a1dd7bd299ec9e8d9[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 20:24:29 2021 +0200
+
+    Discovery now works
+
+[33mcommit 7bc3ec29327960d33badd49c593b4854beff3deb[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 20:16:21 2021 +0200
+
+    fix unit tests
+
+[33mcommit 679e1fac2a315f48ec0775fbdb3e4146d3b841f9[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 19:13:09 2021 +0200
+
+    Fix Discovery
+
+[33mcommit 09bd5eae74d4c08f505378508484e37eb11e0df5[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 18:58:18 2021 +0200
+
+    Restrucutre animations
+
+[33mcommit 1537fed8fcf622eced7a1c09756f667413456f06[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 18:53:03 2021 +0200
+
+    Discovery & Chat useEffect
+
+[33mcommit bba6b0097eefdb6196baff8b8fa784847794ff8f[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 16:57:19 2021 +0200
+
+    Adding Notification Component
+
+[33mcommit ed9ccdbb95e0593e3d96e67f3e499b1d18b49b57[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 16:00:03 2021 +0200
+
+    Add search queries
+
+[33mcommit c287bb7ddabe654b8ca7264b53c99a2786127818[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 14:12:34 2021 +0200
+
+    Better styling for chat
+
+[33mcommit cd074424e7349d6bc24651fdfcb158b4e0027933[m
+Merge: 5b04f24 dceaddd
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Tue Jan 12 12:33:58 2021 +0200
+
+    Merge branch 'frontend'
+
+[33mcommit 5b04f2471fc414b6261b3b1de89f4be1d726ae13[m
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Tue Jan 12 06:14:04 2021 +0200
+
+    edit post.js to fix deletePagePost
+
+[33mcommit 1a3c5acde5a9f2f53951d06a1e54f3a88451c68a[m
+Merge: f609751 6e8cbef
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Tue Jan 12 04:18:00 2021 +0200
+
+    Merge branch 'backend' of https://github.com/hassanelshazly/moria into backend
+
+[33mcommit f6097510f4bc0cb23e828b8c15e487d5fbce7af8[m
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Tue Jan 12 04:16:28 2021 +0200
+
+    fix typo in followPage and deletePagePost
+
+[33mcommit 6e8cbef3053b3a56ddec0351779f596081c3d081[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 04:00:45 2021 +0200
+
+    fix delete page post
+
+[33mcommit 05f84b5315c9e2b528c316dd9d78808a149ff2e4[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 03:58:44 2021 +0200
+
+    change group request to just user
+
+[33mcommit 5e4c3f499a7f73df3f46bba4389b24029963414a[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 03:36:04 2021 +0200
+
+    fixing return type for photos
+
+[33mcommit d51da0e9dd10ae1703efac14ed26e1e9f3ed5445[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 02:41:24 2021 +0200
+
+    finish group resolvers
+
+[33mcommit dceadddb52cbd594d2d170e0ffdad95032e47e77[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 02:39:55 2021 +0200
+
+    Removed change cover.
+
+[33mcommit e254f2b9af4d3f6bd4ce804cdc0a99e8d54f58ef[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 02:34:54 2021 +0200
+
+    Chat Now Works + Some Animations
+
+[33mcommit 92047acb43f713f07b3f0fdc127da0acc8ad0dfc[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 02:13:45 2021 +0200
+
+    fixing bugs on page and group posts
+
+[33mcommit d67b0bed97923d49e410ebb8d93bc63eef763e62[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 01:44:42 2021 +0200
+
+    finish page resolvers
+
+[33mcommit 798f7941c3f8283657f84089de56060649c8ac27[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Tue Jan 12 00:15:34 2021 +0200
+
+    fix forEach read in sequence
+
+[33mcommit 26bdedf9d266cab9b76d47d418d3c26003981d64[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Tue Jan 12 00:11:00 2021 +0200
+
+    Followers list is now working
+
+[33mcommit cd20fea0e9039b2e508864d019b8c718bb0f0558[m
+Merge: 8625c72 44b4b58
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 23:45:51 2021 +0200
+
+    Merge upcomming changes
+
+[33mcommit 8625c727f6ba8d26480e837de0e690b95fab7864[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 23:43:27 2021 +0200
+
+    Image support in user & page & group and more group & page refinemnt
+
+[33mcommit 44b4b58a3257e0c3b2d51450faf7163414b580b0[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 23:09:35 2021 +0200
+
+    Fix compilation errors
+
+[33mcommit 67ae01e9e04c58d2942781afe6c7a27ab315a303[m
+Merge: 7f3e8e6 ff2a6f5
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 22:49:19 2021 +0200
+
+    Merge branch 'frontend'
+
+[33mcommit ff2a6f5a0b01daa78dfbdb7f986fdd4b0cc78cee[m
+Merge: 73c95da ebda95e
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 22:47:25 2021 +0200
+
+    Fix conflicts
+
+[33mcommit 73c95daf1a4daa591c355158a4c78ceae1a62e82[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 22:37:52 2021 +0200
+
+    Fix Chat and Profile issues
+
+[33mcommit 7f3e8e61ae434a73977f28e5f34e593f60c7f5eb[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 21:13:51 2021 +0200
+
+    update groups & pages
+
+[33mcommit c99138aea7318998a71f7bc839eef122e1eb8a68[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 21:13:03 2021 +0200
+
+    Add image upload function
+
+[33mcommit d07beea99acc839b8953f1f8cdbf0f6748e32c1f[m
+Merge: ca4f9b9 767fc28
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 16:51:25 2021 +0200
+
+    Merge branch 'backend' into backend
+
+[33mcommit ca4f9b90bb564db8892ba732bec3f695a0eae703[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 16:48:25 2021 +0200
+
+    uploadImage for experments
+
+[33mcommit 767fc2836c09da60166b6fb228eae33769eca090[m
+Merge: 69dc823 b5a94cf
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Mon Jan 11 16:43:08 2021 +0200
+
+    Merge branch 'backend' of https://github.com/hassanelshazly/moria into backend
+
+[33mcommit ebda95ee04dd756e73f936d611a6fefdf1ec7c22[m
+Author: Ahmed Essam <Ahmedellord56@gmail.com>
+Date:   Mon Jan 11 16:39:12 2021 +0200
+
+    Adding more details to profile
+
+[33mcommit 9f565cc0383b2fe9b455d4a587a01e28f71216b9[m
+Author: Ahmed Essam <Ahmedellord56@gmail.com>
+Date:   Mon Jan 11 16:38:29 2021 +0200
+
+    Added more details to profile
+
+[33mcommit 69dc823cdc2b843dc96235b974c24e7d52bc26f5[m
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Mon Jan 11 16:25:15 2021 +0200
+
+    edit group resolvers & types
+
+[33mcommit 8b341a0dc9eb5e15aa77b010472a8ae6a28dd59e[m
+Author: Radwa <radwaahmed4869@gmail.com>
+Date:   Mon Jan 11 16:15:57 2021 +0200
+
+    edit page & group
+
+[33mcommit b5a94cf87462ed3976c1b6833cd647655edd8162[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 15:36:20 2021 +0200
+
+    Fix state management
+
+[33mcommit a291c9c26bd6e4966f55626933b47949ca35ba9e[m
+Merge: b89455f 25674c8
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 15:13:46 2021 +0200
+
+    Merge branch 'frontend'
+
+[33mcommit 25674c8a9aab3ed48a395c233835979d79285f21[m
+Merge: 406531a 6e9ea3d
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 15:12:17 2021 +0200
+
+    Merge branch 'frontend' into frontend
+
+[33mcommit 406531a5bb327cd5e6e577b251242bbe7c641111[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 15:11:35 2021 +0200
+
+    Transition to Redux for state management
+
+[33mcommit 6e9ea3dfd3656d814ae1eac6b91c8f2b2a05ccbe[m
+Author: Ahmed Essam <Ahmedellord56@gmail.com>
+Date:   Mon Jan 11 14:44:28 2021 +0200
+
+    Added search functionality
+
+[33mcommit 95c3534c22e9281d1e050c368169e847e95f28b8[m
+Author: Ahmed Essam <Ahmedellord56@gmail.com>
+Date:   Mon Jan 11 14:10:50 2021 +0200
+
+    Dont allow sending if no receiver is selected
+
+[33mcommit b89455fadbde868792c459f4c4a0eab3e7969862[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 14:03:56 2021 +0200
+
+    fixing timeline & follow errors
+
+[33mcommit 83a85d7d1d829b1da245dc4af9741db11c8d5e7c[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 12:33:38 2021 +0200
+
+    Restructure and Format components
+
+[33mcommit f2a9a312d65e5d26454da421403982498be7196b[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 12:16:16 2021 +0200
+
+    Fix chat query
+
+[33mcommit 61ab856d2cadc6f10a3216adebeb8c99eaf5e381[m
+Merge: 64f2da6 865d026
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Mon Jan 11 11:09:51 2021 +0200
+
+    Merge branch 'backend'
+    Merge query fixes from backend branch
+
+[33mcommit 64f2da6e13f79cdb2705e5f8d62e73efd7b48b5b[m
+Author: Ahmed Essam <Ahmedellord56@gmail.com>
+Date:   Mon Jan 11 03:04:04 2021 +0200
+
+    Removed CHAT & Fixed some positioning styles
+
+[33mcommit 865d0265d38ff5c43b13a4817bbd2beebb007db6[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 02:26:18 2021 +0200
+
+    Add Post unit tests
+
+[33mcommit 88607125a0f9f935bcab584b823c44e2d9e8d8d3[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Mon Jan 11 01:08:05 2021 +0200
+
+    Fixing queies issues
+
+[33mcommit e67e291fd0fc85886144ce1fc03ee202bf551810[m
+Merge: d2bddc6 a361a45
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Sun Jan 10 22:54:35 2021 +0200
+
+    Merge branch 'frontend'
+
+[33mcommit d2bddc68595f23ea0e16d9b148042dd3a5c3c977[m
+Merge: e557c2b c5c19d2
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Sun Jan 10 22:50:12 2021 +0200
+
+    Merge branch 'master' of github.com:hassanelshazly/moria
+    
+    Merge master
+
+[33mcommit e557c2b920f9ee2db6c5b13adf03dbba0c0da5c8[m
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Sun Jan 10 22:49:39 2021 +0200
+
+    Work up Profile and Posts
+
+[33mcommit a361a45f9e1c35e0643437f5d652cb207c2d03df[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sun Jan 10 22:43:28 2021 +0200
+
+    Discovery now should be working well!
+
+[33mcommit c5c19d2f03e4124362881379bbb7e405ebc8a512[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Sun Jan 10 22:32:59 2021 +0200
+
+    Add findAllUsers Query
+
+[33mcommit 00c58153a2f8dc94b3fb1f63d6d33ba9cff2cd1e[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sun Jan 10 22:30:52 2021 +0200
+
+    Discovery is now integrated (but the query name may need to change)
+
+[33mcommit 0db96e47cd6c3e1cfdaa1dd52c139dc6d42ac370[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sun Jan 10 21:25:21 2021 +0200
+
+    fully Integrated with backend
+
+[33mcommit 772016c74acebab8f34c474f066ae580843eae26[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sun Jan 10 17:50:03 2021 +0200
+
+    added latest backend server
+
+[33mcommit 1bb343e95123152f3667220be570789fe2ac53c1[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 20:49:42 2021 +0200
+
+    preparation-1
+
+[33mcommit 5a33b966307158b4de6944ebe45fac9a1acb3f78[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 20:28:04 2021 +0200
+
+    Refactoring + Adding Message component
+
+[33mcommit b28b0e122c819a73b972627719f68f672b5c6ea9[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 18:45:15 2021 +0200
+
+    Adding Emojis
+
+[33mcommit ca82d1e33cd214648d593918420292fd93d97ee1[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 18:44:44 2021 +0200
+
+    fix typo 3
+
+[33mcommit 4271e739781cc7d9135090bbfdccc3ee06772b8c[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 16:31:09 2021 +0200
+
+    Delete and add the correct file for discovery
+
+[33mcommit 4c7f1d89557f7b62de9f1292a0f8ce0f8580c827[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 16:01:31 2021 +0200
+
+    Added Discovery Page
+
+[33mcommit 778ded37cc411b822777f2d46041429a1012185b[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 14:14:08 2021 +0200
+
+    fixing typo 2
+
+[33mcommit 4c31d2e52e35d598ace110adc2ce04b61f3a1131[m
+Author: Ahmed <ahmedellord56@gmail.com>
+Date:   Sat Jan 9 14:10:45 2021 +0200
+
+    fixing a typo
+
+[33mcommit c5f927d953afb0a909bdd58bf2f224ae24a8229a[m
+Merge: 36e86ab 2ba825e
+Author: Hassan El-shazly <37087388+hassanelshazly@users.noreply.github.com>
+Date:   Fri Jan 8 23:54:01 2021 +0200
+
+    Merge pull request #11 from hassanelshazly/frontend
+    
+    Frontend
+
+[33mcommit 36e86ab15475ca9209a069c2505e10e111ee7807[m
+Merge: e8f7ed1 0740d15
+Author: Hassan El-shazly <37087388+hassanelshazly@users.noreply.github.com>
+Date:   Fri Jan 8 23:52:18 2021 +0200
+
+    Merge pull request #13 from hassanelshazly/backend
+    
+    Backend
+
+[33mcommit 0740d152b1bff0741f9cb6dab2696052d465109f[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Fri Jan 8 23:50:44 2021 +0200
+
+    Unique Email
+
+[33mcommit c05cc5ce88392e2300faa1abebc56af7d03435e4[m
+Merge: e8f7ed1 2ba825e
+Author: Khaled Emara <mail@KhaledEmara.dev>
+Date:   Fri Jan 8 23:41:12 2021 +0200
+
+    Merge branch 'frontend'
+    Merge frontend code
+
+[33mcommit 2dc9c4e950e1b121977203bf28271d226a9b7b06[m
+Author: Hassan El-shazly <hassanelshazly2010@gmail.com>
+Date:   Fri Jan 8 23:40:13 2021 +0200
+
+    Add User unit testing
