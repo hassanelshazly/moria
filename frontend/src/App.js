@@ -28,48 +28,47 @@ import { connect } from "react-redux";
 
 function App(props) {
   const { token } = props;
-
   let httpLink = createHttpLink({
-    uri: "http://localhost:4000",
-  });
+    uri: 'http://localhost:4000',
+  })
 
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : "",
+        authorization:  `Bearer ${token}` ,
       },
     };
   });
-
-  httpLink = authLink.concat(httpLink);
+  httpLink = authLink.concat(httpLink)
 
   const wsLink = new WebSocketLink({
     uri: `ws://localhost:4000/graphql`,
     options: {
       reconnect: true,
       connectionParams: {
-        authToken: token,
+        authorization: `Bearer ${token}`,
       },
     },
-  });
+  })
 
   const splitLink = split(
     ({ query }) => {
-      const definition = getMainDefinition(query);
+      const definition = getMainDefinition(query)
       return (
-        definition.kind === "OperationDefinition" &&
-        definition.operation === "subscription"
-      );
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      )
     },
     wsLink,
     httpLink
-  );
+  )
 
   const apolloClient = new ApolloClient({
     link: splitLink,
     cache: new InMemoryCache(),
-  });
+  })
+
 
   return (
     <ApolloProvider client={apolloClient}>

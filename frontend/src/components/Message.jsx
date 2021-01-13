@@ -34,10 +34,12 @@ const useStyles = makeStyles(() => ({
     width:"max-content",
     float:"right",
     maxWidth:"500px",
-    overflow:"hidden"
+    overflow:"hidden",
+    textAlign:"left"
   },
   receiverStyle: {
     backgroundColor: "#E0DBDA",
+    textAlign:"left",
     width:"max-content",
     maxWidth:"500px",
     overflow:"hidden",

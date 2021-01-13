@@ -28,6 +28,12 @@ import classNames from "classnames";
 import Message from "./Message";
 
 import MessageReceivedAnimation from "../assets/animations/message-received.json";
+import Skeleton from "@material-ui/lab/Skeleton";
+
+
+let messageArrayLoading = false;
+
+const skeletonHolder=Array.from({length: Math.floor(Math.random() * (12 - 4 + 1)) + 4}, () => Math.floor(Math.random() * 100)  );
 
 const useImperativeQuery = (query) => {
   const { refetch } = useQuery(query, { skip: true });
@@ -53,6 +59,9 @@ const useStyles = makeStyles((theme) => ({
     position:"absolute",
     width: "400px",
     height: "400px",
+    overflow:"hidden",
+    
+    
     [theme.breakpoints.down("md")]: {
       position:"absolute",
       top:"10vh",
@@ -92,17 +101,17 @@ const useStyles = makeStyles((theme) => ({
   },
   pickerSpanStyling: {
     position: "absolute",
-    bottom: "20vh",
+    bottom: "10vh",
     zIndex: "1",
     [theme.breakpoints.up("md")]: {
-      left: "37.9vw",
+      left: "1vw",
     },
     [theme.breakpoints.down("md")]: {
-      left: "35vw",
+      left: "1vw",
     },
     [theme.breakpoints.down("sm")]: {
-      left: "10vw",
-      bottom: "22vh",
+      left: "1",
+      bottom: "11vh",
     },
   },
   peopleList: {
@@ -182,7 +191,7 @@ const Chat = (props) => {
   const { user } = props;
 
   if (user == null) {
-    return <Redirect to="/" />;
+    return <p>Loading ...</p>
   }
   const {
     data: subData,
@@ -191,21 +200,19 @@ const Chat = (props) => {
   } = useSubscription(MESSAGE_SUBSCRIPTION);
   
   if(subError) console.log (subError)
-  
+
   const container = useRef(null);
   useEffect(() => {
-    const anim = lottie.loadAnimation({
+    lottie.loadAnimation({
       container: container.current,
       renderer: "svg",
       autoplay: true,
       loop: true,
-      animationData: MessageReceivedAnimation,
+      animationData: require("./../assets/animations/message-received.json"),
     });
 
-    return () => {
-      anim.destroy();
-    };
-  }, []);
+    
+  } );
   const classes = useStyles();
   const theme = useTheme();
   const dummy = useRef();
@@ -279,7 +286,9 @@ const Chat = (props) => {
           body: subData.newMessage.body,
           sender: subData.newMessage.from.id == user.id,
         },
-      ]);
+      ]
+      
+      );
       
       // console.log(subData.newMessage)
     }
@@ -329,11 +338,13 @@ const Chat = (props) => {
                     }}
                     onClick={async () => {
                       setCurrentReceiver(someuser.id);
-                      const { data, error } = await callQuery({
+                      messageArrayLoading=true;
+                      const { data, error,loading } = await callQuery({
                         receiver: someuser.id,
                       });
+                      if(!loading) messageArrayLoading=false;
                       setMessageArray((messageArray) => []);
-
+                     
                       // if(error) { return;}
                       data.findMessages.forEach((x) => {
                         setMessageArray((messageArray) => [
@@ -376,6 +387,22 @@ const Chat = (props) => {
                 {" "}
               </div>
             )}
+           { currentReceiver != "#" && messageArrayLoading &&
+                <div style={{display:"flex" , flexDirection:"column" , justifyContent:"flex-end"}}> 
+                {
+                    skeletonHolder.map(id=>(
+                      <Skeleton key={id} variant="rect" animation="wave" align="right" width={Math.floor(Math.random() * (240 - 80 + 1)) + 80} height={Math.floor(Math.random() * (60 - 20 + 1)) + 20 }  
+                      style={{ alignSelf:id%2==0 ? "flex-start":"flex-end" ,marginBottom:"10px" , marginRight: id%2==0? "0":"10px" , backgroundColor:id%2==0?"#E0DBDA":"rgb(44,225,210)" ,  marginLeft: id%2==0? "10px":"0px", borderRadius:"20px"}}>
+
+                      
+                      </Skeleton>
+                      ))                  
+
+                }
+               {/* <Skeleton variant="rect" animation="wave" width={Math.floor(Math.random() * 240)} height={Math.floor(Math.random() * 140)}  style={{ borderRadius:"30px"}}/> */}
+               </div>
+            } 
+           
             {messageArray.map((x) => (
               <Message
                 ISSMALL={isMobile}
