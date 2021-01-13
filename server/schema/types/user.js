@@ -18,6 +18,7 @@ const User = gql`
         savedPosts: [Post]
         pages:      [Page]
         groups:     [Group]
+        requests:   [Group]
     }
 
     extend type Query {

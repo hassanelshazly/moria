@@ -129,6 +129,7 @@ GroupModel.statics.sendRequest = async function ({ groupId, userId }) {
         throw new Error("User already a member");
 
     await group.addOrRemoveRequest(userId);
+    await user.addOrRemoveRequest(group._id);
     return group;
 }
 
@@ -152,6 +153,7 @@ GroupModel.statics.acceptRequest = async function ({ groupId, userId, memberId }
         throw new Error("User hasn't join");
 
     await group.addOrRemoveRequest(memberId);
+    await user.addOrRemoveRequest(group._id);
     await group.addOrRemoveMember(memberId);
     return group;
 }
@@ -185,6 +187,10 @@ GroupModel.statics.addMembers = async function ({ groupId, userId, membersId }) 
     for (member of members) {
         await member.addOrRemoveGroup(group._id);
         await group.addOrRemoveMember(member._id);
+        if (group.requests.includes(member._id)) {
+            await member.addOrRemoveRequest(group._id);
+            await group.addOrRemoveRequest(member._id);
+        }
     }
     return group;
 }
