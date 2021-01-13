@@ -263,7 +263,7 @@ GroupModel.statics.createGroupPost = async function (args) {
     await Notification.createNotification({
         group,
         content: GROUP_POST,
-        contentId: post._id,
+        contentId: group._id,
         author: userId
     });
 
@@ -292,7 +292,7 @@ GroupModel.statics.deleteGroupPost = async function (args) {
 
     await Notification.deleteMany({
         content: GROUP_POST,
-        contentId: post._id,
+        contentId: group._id,
         author: userId
     });
 
@@ -314,7 +314,7 @@ GroupModel.methods.addOrRemoveRequest = async function (userId) {
         this.requests.push(userId);
         await this.save();
         await Notification.createNotification({
-            group,
+            group: this,
             content: GROUP_REQUEST,
             contentId: this._id,
             author: userId
