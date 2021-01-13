@@ -34,6 +34,8 @@ import Logo from "../assets/images/logo192.png";
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from "@material-ui/icons/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import NotificationsMenu from "./NotificationsMenu";
+import NotificationsTwoToneIcon from "@material-ui/icons/NotificationsTwoTone";
 import SearchBar from "./SearchBar";
 import SignUpDialog from "../dialogs/SignUpDialog";
 import SignInDialog from "../dialogs/SignInDialog";
@@ -379,23 +381,25 @@ const DrawerHeader = connect(
   mapDrawerDispatchToProps
 )(DrawerInfo);
 
-const accountMenuId = "primary-account-menu";
+const accountMenuId = "account-menu";
+const notificationsMenuId = "notifications-menu";
 
 function MainMenu(props) {
   const {
     user,
-    account,
+    menus,
     setMenuAnchor,
     setDialog,
     setUser,
     showSnackbar,
   } = props;
 
-  const isMenuOpen = Boolean(account);
+  const isAccountMenuOpen = Boolean(menus.account);
+  const isNotificationsMenuOpen = Boolean(menus.notifications);
 
   return useMemo(() => {
-    const handleMenuClose = () => {
-      setMenuAnchor("account", null);
+    const handleMenuClose = (menu) => () => {
+      setMenuAnchor(menu, null);
     };
 
     const handleAccountClick = () => {
@@ -406,29 +410,45 @@ function MainMenu(props) {
         setUser(null);
         showSnackbar("success", "Signed out");
       }
-      handleMenuClose();
+      handleMenuClose("account")();
     };
 
     return (
-      <Menu
-        anchorEl={account}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        id={accountMenuId}
-        keepMounted
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleAccountClick}>
-          {!user ? "Sign in" : "Sign out"}
-        </MenuItem>
-      </Menu>
+      <React.Fragment>
+        <Menu
+          anchorEl={menus.notifications}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          id={notificationsMenuId}
+          keepMounted
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isNotificationsMenuOpen}
+          onClose={handleMenuClose("notifications")}
+        >
+          <NotificationsMenu
+            closeMenu={handleMenuClose("notifications")}
+            open={isNotificationsMenuOpen}
+          />
+        </Menu>
+        <Menu
+          anchorEl={menus.account}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          id={accountMenuId}
+          keepMounted
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isAccountMenuOpen}
+          onClose={handleMenuClose("account")}
+        >
+          <MenuItem onClick={handleAccountClick}>
+            {!user ? "Sign in" : "Sign out"}
+          </MenuItem>
+        </Menu>
+      </React.Fragment>
     );
-  }, [setMenuAnchor, user, account, isMenuOpen]);
+  }, [setMenuAnchor, user, menus, isAccountMenuOpen]);
 }
 
 const mapMenuStateToProps = (state) => {
-  return { user: state.user, account: state.menus.account };
+  return { user: state.user, menus: state.menus };
 };
 
 function mapMenuDispatchToProps(dispatch) {
@@ -458,28 +478,43 @@ function MainMenuTrigger(props) {
   const { user, setMenuAnchor } = props;
 
   return useMemo(() => {
-    const handleMenuOpen = (event) => {
+    const handleNotificationsOpen = (event) => {
+      setMenuAnchor("notifications", event.currentTarget);
+    };
+
+    const handleAccountMenuOpen = (event) => {
       setMenuAnchor("account", event.currentTarget);
     };
 
     return (
-      <IconButton
-        aria-label="account of current user"
-        aria-controls={accountMenuId}
-        aria-haspopup="true"
-        onClick={handleMenuOpen}
-        color="inherit"
-      >
-        {user && user.photo ? (
-          <Avatar
-            className={classes.avatar}
-            alt="user avatar"
-            src={user.photo}
-          />
-        ) : (
-          <AccountCircleTwoTone />
-        )}
-      </IconButton>
+      <React.Fragment>
+        <IconButton
+          aria-label="notifications for current user"
+          aria-controls={notificationsMenuId}
+          aria-haspopup="true"
+          onClick={handleNotificationsOpen}
+          color="inherit"
+        >
+          <NotificationsTwoToneIcon />
+        </IconButton>
+        <IconButton
+          aria-label="account of current user"
+          aria-controls={accountMenuId}
+          aria-haspopup="true"
+          onClick={handleAccountMenuOpen}
+          color="inherit"
+        >
+          {user && user.photo ? (
+            <Avatar
+              className={classes.avatar}
+              alt="user avatar"
+              src={user.photo}
+            />
+          ) : (
+            <AccountCircleTwoTone />
+          )}
+        </IconButton>
+      </React.Fragment>
     );
   }, [classes, setMenuAnchor, user]);
 }
