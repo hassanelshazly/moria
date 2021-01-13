@@ -25,6 +25,7 @@ const GET_ALL_USERS = gql`
       id
       username
       fullname
+      profileUrl
     }
   }
 `;
@@ -91,7 +92,7 @@ function Discovery(props) {
           if (user!= null && someuser.id !=user.id  ) {
             return (
               <Grid item xs={12} sm={6} md={4}>
-                <UserCard canFollow={!currentlyFollowing.includes(someuser.username)} fullname={someuser.fullname} username={someuser.username} id={someuser.id} />
+                <UserCard profilePic={someuser.profileUrl} canFollow={!currentlyFollowing.includes(someuser.username)} fullname={someuser.fullname} username={someuser.username} id={someuser.id} />
               </Grid>
             );
           }

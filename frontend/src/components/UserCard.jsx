@@ -74,6 +74,7 @@ function UserCard(props) {
     });
 
   };
+  console.log(props.profilePic);
    return (
     <Card className={classes.root} key={id}>
       <CardActionArea>
@@ -81,7 +82,8 @@ function UserCard(props) {
           className={classes.cardmediaStyling}
           component="img"
           alt="Avatar"
-          image={anon}
+          style={{width:"250px" , height:"250px" , margin:"20px auto"}}
+          image={props.profilePic==null? anon : props.profilePic}
           title="Contemplative Reptile"
         />
         <CardContent>
