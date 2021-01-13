@@ -16,6 +16,8 @@ import MainNav from "./components/MainNav";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Pages from "./pages/Pages";
+import Page from "./pages/Page";
 import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import Chat from "./pages/Chat";
@@ -78,6 +80,12 @@ function App(props) {
           </Route>
           <Route path="/profile/">
             <Profile />
+          </Route>
+          <Route exact path="/page/">
+            <Pages />
+          </Route>
+          <Route path="/page/:id/">
+            <Page />
           </Route>
           <Route exact path="/group/">
             <Groups />

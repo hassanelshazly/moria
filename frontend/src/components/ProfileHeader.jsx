@@ -67,6 +67,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
     [breakpoints.only("xs")]: { height: 240 },
     [breakpoints.only("sm")]: { height: 360 },
     [breakpoints.up("md")]: { height: 480 },
+    objectFit: "cover",
   },
   coverAnimation: {
     position: "relative",
@@ -106,7 +107,9 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   },
   photo: {
     width: spacing(20),
+    height: spacing(20),
     objectFit: "cover",
+    borderRadius: "50%",
   },
   photoEdit: {
     position: "absolute",
@@ -163,8 +166,6 @@ function ProfileHeader(props) {
     user && profile_user && profile_user.followers
       ? profile_user.followers.some((el) => el.id === user.id)
       : false;
-
-  console.log(profile_user.profileUrl);
 
   const classes = useStyles();
   const theme = useTheme();

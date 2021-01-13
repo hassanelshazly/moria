@@ -8,6 +8,8 @@ import AppBar from "@material-ui/core/AppBar";
 import ChatIcon from "@material-ui/icons/Chat";
 import Container from "@material-ui/core/Container";
 import CreateIcon from "@material-ui/icons/Create";
+import CreateGroupDialog from "../dialogs/CreateGroupDialog";
+import CreatePageDialog from "../dialogs/CreatePageDialog";
 import CreatePostDialog from "../dialogs/CreatePostDialog";
 import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
@@ -210,6 +212,20 @@ function Dialogs(props) {
           aria-labelledby="create-post-dialog"
         >
           <CreatePostDialog />
+        </Dialog>
+        <Dialog
+          open={dialog === "create-group"}
+          onClose={handleDialogClose}
+          aria-labelledby="create-group-dialog"
+        >
+          <CreateGroupDialog />
+        </Dialog>
+        <Dialog
+          open={dialog === "create-page"}
+          onClose={handleDialogClose}
+          aria-labelledby="create-page-dialog"
+        >
+          <CreatePageDialog />
         </Dialog>
       </React.Fragment>
     );
@@ -629,13 +645,13 @@ function DrawerItems() {
       {
         id: "/page/",
         icon: <CreateIcon />,
-        text: "My Page",
-        action: () => history.push("/"),
+        text: "Pages",
+        action: () => history.push("/page/"),
       },
       {
         id: "/group/",
         icon: <GroupIcon />,
-        text: "My Group",
+        text: "Groups",
         action: () => history.push("/group/"),
       },
       {
@@ -658,7 +674,7 @@ function DrawerItems() {
           <ListItem
             key={item.id}
             className={classes.listItem}
-            selected={history.location.pathname.startsWith(item.id)}
+            selected={history.location.pathname == item.id}
             button
             onClick={() => history.push(item.id)}
           >

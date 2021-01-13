@@ -19,13 +19,17 @@ import { gql, useQuery } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog } from "../state/actions";
 
-const GET_GROUPS = gql`
-  query GetGroups {
-    findAllGroups {
+const GET_PAGES = gql`
+  query GetPages {
+    findAllPages {
       id
+      owner {
+        id
+        username
+      }
       title
       profileUrl
-      membersCount
+      description
     }
   }
 `;
@@ -42,15 +46,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Groups(props) {
+function Pages(props) {
   const { setDialog } = props;
   const classes = useStyles();
 
-  const handleCreateGroup = () => {
+  const handleCreatePage = () => {
     setDialog("create-group");
   };
 
-  const { loading, error, data } = useQuery(GET_GROUPS);
+  const { loading, error, data } = useQuery(GET_PAGES);
 
   if (loading)
     return (
@@ -90,7 +94,7 @@ function Groups(props) {
     <React.Fragment>
       <Paper>
         <List>
-          {data.findAllGroups.map(({ id, title, profileUrl, membersCount }) => (
+          {data.findAllPages.map(({ id, title, profileUrl, description }) => (
             <React.Fragment key={id}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
@@ -104,12 +108,12 @@ function Groups(props) {
                   primary={
                     <Link
                       component={RouterLink}
-                      to={`/group/${encodeURIComponent(id)}`}
+                      to={`/page/${encodeURIComponent(id)}`}
                     >
                       {title}
                     </Link>
                   }
-                  secondary={`This groups has ${membersCount} member.`}
+                  secondary={description}
                 />
               </ListItem>
               <Divider variant="inset" component="li" />
@@ -121,7 +125,7 @@ function Groups(props) {
         className={classes.fab}
         color="primary"
         aria-label="add"
-        onClick={handleCreateGroup}
+        onClick={handleCreatePage}
       >
         <AddIcon />
       </Fab>
@@ -129,7 +133,7 @@ function Groups(props) {
   );
 }
 
-Groups.propTypes = {
+Pages.propTypes = {
   setDialog: PropTypes.func.isRequired,
 };
 
@@ -139,4 +143,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(Groups);
+export default connect(null, mapDispatchToProps)(Pages);

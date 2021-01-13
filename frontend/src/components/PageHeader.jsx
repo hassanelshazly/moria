@@ -24,31 +24,31 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
-const DELETE_GROUP = gql`
-  mutation DeleteGroup($group_id: ID!) {
-    deleteGroup(groupId: $group_id)
+const DELETE_PAGE = gql`
+  mutation DeletePage($page_id: ID!) {
+    deletePage(pageId: $page_id)
   }
 `;
 
-const SEND_REQUEST = gql`
-  mutation SendRequest($group_id: ID!) {
-    sendRequest(groupId: $group_id) {
+const FOLLOW_PAGE = gql`
+  mutation FollowPage($page_id: ID!) {
+    followPage(pageId: $page_id) {
       id
     }
   }
 `;
 
 const CHANGE_COVER = gql`
-  mutation ChangeCover($group_id: ID!, $image: String!) {
-    changeGroupCover(groupId: $group_id, coverSrc: $image) {
+  mutation ChangeCover($page_id: ID!, $image: String!) {
+    changePageCover(pageId: $page_id, coverSrc: $image) {
       id
     }
   }
 `;
 
 const CHANGE_IMAGE = gql`
-  mutation ChangeImage($group_id: ID!, $image: String!) {
-    changeGroupProfile(groupId: $group_id, profileSrc: $image) {
+  mutation ChangeImage($page_id: ID!, $image: String!) {
+    changePageProfile(pageId: $page_id, profileSrc: $image) {
       id
     }
   }
@@ -138,7 +138,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   },
 }));
 
-function GroupHeader(props) {
+function PageHeader(props) {
   const {
     user,
     setDialog,
@@ -149,16 +149,13 @@ function GroupHeader(props) {
     title,
     coverUrl,
     profileUrl,
-    members,
-    requests,
+    followers,
     loading,
   } = props;
 
   const isAnAdmin = user && admin ? admin.id === user.id : false;
-  const isMember =
-    user && members ? members.some((el) => el.id === user.id) : false;
-  const isRequestee =
-    user && requests ? requests.some((el) => el.id === user.id) : false;
+  const isFollower =
+    user && followers ? followers.some((el) => el.id === user.id) : false;
 
   const classes = useStyles();
   const theme = useTheme();
@@ -168,15 +165,14 @@ function GroupHeader(props) {
   const history = useHistory();
   const [cover, setCover] = useState(coverUrl);
   const [photo, setPhoto] = useState(profileUrl);
-  const [isAMember, setIsAMember] = useState(isMember);
-  const [isARequestee, setIsARequestee] = useState(isRequestee);
+  const [isAFollower, setIsAFollower] = useState(isFollower);
   const [cardContentHeight, setCardContentHeight] = useState(0);
-  const [deleteGroup] = useMutation(DELETE_GROUP, {
+  const [deletePage] = useMutation(DELETE_PAGE, {
     onError(error) {
       showSnackbar("error", error.message);
     },
   });
-  const [sendRequest] = useMutation(SEND_REQUEST, {
+  const [followPage] = useMutation(FOLLOW_PAGE, {
     onError(error) {
       showSnackbar("error", error.message);
     },
@@ -199,9 +195,8 @@ function GroupHeader(props) {
   useEffect(() => {
     setCover(coverUrl);
     setPhoto(profileUrl);
-    setIsAMember(isMember);
-    setIsARequestee(isRequestee);
-  }, [coverUrl, profileUrl, isMember, isRequestee]);
+    setIsAFollower(isFollower);
+  }, [coverUrl, profileUrl, isFollower]);
 
   useEffect(() => {
     setCardContentHeight(cardContent.current.offsetHeight);
@@ -231,7 +226,7 @@ function GroupHeader(props) {
       reader.onloadend = () => {
         changeCover({
           variables: {
-            group_id: id,
+            page_id: id,
             image: reader.result,
           },
         });
@@ -252,7 +247,7 @@ function GroupHeader(props) {
       reader.onloadend = () => {
         changeImage({
           variables: {
-            group_id: id,
+            page_id: id,
             image: reader.result,
           },
         });
@@ -264,22 +259,21 @@ function GroupHeader(props) {
   };
 
   const handlePost = () => {
-    fillForm("post", { type: "group", id });
+    fillForm("post", { type: "page", id });
     setDialog("create-post");
   };
 
   const handleDelete = () => {
-    deleteGroup({ variables: { group_id: id } });
-    history.push("/group/");
+    deletePage({ variables: { page_id: id } });
+    history.push("/page/");
   };
 
-  const handleJoinToggle = (event) => {
-    const isJoin = event.target.checked;
-    setIsARequestee(isJoin);
-    setIsAMember(false);
-    sendRequest({
+  const handleFollowToggle = (event) => {
+    const isFollow = event.target.checked;
+    setIsAFollower(isFollow);
+    followPage({
       variables: {
-        group_id: id,
+        page_id: id,
       },
     });
   };
@@ -340,7 +334,7 @@ function GroupHeader(props) {
                   className={classes.photo}
                   image={photo ? photo : Avatar}
                   loading="auto"
-                  title={title ? title : "Group"}
+                  title={title ? title : "Page"}
                 />
               ) : (
                 <Skeleton
@@ -378,7 +372,7 @@ function GroupHeader(props) {
               <CardContent className={classes.content}>
                 {!loading ? (
                   <Typography component="h1" variant="h5">
-                    {title ? title : "Group"}
+                    {title ? title : "Page"}
                   </Typography>
                 ) : (
                   <Skeleton
@@ -393,34 +387,33 @@ function GroupHeader(props) {
                   variant="outlined"
                   size="small"
                   icon={<FaceIcon />}
-                  label="Group"
+                  label="Page"
                   color="primary"
                 />
               </CardContent>
               <div className={classes.controls}>
                 <div>
-                  {isAMember && (
+                  {isAFollower && (
                     <Button color="red" onClick={handlePost}>
                       Post Now
                     </Button>
                   )}
                   {isAnAdmin && (
                     <Button color="blue" onClick={handleDelete}>
-                      Delete Group
+                      Delete Page
                     </Button>
                   )}
                 </div>
-                {!isAMember && (
+                {!isAFollower && (
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={isAMember === true}
-                        indeterminate={isARequestee === true}
-                        onChange={handleJoinToggle}
-                        name="isAMember"
+                        checked={isAFollower}
+                        onChange={handleFollowToggle}
+                        name="isAFollower"
                       />
                     }
-                    label={isAMember ? "Joined" : "Join"}
+                    label={isAFollower ? "Following" : "Follow"}
                   />
                 )}
               </div>
@@ -432,7 +425,7 @@ function GroupHeader(props) {
   );
 }
 
-GroupHeader.propTypes = {
+PageHeader.propTypes = {
   user: PropTypes.any,
   setDialog: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
@@ -442,8 +435,7 @@ GroupHeader.propTypes = {
   title: PropTypes.any,
   coverUrl: PropTypes.any,
   profileUrl: PropTypes.any,
-  members: PropTypes.any,
-  requests: PropTypes.any,
+  followers: PropTypes.any,
   loading: PropTypes.any,
 };
 
@@ -460,4 +452,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GroupHeader);
+export default connect(mapStateToProps, mapDispatchToProps)(PageHeader);

@@ -14,7 +14,7 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <Router>
+        <Router forceRefresh={true}>
           <CssBaseline />
           <App />
         </Router>
