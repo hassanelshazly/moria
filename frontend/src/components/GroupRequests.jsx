@@ -105,7 +105,7 @@ function GroupRequests(props) {
                   <IconButton
                     edge="end"
                     aria-label="accept-member"
-                    onCLick={() => {
+                    onClick={() => {
                       acceptRequest({ variables: { group_id, user: id } });
                       setRequestsState((prevRequests) =>
                         prevRequests.filter((el) => el.id === id)
