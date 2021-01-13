@@ -4,7 +4,6 @@ const mongoose = require('mongoose')
 const User = require("../data/user")
 const Post = require("../data/user")
 const Page = require("../data/page")
-const { group } = require('console')
 const { ObjectId } = mongoose.Types;
 
 describe("Page", () => {
@@ -47,11 +46,10 @@ describe("Page", () => {
     })
     describe("#createPage()", () => {
         beforeEach(async () => {
-            await Group.deleteMany({ admin: testUserId });
+            await Page.deleteMany({ admin: testUserId });
         });
-
         afterEach(async () => {
-            await Group.deleteMany({ admin: testUserId });
+            await Page.deleteMany({ admin: testUserId });
         });
 
         it("Normal Page Creation", async () => {
