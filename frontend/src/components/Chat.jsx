@@ -349,10 +349,12 @@ const Chat = (props) => {
                     onClick={async () => {
                       setCurrentReceiver(someuser.id);
                       messageArrayLoading=true;
+                      setMessageArray((messageArray) => []);
+
                       const { data, error,loading } = await callQuery({
                         receiver: someuser.id,
                       });
-                      if(!loading) messageArrayLoading=false;
+                      if(!loading) {messageArrayLoading=false;}
                       setMessageArray((messageArray) => []);
                      
                       // if(error) { return;}
