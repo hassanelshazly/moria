@@ -24,6 +24,10 @@ MessageModel.statics.sendMessage = async function (args) {
     });
 
     await message.save();
+    await message.populate('to')
+        .populate('from')
+        .execPopulate();
+
     await pubSub.publish(NEW_MESSAGE, { newMessage: message });
     return message;
 }
@@ -41,7 +45,10 @@ MessageModel.statics.findMessages = async function (args) {
         .or([
             { $and: [{ to: userId }, { from: toUserId }] },
             { $and: [{ to: toUserId }, { from: userId }] }
-        ]).sort({ createdAt: 'ASC' });
+        ])
+        .populate('to')
+        .populate('from')
+        .sort({ createdAt: 'ASC' });
 
     return messages;
 }

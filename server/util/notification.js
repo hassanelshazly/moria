@@ -1,23 +1,37 @@
 /**************************************************
  * FOLLOW -> {
- *      authorId: follower(who made the follow)
- *      userId: following(whose bening followed)
+ *      author: follower(who made the follow)
+ *      user: following(whose bening followed)
  *      contentId: follower
  * }
  * POST -> {
- *      authorId: puplisher
- *      userId: following of the puplisher
+ *      author: puplisher
+ *      user: following of the puplisher
  *      contentId: post
  * }
  * LIKE -> {
- *      authorId: who liked the post
- *      userId: post owenr
+ *      author: who liked the post
+ *      user: post owenr
  *      contentId: post
  * }
  * COMMENT -> {
- *      authorId: who made the comment
- *      userId: post onwer & commenters (set)
+ *      author: who made the comment
+ *      user: post onwer & commenters (set)
  *      contentId: post
  * }
- *
+ * GROUP_REQUEST -> {
+ *      author: who made the request
+ *      user: group admin
+ *      contentId: group
+ * }
+ * GROUP_ADD -> {
+ *      author: group admin
+ *      user: who being add by admin
+ *      contentId: group
+ * }
+ * GROUP_POST -> {
+ *      author: post author
+ *      user: group members
+ *      contentId: post
+ * }
  **************************************************/

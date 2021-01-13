@@ -90,9 +90,6 @@ PostModel.statics.createPost = async function (args) {
         post.imageUrl = await uploadImage(imageSrc);
 
     await post.save();
-
-    // TODO
-    // notifications to group & pages
     if (!groupId && !pageId) {
         await Notification.createNotification({
             post,
