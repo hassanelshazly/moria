@@ -4,7 +4,10 @@ const {
     FOLLOW,
     POST,
     LIKE,
-    COMMENT
+    COMMENT,
+    GROUP_ADD,
+    GROUP_POST,
+    GROUP_REQUEST,
 } = require("../util/constant");
 
 const NotificationSchema = new mongoose.Schema({
@@ -24,7 +27,10 @@ const NotificationSchema = new mongoose.Schema({
             FOLLOW,
             POST,
             LIKE,
-            COMMENT
+            COMMENT,
+            GROUP_ADD,
+            GROUP_POST,
+            GROUP_REQUEST,
         ],
         required: true,
     },

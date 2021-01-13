@@ -4,6 +4,8 @@ const GroupChatModel = require("../models/chat");
 const User = require("./user");
 const Message = require("./message");
 const { pubSub, NEW_MESSAGE } = require("../util/subscription");
+const { populate } = require("./notification");
+const { path } = require("../models/chat");
 
 GroupChatModel.statics.sendGroupMessage = async function (args) {
     let { userId, groupChatId, body } = args;
@@ -30,7 +32,7 @@ GroupChatModel.statics.sendGroupMessage = async function (args) {
     });
 
     await message.save();
-
+    await message.populate('to').populate('from').execPopulate();
     await pubSub.publish(NEW_MESSAGE, { newMessage: message });
     return message;
 }
@@ -69,7 +71,13 @@ GroupChatModel.statics.findMessages = async function ({ id }) {
     if (!chat)
         throw new Error("GroupChat not found");
 
-    await chat.populate('messages').execPopulate();
+    await chat.populate({
+        path: 'messages',
+        populate: [
+            { path: 'to' },
+            { path: 'from' }
+        ]
+    }).execPopulate();
     return chat.messages;
 }
 

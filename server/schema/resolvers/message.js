@@ -40,13 +40,13 @@ module.exports = {
     },
 
     Message: {
-        to(parent) {
-            return Message.findTo({ id: parent.id });
-        },
+        // to(parent) {
+        //     return Message.findTo({ id: parent.id });
+        // },
 
-        from(parent) {
-            return Message.findFrom({ id: parent.id })
-        }
+        // from(parent) {
+        //     return Message.findFrom({ id: parent.id })
+        // }
     },
 
     UserGroup: {

@@ -6,9 +6,23 @@ const {
     FOLLOW,
     POST,
     LIKE,
-    COMMENT
+    COMMENT,
+    GROUP_ADD,
+    GROUP_POST,
+    GROUP_REQUEST,
 } = require("../util/constant");
 
+async function resolveGroupAdd(user) {
+    return [user];
+}
+
+async function resolveGroupPost(group) {
+    return group.members;
+}
+
+async function resolveGroupRequest(group) {
+    return [group.admin._id];
+}
 
 async function resolvePost(post) {
     await post.populate('user').execPopulate();
@@ -32,7 +46,8 @@ async function resolveComment(post) {
     return [...commentAuthors];
 }
 
-async function resolveUsers({ author, content, contentId, post }) {
+async function resolveUsers(args) {
+    let { author, content, contentId, post, group, user } = args;
     let users;
     switch (content) {
         case FOLLOW:
@@ -47,10 +62,19 @@ async function resolveUsers({ author, content, contentId, post }) {
         case COMMENT:
             users = await resolveComment(post);
             break;
+        case GROUP_ADD:
+            users = await resolveGroupAdd(user);
+            break;
+        case GROUP_POST:
+            users = await resolveGroupPost(group);
+            break;
+        case GROUP_REQUEST:
+            users = await resolveGroupRequest(group);
+            break;
         default:
             throw new Error("Not recognized notification type")
     }
-    return users.filter(user => user != author);
+    return users.filter(user => user.toString() != author.toString());
 }
 
 NotificationModel.statics.createNotification = async function (args) {
