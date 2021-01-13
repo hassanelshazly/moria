@@ -15,6 +15,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 import { Redirect } from "react-router-dom";
+import useSound from 'use-sound';
 
 import { CircularProgress, Typography, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
@@ -28,6 +29,7 @@ import classNames from "classnames";
 import Message from "./Message";
 
 import MessageReceivedAnimation from "../assets/animations/message-received.json";
+import MessageSound from "../assets/sounds/message-sound.mp3";
 import Skeleton from "@material-ui/lab/Skeleton";
 
 
@@ -220,6 +222,8 @@ const Chat = (props) => {
   const [newMessage, setNewMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [filter, setFilter] = useState("");
+  const [play] = useSound(MessageSound);
+
   const USERNAME = user.username;
 
   const { loading, error, data } = useQuery(GET_FOLLOWERS, {
@@ -278,6 +282,8 @@ const Chat = (props) => {
 
   if (error) return <p>Error :(</p>;
     if (!subLoading && subData &&  subData.newMessage.id != messageArray[messageArray.length - 1].id) { //subData.newMessage.body
+      if(subData.newMessage.from.id != user.id)
+        {play();}
       setMessageArray((messageArray) => [
         ...messageArray,
         {
