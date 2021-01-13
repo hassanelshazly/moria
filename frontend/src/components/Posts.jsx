@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
@@ -255,6 +255,8 @@ function PostViewer(props) {
     showSnackbar,
   } = props;
 
+  const isLiking = likes.some((el) => el.id === current_user.id);
+
   const classes = usePostStyles();
   const [likePost] = useMutation(LIKE_POST, {
     onError(error) {
@@ -288,10 +290,15 @@ function PostViewer(props) {
 
   const [expanded, setExpanded] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [likeState, setLikeState] = useState(
-    likes.some((el) => el.id === current_user.id)
-  );
+  const [likeState, setLikeState] = useState(isLiking);
   const [commentsState, setCommentsState] = useState(comments);
+  const [likeCountState, setLikeCountState] = useState(likeCount);
+
+  useEffect(() => {
+    setLikeState(isLiking);
+    setCommentsState(comments);
+    setLikeCountState(likeCount);
+  }, [isLiking, comments, likeCount]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -340,6 +347,9 @@ function PostViewer(props) {
         post_id: id,
       },
     });
+    setLikeCountState((prevState) =>
+      likeState ? prevState - 1 : prevState + 1
+    );
     setLikeState((prevState) => !prevState);
   };
 
@@ -397,7 +407,7 @@ function PostViewer(props) {
             }}
           />
         </IconButton>
-        {likeCount}
+        {likeCountState}
         <IconButton aria-label="share">
           <ShareIcon />
         </IconButton>

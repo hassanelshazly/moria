@@ -6,24 +6,20 @@ import "fontsource-roboto";
 import theme from "./config/theme";
 import App from "./App";
 import CssBaseline from "@material-ui/core/CssBaseline";
-// import { StateProvider } from "./state/store";
-// import { reducer, initialState } from "./state/reducer";
 import { Provider } from "react-redux";
 import store from "./state/reduxStore";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <StateProvider initialState={initialState} reducer={reducer}> */}
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <Router>
+        <Router forceRefresh={true}>
           <CssBaseline />
           <App />
         </Router>
       </ThemeProvider>
     </Provider>
-    {/* </StateProvider> */}
   </React.StrictMode>,
   document.getElementById("root")
 );

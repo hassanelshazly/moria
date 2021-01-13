@@ -17,25 +17,19 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
-const ADD_PROFILE_POST = gql`
-  mutation AddProfilePost($text: String!, $image: String) {
-    createPost(body: $text, imageSrc: $image) {
-      id
-    }
-  }
-`;
-
-const ADD_GROUP_POST = gql`
-  mutation AddGroupPost($group_id: ID!, $text: String!, $image: String) {
-    createGroupPost(groupId: $group_id, body: $text, imageSrc: $image) {
-      id
-    }
-  }
-`;
-
-const ADD_PAGE_POST = gql`
-  mutation AddPagePost($page_id: ID!, $text: String!, $image: String) {
-    createPagePost(pageId: $page_id, body: $text, imageSrc: $image) {
+const CREATE_GROUP = gql`
+  mutation CreateGroup(
+    $title: String!
+    $current_user_id: ID!
+    $cover_image: String
+    $profile_image: String
+  ) {
+    createGroup(
+      title: $title
+      membersId: [$current_user_id]
+      coverSrc: $cover_image
+      prfileSrc: $profile_image
+    ) {
       id
     }
   }
@@ -92,34 +86,15 @@ function CreatePostDialog(props) {
   const width = useWidth();
   const history = useHistory();
   const cardContent = useRef(null);
-  const [text, setText] = React.useState("");
-  const [media, setMedia] = React.useState(null);
+  const [title, setTitle] = React.useState("");
+  const [cover, setCover] = React.useState(null);
   const [cardContentHeight, setCardContentHeight] = React.useState(0);
 
-  // eslint-disable-next-line no-empty-pattern
-  const { postForm, setDialog, showSnackbar } = props;
-  const [addProfilePost] = useMutation(ADD_PROFILE_POST, {
-    onCompleted() {
+  const { user, setDialog, showSnackbar } = props;
+  const [createGroup] = useMutation(CREATE_GROUP, {
+    onCompleted({ createGroup: { id } }) {
       setDialog(null);
-      history.push(`/profile/${encodeURIComponent(postForm.id)}/`);
-    },
-    onError(error) {
-      showSnackbar("error", error.message);
-    },
-  });
-  const [addGroupPost] = useMutation(ADD_GROUP_POST, {
-    onCompleted() {
-      setDialog(null);
-      history.push(`/group/${encodeURIComponent(postForm.id)}/`);
-    },
-    onError(error) {
-      showSnackbar("error", error.message);
-    },
-  });
-  const [addPagePost] = useMutation(ADD_PAGE_POST, {
-    onCompleted() {
-      setDialog(null);
-      history.push(`/page/${encodeURIComponent(postForm.id)}/`);
+      history.push(`/group/${encodeURIComponent(id)}/`);
     },
     onError(error) {
       showSnackbar("error", error.message);
@@ -134,56 +109,39 @@ function CreatePostDialog(props) {
     setCardContentHeight(cardContent.current.offsetHeight);
   });
 
-  const handlePost = () => {
-    if (media) {
+  const handleCreate = () => {
+    if (cover) {
       const reader = new FileReader();
-      reader.readAsDataURL(media);
+      reader.readAsDataURL(cover);
       reader.onloadend = () => {
-        switch (postForm.type) {
-          case "profile":
-            addProfilePost({ variables: { text, image: reader.result } });
-            break;
-          case "group":
-            addGroupPost({
-              variables: { group_id: postForm.id, text, image: reader.result },
-            });
-            break;
-          case "page":
-            addPagePost({
-              variables: { page_id: postForm.id, text, image: reader.result },
-            });
-            break;
-        }
+        createGroup({
+          variables: {
+            title,
+            current_user_id: user.id,
+            cover_image: reader.result,
+          },
+        });
       };
       reader.onerror = () => {
         showSnackbar("Something went wrong!");
       };
     } else {
-      switch (postForm.type) {
-        case "profile":
-          addProfilePost({ variables: { text } });
-          break;
-        case "group":
-          addGroupPost({
-            variables: { group_id: postForm.id, text },
-          });
-          break;
-        case "page":
-          addPagePost({
-            variables: { page_id: postForm.id, text },
-          });
-          break;
-      }
+      createGroup({
+        variables: {
+          title,
+          current_user_id: user.id,
+        },
+      });
     }
   };
 
-  const handleMediaChange = (event) => {
+  const handleCoverChange = (event) => {
     const files = event.target.files;
-    if (files.length > 0) setMedia(files[0]);
+    if (files.length > 0) setCover(files[0]);
   };
 
-  const handleTextChange = (event) => {
-    setText(event.target.value);
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
   };
 
   return (
@@ -199,7 +157,7 @@ function CreatePostDialog(props) {
           className={classes.input}
           id="icon-button-file"
           type="file"
-          onChange={handleMediaChange}
+          onChange={handleCoverChange}
         />
         <label className={classes.mediaEditLabel} htmlFor="icon-button-file">
           <IconButton aria-label="edit-media" component="span">
@@ -210,38 +168,33 @@ function CreatePostDialog(props) {
           component="img"
           className={classes.cardMedia}
           onError={() => {
-            if (media) setMedia(null);
+            if (cover) setCover(null);
           }}
           src={
-            media
-              ? URL.createObjectURL(media)
+            cover
+              ? URL.createObjectURL(cover)
               : "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1404&q=80"
           }
-          alt={media ? media.name : "Post Photo"}
+          alt={cover ? cover.name : "Post Photo"}
         />
         <CardContent ref={cardContent} className={classes.cardContent}>
           <Chip
             variant="outlined"
             size="small"
             icon={<FaceIcon />}
-            label={
-              postForm.type.charAt(0).toUpperCase() + postForm.type.slice(1)
-            }
+            label="Group"
             color="primary"
           />
           <br />
           <br />
           <TextField
-            id="post-text"
-            label="Post Body"
-            multiline
+            id="group-title"
+            label="Title"
             fullWidth
             autoFocus
-            rows={6}
-            placeholder="Write your post here..."
-            value={text}
-            onChange={handleTextChange}
-            variant="filled"
+            value={title}
+            onChange={handleTitleChange}
+            variant="outlined"
           />
           <br />
           <br />
@@ -249,9 +202,9 @@ function CreatePostDialog(props) {
             fullWidth
             variant="outlined"
             color="primary"
-            onClick={handlePost}
+            onClick={handleCreate}
           >
-            Post Now
+            Create Now
           </Button>
         </CardContent>
       </Card>
@@ -260,13 +213,13 @@ function CreatePostDialog(props) {
 }
 
 CreatePostDialog.propTypes = {
-  postForm: PropTypes.any,
+  user: PropTypes.any,
   setDialog: PropTypes.func.isRequired,
   showSnackbar: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
-  return { postForm: state.forms.post };
+  return { user: state.user };
 };
 
 function mapDispatchToProps(dispatch) {

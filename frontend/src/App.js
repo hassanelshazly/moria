@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from "react";
 import PropTypes from "prop-types";
 import { Switch, Route } from "react-router-dom";
@@ -8,17 +7,17 @@ import {
   InMemoryCache,
   createHttpLink,
 } from "@apollo/client";
-import { split, HttpLink } from '@apollo/client';
-import { getMainDefinition } from '@apollo/client/utilities';
-import { WebSocketLink } from '@apollo/client/link/ws';
-
-
-
 import { setContext } from "@apollo/client/link/context";
+import { split } from "@apollo/client";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { WebSocketLink } from "@apollo/client/link/ws";
+
 import MainNav from "./components/MainNav";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Pages from "./pages/Pages";
+import Page from "./pages/Page";
 import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import Chat from "./pages/Chat";
@@ -29,46 +28,48 @@ import { connect } from "react-redux";
 
 function App(props) {
   const { token } = props;
+
   let httpLink = createHttpLink({
-    uri: 'http://localhost:4000',
-  })
+    uri: "http://localhost:4000",
+  });
 
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
-        authorization:  `Bearer ${token}` ,
+        authorization: token ? `Bearer ${token}` : "",
       },
     };
   });
-  httpLink = authLink.concat(httpLink)
+
+  httpLink = authLink.concat(httpLink);
+
   const wsLink = new WebSocketLink({
     uri: `ws://localhost:4000/graphql`,
     options: {
       reconnect: true,
       connectionParams: {
-        authorization: `Bearer ${token}`,
+        authToken: token,
       },
     },
-  })
+  });
 
   const splitLink = split(
     ({ query }) => {
-      const definition = getMainDefinition(query)
+      const definition = getMainDefinition(query);
       return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      )
+        definition.kind === "OperationDefinition" &&
+        definition.operation === "subscription"
+      );
     },
     wsLink,
     httpLink
-  )
+  );
 
   const apolloClient = new ApolloClient({
     link: splitLink,
     cache: new InMemoryCache(),
-  })
-
+  });
 
   return (
     <ApolloProvider client={apolloClient}>
@@ -79,6 +80,12 @@ function App(props) {
           </Route>
           <Route path="/profile/">
             <Profile />
+          </Route>
+          <Route exact path="/page/">
+            <Pages />
+          </Route>
+          <Route path="/page/:id/">
+            <Page />
           </Route>
           <Route exact path="/group/">
             <Groups />

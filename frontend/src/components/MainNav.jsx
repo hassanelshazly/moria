@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles, useTheme, ThemeProvider } from "@material-ui/core/styles";
 import AccountCircleTwoTone from "@material-ui/icons/AccountCircleTwoTone";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
 import ChatIcon from "@material-ui/icons/Chat";
 import Container from "@material-ui/core/Container";
 import CreateIcon from "@material-ui/icons/Create";
+import CreateGroupDialog from "../dialogs/CreateGroupDialog";
+import CreatePageDialog from "../dialogs/CreatePageDialog";
 import CreatePostDialog from "../dialogs/CreatePostDialog";
 import Dialog from "@material-ui/core/Dialog";
 import Divider from "@material-ui/core/Divider";
@@ -32,6 +34,8 @@ import Logo from "../assets/images/logo192.png";
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from "@material-ui/icons/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import NotificationsMenu from "./NotificationsMenu";
+import NotificationsTwoToneIcon from "@material-ui/icons/NotificationsTwoTone";
 import SearchBar from "./SearchBar";
 import SignUpDialog from "../dialogs/SignUpDialog";
 import SignInDialog from "../dialogs/SignInDialog";
@@ -42,6 +46,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import styled from "styled-components";
 
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -210,6 +215,20 @@ function Dialogs(props) {
         >
           <CreatePostDialog />
         </Dialog>
+        <Dialog
+          open={dialog === "create-group"}
+          onClose={handleDialogClose}
+          aria-labelledby="create-group-dialog"
+        >
+          <CreateGroupDialog />
+        </Dialog>
+        <Dialog
+          open={dialog === "create-page"}
+          onClose={handleDialogClose}
+          aria-labelledby="create-page-dialog"
+        >
+          <CreatePageDialog />
+        </Dialog>
       </React.Fragment>
     );
   }, [setDialog, dialog]);
@@ -362,23 +381,25 @@ const DrawerHeader = connect(
   mapDrawerDispatchToProps
 )(DrawerInfo);
 
-const accountMenuId = "primary-account-menu";
+const accountMenuId = "account-menu";
+const notificationsMenuId = "notifications-menu";
 
 function MainMenu(props) {
   const {
     user,
-    account,
+    menus,
     setMenuAnchor,
     setDialog,
     setUser,
     showSnackbar,
   } = props;
 
-  const isMenuOpen = Boolean(account);
+  const isAccountMenuOpen = Boolean(menus.account);
+  const isNotificationsMenuOpen = Boolean(menus.notifications);
 
   return useMemo(() => {
-    const handleMenuClose = () => {
-      setMenuAnchor("account", null);
+    const handleMenuClose = (menu) => () => {
+      setMenuAnchor(menu, null);
     };
 
     const handleAccountClick = () => {
@@ -389,29 +410,42 @@ function MainMenu(props) {
         setUser(null);
         showSnackbar("success", "Signed out");
       }
-      handleMenuClose();
+      handleMenuClose("account")();
     };
 
     return (
-      <Menu
-        anchorEl={account}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        id={accountMenuId}
-        keepMounted
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleAccountClick}>
-          {!user ? "Sign in" : "Sign out"}
-        </MenuItem>
-      </Menu>
+      <React.Fragment>
+        <Menu
+          anchorEl={menus.notifications}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          id={notificationsMenuId}
+          keepMounted
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isNotificationsMenuOpen}
+          onClose={handleMenuClose("notifications")}
+        >
+          <NotificationsMenu closeMenu={handleMenuClose("notifications")} />
+        </Menu>
+        <Menu
+          anchorEl={menus.account}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          id={accountMenuId}
+          keepMounted
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isAccountMenuOpen}
+          onClose={handleMenuClose("account")}
+        >
+          <MenuItem onClick={handleAccountClick}>
+            {!user ? "Sign in" : "Sign out"}
+          </MenuItem>
+        </Menu>
+      </React.Fragment>
     );
-  }, [setMenuAnchor, user, account, isMenuOpen]);
+  }, [setMenuAnchor, user, menus, isAccountMenuOpen]);
 }
 
 const mapMenuStateToProps = (state) => {
-  return { user: state.user, account: state.menus.account };
+  return { user: state.user, menus: state.menus };
 };
 
 function mapMenuDispatchToProps(dispatch) {
@@ -441,28 +475,43 @@ function MainMenuTrigger(props) {
   const { user, setMenuAnchor } = props;
 
   return useMemo(() => {
-    const handleMenuOpen = (event) => {
+    const handleNotificationsOpen = (event) => {
+      setMenuAnchor("notifications", event.currentTarget);
+    };
+
+    const handleAccountMenuOpen = (event) => {
       setMenuAnchor("account", event.currentTarget);
     };
 
     return (
-      <IconButton
-        aria-label="account of current user"
-        aria-controls={accountMenuId}
-        aria-haspopup="true"
-        onClick={handleMenuOpen}
-        color="inherit"
-      >
-        {user && user.photo ? (
-          <Avatar
-            className={classes.avatar}
-            alt="user avatar"
-            src={user.photo}
-          />
-        ) : (
-          <AccountCircleTwoTone />
-        )}
-      </IconButton>
+      <React.Fragment>
+        <IconButton
+          aria-label="notifications for current user"
+          aria-controls={notificationsMenuId}
+          aria-haspopup="true"
+          onClick={handleNotificationsOpen}
+          color="inherit"
+        >
+          <NotificationsTwoToneIcon />
+        </IconButton>
+        <IconButton
+          aria-label="account of current user"
+          aria-controls={accountMenuId}
+          aria-haspopup="true"
+          onClick={handleAccountMenuOpen}
+          color="inherit"
+        >
+          {user && user.photo ? (
+            <Avatar
+              className={classes.avatar}
+              alt="user avatar"
+              src={user.photo}
+            />
+          ) : (
+            <AccountCircleTwoTone />
+          )}
+        </IconButton>
+      </React.Fragment>
     );
   }, [classes, setMenuAnchor, user]);
 }
@@ -495,6 +544,116 @@ const drawerItemsStyles = makeStyles((theme) => ({
   },
 }));
 
+const lightTheme = {
+  body: "#e2e2e2",
+  text: "#363537",
+  toggleBorder: "#fff",
+  gradient: "linear-gradient(#39598A, #79D7ED)",
+};
+
+const darkTheme = {
+  body: "#363537",
+  text: "#FAFAFA",
+  toggleBorder: "#6B8096",
+  gradient: "linear-gradient(#091236, #1E215D)",
+};
+
+// eslint-disable-next-line react/prop-types
+const Toggle = ({ theme, toggleTheme }) => {
+  const isLight = theme === "light";
+
+  return (
+    <ToggleContainer lightTheme={isLight} onClick={toggleTheme}>
+      <img
+        src="https://image.flaticon.com/icons/svg/1164/1164954.svg"
+        width="224"
+        height="224"
+        alt="Sun free icon"
+        title="Sun free icon"
+      />
+      <img
+        src="https://image.flaticon.com/icons/svg/2033/2033921.svg"
+        width="224"
+        height="224"
+        alt="Moon free icon"
+        title="Moon free icon"
+      />
+    </ToggleContainer>
+  );
+};
+
+const ToggleContainer = styled.button`
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  border: none;
+  outline: none;
+  width: 70px;
+  height: 50px;
+  margin: 20px auto;
+  border-radius: 30px;
+  border: 0.5px solid #c2c2c2;
+  font-size: 0.5rem;
+  padding: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  img {
+    width: 30px;
+    height: 30px;
+    max-width: 2.5rem;
+    height: auto;
+    transition: all 0.3s linear;
+    &:first-child {
+      transform: ${({ lightTheme }) =>
+        lightTheme ? "translateY(0)" : "translateY(100px)"};
+    }
+    &:nth-child(2) {
+      transform: ${({ lightTheme }) =>
+        lightTheme ? "translateY(-100px)" : "translateY(0)"};
+    }
+  }
+`;
+
+const useDarkMode = () => {
+  const [theme, setTheme] = useState("light");
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+      window.localStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      window.localStorage.setItem("theme", "light");
+    }
+  };
+
+  useEffect(() => {
+    const localTheme = window.localStorage.getItem("theme");
+
+    if (localTheme) {
+      setTheme(localTheme);
+    } else {
+      window.localStorage.setItem("theme", "light");
+    }
+  });
+
+  return [theme, toggleTheme];
+};
+
+function SWITCHER() {
+  const [theme, toggleTheme] = useDarkMode();
+  const themeMode = theme === "light" ? lightTheme : darkTheme;
+
+  return (
+    <ThemeProvider theme={themeMode}>
+      <div>
+        <Toggle theme={theme} toggleTheme={toggleTheme} />
+      </div>
+    </ThemeProvider>
+  );
+}
+
 function DrawerItems() {
   const classes = drawerItemsStyles();
 
@@ -518,13 +677,13 @@ function DrawerItems() {
       {
         id: "/page/",
         icon: <CreateIcon />,
-        text: "My Page",
-        action: () => history.push("/"),
+        text: "Pages",
+        action: () => history.push("/page/"),
       },
       {
         id: "/group/",
         icon: <GroupIcon />,
-        text: "My Group",
+        text: "Groups",
         action: () => history.push("/group/"),
       },
       {
@@ -547,7 +706,7 @@ function DrawerItems() {
           <ListItem
             key={item.id}
             className={classes.listItem}
-            selected={history.location.pathname.startsWith(item.id)}
+            selected={history.location.pathname == item.id}
             button
             onClick={() => history.push(item.id)}
           >
@@ -555,6 +714,7 @@ function DrawerItems() {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
+        <SWITCHER />
       </List>
     );
   }, [classes]);
