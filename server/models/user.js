@@ -64,6 +64,12 @@ const UserSchema = new mongoose.Schema({
             ref: "Post"
         }
     ],
+    sharedPosts: [
+        {
+            type: ObjectId,
+            ref: "Post"
+        }
+    ],
     groupChats: [
         {
             type: ObjectId,

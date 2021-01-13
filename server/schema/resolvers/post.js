@@ -54,6 +54,10 @@ module.exports = {
             return Post.findUser({ id: parent.id });
         },
 
+        meta(parent) {
+            return Post.findMeta({ id: parent.id });
+        },
+
         likeCount(parent) {
             return parent.likes.length;
         },

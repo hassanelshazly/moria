@@ -70,6 +70,10 @@ const User = gql`
             postId: ID!
         ): User
 
+        sharePost(
+            postId: ID!
+        ): User
+
         changeCover(
             coverSrc: String!
         ): User
