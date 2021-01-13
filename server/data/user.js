@@ -169,6 +169,15 @@ UserModel.statics.findGroups = async function ({ id }) {
     return user.groups.sort((a, b) => b.createdAt - a.createdAt);
 }
 
+UserModel.statics.findRequests = async function ({ id }) {
+    const user = await User.findById(id);
+    if (!user)
+        throw new Error("User not found");
+
+    await user.populate('requests').execPopulate();
+    return user.requests.sort((a, b) => b.createdAt - a.createdAt);
+}
+
 UserModel.statics.login = async function ({ username, password }) {
     const user = await User.findOne({ username });
 
@@ -344,6 +353,15 @@ UserModel.methods.addOrRemoveGroup = async function (groupId) {
             group.toString() != groupId.toString());
     else
         this.groups.push(groupId);
+    await this.save();
+}
+
+UserModel.methods.addOrRemoveRequest = async function (groupId) {
+    if (this.requests.includes(groupId))
+        this.requests = this.requests.filter(request =>
+            request.toString() != groupId.toString());
+    else
+        this.requests.push(groupId);
     await this.save();
 }
 

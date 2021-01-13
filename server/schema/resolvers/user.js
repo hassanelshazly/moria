@@ -115,6 +115,10 @@ module.exports = {
 
         groups(parent, args) {
             return User.findGroups({ id: parent.id });
+        },
+
+        requests(parent, args) {
+            return User.findRequests({ id: parent.id });
         }
     }
 }
