@@ -34,44 +34,39 @@ describe("Page", () => {
             assert.fail(err);
         }
         testUserId = user._id;
-        testcoverSrc = "sfsd.jpeg";
-        testprofileSrc = "sdflsdv.jpeg";
-        testTitle = "fskbs";// page must have a title
+        testTitle = "thisisatestpagetitle";
         testPostBody = "sfgkbskgvbl";
-
-
     })
+
     after(async () => {
         await User.deleteOne({ username: testUsername })
     })
+
     describe("#createPage()", () => {
         beforeEach(async () => {
-            await Page.deleteMany({ admin: testUserId });
+            await Page.deleteMany({ owner: testUserId });
         });
         afterEach(async () => {
-            await Page.deleteMany({ admin: testUserId });
+            await Page.deleteMany({ owner: testUserId });
         });
 
         it("Normal Page Creation", async () => {
             const page = await Page.createPage({
                 userId: testUserId,
                 title: testTitle,
-                coverSrc: testcoverSrc,
-                profileSrc: testprofileSrc
             })
             assert.ok(page)
 
             const dbPage = await Page.findById(page._id);
             assert.ok(dbPage)
-           
+
             assert.strictEqual(page.title, page.title);
         })
+
         it("Not Providing Id", async () => {
             try {
                 const page = await Page.createPage({
                     title: testTitle,
-                    coverSrc: testcoverSrc,
-                    profileSrc: testprofileSrc
                 })
                 assert.fail("Page Without userId has been accepted");
             } catch {
@@ -83,14 +78,12 @@ describe("Page", () => {
 
 
     })
-    
+
     describe("#createPagePost()", async () => {
         beforeEach(async () => {
             const page = await Page.createPage({
                 title: testTitle,
                 userId: testUserId,
-                coverSrc: testcoverSrc,
-                profileSrc: testprofileSrc
             })
 
             testPageId = page._id;
@@ -98,14 +91,14 @@ describe("Page", () => {
 
         afterEach(async () => {
             await Post.deleteMany({ user: testUserId });
-            await Page.deleteMany({ admin: testUserId });
+            await Page.deleteMany({ owner: testUserId });
         })
 
 
         it("Normal Post Post Creation", async () => {
             const post = await Page.createPagePost({
                 userId: testUserId,
-                testPageId: testPageId,
+                pageId: testPageId,
                 body: testPostBody
             })
 

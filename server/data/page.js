@@ -139,7 +139,7 @@ PageModel.statics.createPagePost = async function (args) {
     if (!page)
         throw new Error("Page not found");
 
-    if (page.owner != userId)
+    if (page.owner.toString() != userId.toString())
         throw new Error("User not authorized")
 
     const post = await Post.createPost(args);

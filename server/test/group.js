@@ -47,7 +47,7 @@ describe("Group", () => {
             assert.fail(err);
         }
         testUserId = user._id;
-        testGroupTitle = "Group Title";
+        testGroupTitle = "thisistestgrouptitlewhatever";
 
         testMembersId = [member._id];
     })
