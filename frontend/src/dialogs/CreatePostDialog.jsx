@@ -141,8 +141,9 @@ function CreatePostDialog(props) {
       const reader = new FileReader();
       reader.readAsDataURL(media);
       reader.onloadend = () => {
+        console.log(postForm.type);
         switch (postForm.type) {
-          case "porfile":
+          case "profile":
             addProfilePost({ variables: { text, image: reader.result } });
             break;
           case "group":
@@ -158,6 +159,7 @@ function CreatePostDialog(props) {
         }
       };
       reader.onerror = () => {
+        console.log("error");
         showSnackbar("Something went wrong!");
       };
     } else {
