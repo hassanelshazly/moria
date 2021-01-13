@@ -13,7 +13,7 @@ PageModel.statics.findPage = async function ({ pageId }) {
 }
 
 PageModel.statics.findAllPages = async function () {
-    return await Page.find({}).sort((a, b) => b.createdAt - a.createdAt);
+    return (await Page.find({})).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 PageModel.statics.findOwner = async function ({ id }) {

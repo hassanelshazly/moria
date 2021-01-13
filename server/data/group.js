@@ -14,7 +14,7 @@ GroupModel.statics.findGroup = async function ({ groupId }) {
 }
 
 GroupModel.statics.findAllGroups = async function (args) {
-    return await Group.find({}).sort((a, b) => b.createdAt - a.createdAt);
+    return (await Group.find({})).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 GroupModel.statics.findAdmin = async function ({ id }) {

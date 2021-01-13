@@ -16,8 +16,8 @@ UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
 }
 
-UserModel.statics.findAllUsers = function () {
-    return User.find({}).sort((a, b) => b.createdAt - a.createdAt);
+UserModel.statics.findAllUsers = async function () {
+    return (await User.find({})).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 UserModel.statics.findTimeline = async function ({ userId }) {
