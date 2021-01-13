@@ -227,6 +227,10 @@ GroupModel.statics.deleteGroup = async function ({ groupId, userId }) {
     for (post of group.posts)
         await Post.findByIdAndDelete(post);
 
+    await group.populate('members').execPopulate();
+    for (member of group.members)
+        member.addOrRemoveGroup(group._id);
+
     await group.delete();
     return "Group deleted successfully!";
 }

@@ -24,7 +24,31 @@ UserModel.statics.findTimeline = async function ({ userId }) {
     const user = await User.findById(userId);
     let posts = await User.findPosts({ id: userId });
     for (following of user.following)
-        posts = posts.concat(await User.findPosts({ id: following._id }));
+        posts = posts.concat(
+            await User.findPosts({
+                id: following._id,
+                noCheck: true
+            }));
+    await user.populate([
+        {
+            path: 'groups',
+            populate: {
+                path: 'posts'
+            }
+        },
+        {
+            path: 'pages',
+            populate: {
+                path: 'posts'
+            }
+        },
+    ]).execPopulate()
+
+    for (page of user.pages)
+        posts = posts.concat(page.posts);
+
+    for (group of user.groups)
+        posts = posts.concat(group.posts);
     return posts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
@@ -73,9 +97,9 @@ UserModel.statics.savePost = async function ({ userId, postId }) {
     return user;
 }
 
-UserModel.statics.findPosts = async function ({ id }) {
+UserModel.statics.findPosts = async function ({ id, noCheck }) {
     const user = await User.findById(id);
-    if (!user)
+    if (!user && noCheck)
         throw new Error("User not found");
 
     await user.populate('posts').execPopulate();

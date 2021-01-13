@@ -5,6 +5,7 @@ const Post = gql`
     type Post {
         id:           ID!
         user:         User!
+        meta:         MetaPost!
         body:         String!
         imageUrl:     String
         createdAt:    String!
@@ -19,6 +20,11 @@ const Post = gql`
         body:      String!
         user:      User!
         createdAt: String!
+    }
+
+    type MetaPost {
+        type:     String!
+        parentId: ID!
     }
 
     extend type Query {

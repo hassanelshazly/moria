@@ -20,6 +20,29 @@ PostModel.statics.findUser = async function ({ id }) {
     return post.user;
 }
 
+PostModel.statics.findMeta = async function ({ id }) {
+    const post = await Post.findById(id);
+    if (!post)
+        throw new Error("Post not Found");
+    if (post.group) {
+        post.meta = {
+            type: "GROUP_POST",
+            parentId: post.group
+        }
+    } else if (post.page) {
+        post.meta = {
+            type: "PAGE_POST",
+            parentId: post.page
+        }
+    } else {
+        post.meta = {
+            type: "USER_POST",
+            parentId: post.user
+        }
+    }
+    return post.meta;
+}
+
 PostModel.statics.findLikes = async function ({ id }) {
     const post = await Post.findById(id);
     if (!post)

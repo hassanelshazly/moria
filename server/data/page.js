@@ -121,6 +121,10 @@ PageModel.statics.deletePage = async function ({ pageId, userId }) {
     for (post of page.posts)
         await Post.findByIdAndDelete(post);
 
+    await page.populate('followers').execPopulate();
+    for (follower of page.followers)
+        await follower.addOrRemovePage(page_id);
+
     await page.delete();
     return "Page deleted successfully!";
 }
