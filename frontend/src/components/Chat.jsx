@@ -168,10 +168,12 @@ const SEND_MESSAGE = gql`
 const GET_FOLLOWERS = gql`
   query GetFollowers($bla: String!) {
     findUser(username: $bla) {
+      profileUrl
       following {
         username
         fullname
         id
+        profileUrl
       }
     }
   }
@@ -299,6 +301,7 @@ const Chat = (props) => {
       
       // console.log(subData.newMessage)
     }
+    console.log(user)
   return (
     <div>
       <Grid container component={Paper} className={classes.chatSection}>
@@ -310,7 +313,7 @@ const Chat = (props) => {
           <List>
             <ListItem button key={user.id}>
               <ListItemIcon>
-                <Avatar alt={user.fullname} src="" />
+                <Avatar alt={user.fullname} src={data.findUser.profileUrl? data.findUser.profileUrl : ""} />
               </ListItemIcon>
               <ListItemText primary={user.fullname}></ListItemText>
             </ListItem>
@@ -368,7 +371,7 @@ const Chat = (props) => {
                     }}
                   >
                     <ListItemIcon>
-                      <Avatar alt={someuser.fullname} src="" />
+                      <Avatar alt={someuser.fullname} src={someuser.profileUrl} />
                     </ListItemIcon>
                     <ListItemText primary={someuser.fullname}>
                       {someuser.fullname}
