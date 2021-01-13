@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { makeStyles, useTheme,ThemeProvider } from "@material-ui/core/styles";
+import { makeStyles, useTheme, ThemeProvider } from "@material-ui/core/styles";
 import AccountCircleTwoTone from "@material-ui/icons/AccountCircleTwoTone";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
@@ -42,7 +42,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import styled from 'styled-components'
+import styled from "styled-components";
 
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -497,27 +497,39 @@ const drawerItemsStyles = makeStyles((theme) => ({
 }));
 
 const lightTheme = {
-  body: '#e2e2e2',
-  text: '#363537',
-  toggleBorder: '#fff',
-  gradient: 'linear-gradient(#39598A, #79D7ED)',
-}
+  body: "#e2e2e2",
+  text: "#363537",
+  toggleBorder: "#fff",
+  gradient: "linear-gradient(#39598A, #79D7ED)",
+};
 
 const darkTheme = {
-  body: '#363537',
-  text: '#FAFAFA',
-  toggleBorder: '#6B8096',
-  gradient: 'linear-gradient(#091236, #1E215D)',
-}
+  body: "#363537",
+  text: "#FAFAFA",
+  toggleBorder: "#6B8096",
+  gradient: "linear-gradient(#091236, #1E215D)",
+};
 
 // eslint-disable-next-line react/prop-types
 const Toggle = ({ theme, toggleTheme }) => {
-  const isLight = theme === 'light';
+  const isLight = theme === "light";
 
   return (
     <ToggleContainer lightTheme={isLight} onClick={toggleTheme}>
-      <img src="https://image.flaticon.com/icons/svg/1164/1164954.svg" width="224" height="224" alt="Sun free icon" title="Sun free icon"/>
-      <img src="https://image.flaticon.com/icons/svg/2033/2033921.svg" width="224" height="224" alt="Moon free icon" title="Moon free icon"/>
+      <img
+        src="https://image.flaticon.com/icons/svg/1164/1164954.svg"
+        width="224"
+        height="224"
+        alt="Sun free icon"
+        title="Sun free icon"
+      />
+      <img
+        src="https://image.flaticon.com/icons/svg/2033/2033921.svg"
+        width="224"
+        height="224"
+        alt="Moon free icon"
+        title="Moon free icon"
+      />
     </ToggleContainer>
   );
 };
@@ -527,8 +539,8 @@ const ToggleContainer = styled.button`
   display: flex;
   justify-content: space-between;
   background-color: white;
-  border:none;
-  outline:none;
+  border: none;
+  outline: none;
   width: 70px;
   height: 50px;
   margin: 20px auto;
@@ -545,52 +557,54 @@ const ToggleContainer = styled.button`
     height: auto;
     transition: all 0.3s linear;
     &:first-child {
-      transform: ${({ lightTheme }) => lightTheme ? 'translateY(0)' : 'translateY(100px)'};
+      transform: ${({ lightTheme }) =>
+        lightTheme ? "translateY(0)" : "translateY(100px)"};
     }
     &:nth-child(2) {
-      transform: ${({ lightTheme }) => lightTheme ? 'translateY(-100px)' : 'translateY(0)'};
+      transform: ${({ lightTheme }) =>
+        lightTheme ? "translateY(-100px)" : "translateY(0)"};
     }
   }
 `;
 
 const useDarkMode = () => {
-
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState("light");
 
   const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark')
-      window.localStorage.setItem('theme', 'dark');
+    if (theme === "light") {
+      setTheme("dark");
+      window.localStorage.setItem("theme", "dark");
     } else {
-      setTheme('light')
-      window.localStorage.setItem('theme', 'light');
+      setTheme("light");
+      window.localStorage.setItem("theme", "light");
     }
   };
 
   useEffect(() => {
-    const localTheme = window.localStorage.getItem('theme');
+    const localTheme = window.localStorage.getItem("theme");
 
     if (localTheme) {
       setTheme(localTheme);
     } else {
-      window.localStorage.setItem('theme', 'light');
+      window.localStorage.setItem("theme", "light");
     }
-  })
+  });
 
-  return [theme, toggleTheme]
+  return [theme, toggleTheme];
 };
+
 function SWITCHER() {
   const [theme, toggleTheme] = useDarkMode();
-  const themeMode = theme === 'light' ? lightTheme : darkTheme;
+  const themeMode = theme === "light" ? lightTheme : darkTheme;
 
   return (
     <ThemeProvider theme={themeMode}>
       <div>
-        <Toggle theme={theme} toggleTheme={toggleTheme} />       
+        <Toggle theme={theme} toggleTheme={toggleTheme} />
       </div>
     </ThemeProvider>
   );
-};
+}
 
 function DrawerItems() {
   const classes = drawerItemsStyles();
@@ -652,8 +666,7 @@ function DrawerItems() {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-                  <SWITCHER />
-
+        <SWITCHER />
       </List>
     );
   }, [classes]);
