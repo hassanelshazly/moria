@@ -97,15 +97,31 @@ UserModel.statics.savePost = async function ({ userId, postId }) {
     return user;
 }
 
+UserModel.statics.sharePost = async function ({ userId, postId }) {
+    const user = await User.findById(userId);
+    if (!user)
+        throw new Error("User not found");
+
+    const post = await Post.findById(postId);
+    if (!post)
+        throw new Error("Post not found");
+
+    await user.shareOrUnSharePost(postId);
+    return user;
+}
+
 UserModel.statics.findPosts = async function ({ id, noCheck }) {
     const user = await User.findById(id);
     if (!user && noCheck)
         throw new Error("User not found");
 
-    await user.populate('posts').execPopulate();
+    await user.populate('posts').populate('sharedPosts').execPopulate();
+    user.sharedPosts.forEach(post => post.isShared = true);
     return user.posts
         .filter(post => !(post.group || post.page))
+        .concat(user.sharedPosts)
         .sort((a, b) => b.createdAt - a.createdAt);
+
 }
 
 UserModel.statics.findFollowers = async function ({ id }) {
@@ -355,6 +371,21 @@ UserModel.methods.saveOrUnSavePost = async function (postId) {
     }
     else {
         this.savedPosts.push(postId);
+        created = true;
+    }
+    await this.save();
+    return created;
+}
+
+UserModel.methods.shareOrUnSharePost = async function (postId) {
+    let created = false;
+    if (this.sharedPosts.includes(postId)) {
+        this.sharedPosts = this.sharedPosts.filter(post =>
+            post.toString() != postId.toString());
+        created = false;
+    }
+    else {
+        this.sharedPosts.push(postId);
         created = true;
     }
     await this.save();

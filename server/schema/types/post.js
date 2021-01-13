@@ -11,6 +11,7 @@ const Post = gql`
         createdAt:    String!
         likes:        [User]
         comments:     [Comment]
+        isShared:     Boolean
         likeCount:    Int!
         commentCount: Int!
     }

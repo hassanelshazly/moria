@@ -70,6 +70,13 @@ module.exports = {
             });
         },
 
+        sharePost(_, args, context) {
+            return User.sharePost({
+                ...args,
+                ...getAuthUser(context)
+            });
+        },
+
         changeCover(_, args, context) {
             return User.changeCover({
                 ...args,
