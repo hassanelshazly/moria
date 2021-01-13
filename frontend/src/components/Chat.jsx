@@ -16,6 +16,7 @@ import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 import { Redirect } from "react-router-dom";
 import useSound from 'use-sound';
+import { formatDistance } from "date-fns";
 
 import { CircularProgress, Typography, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
@@ -414,7 +415,7 @@ const Chat = (props) => {
                 ISSMALL={isMobile}
                 key={x.id}
                 messageText={x.body}
-                messageDate={x.createdAt}
+                messageDate={  formatDistance(new Date(Number(x.createdAt , 10)), new Date())}
                 sender={x.sender}
               />
             ))}
