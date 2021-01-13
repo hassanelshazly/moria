@@ -41,6 +41,7 @@ import SignUpDialog from "../dialogs/SignUpDialog";
 import SignInDialog from "../dialogs/SignInDialog";
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
+import StarIcon from "@material-ui/icons/Star";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -673,6 +674,12 @@ function DrawerItems() {
         icon: <FaceIcon />,
         text: "Profile",
         action: () => history.push("/profile/"),
+      },
+      {
+        id: "/saved/",
+        icon: <StarIcon />,
+        text: "Saved",
+        action: () => history.push("/saved/"),
       },
       {
         id: "/page/",

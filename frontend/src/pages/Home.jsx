@@ -40,14 +40,33 @@ const GET_FEED_POSTS = gql`
   }
 `;
 
+const GET_SAVED_POSTS = gql`
+  query GetSavedPosts($user_name: String!) {
+    findUser(username: $user_name) {
+      savedPosts {
+        id
+      }
+    }
+  }
+`;
+
 function Home(props) {
   const { user, showSnackbar, setDialog, fillForm } = props;
   const { error, data } = useQuery(GET_FEED_POSTS, {
     skip: !user,
   });
+  const { error: errorSaved, data: dataSaved } = useQuery(GET_SAVED_POSTS, {
+    variables: {
+      user_name: user ? user.username : undefined,
+    },
+    skip: !user,
+  });
 
   if (error) {
     showSnackbar("error", error.message);
+  }
+  if (errorSaved) {
+    showSnackbar("error", errorSaved.message);
   }
 
   const handleAction = () => {
@@ -58,6 +77,8 @@ function Home(props) {
       setDialog("sign-in");
     }
   };
+
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
 
   return (
     <Grid container spacing={2}>
@@ -74,7 +95,11 @@ function Home(props) {
       </Grid>
       {data && (
         <Grid item xs={12}>
-          <Posts type="profile" posts={data.findTimeline} />
+          <Posts
+            type="profile"
+            posts={data.findTimeline}
+            savedPosts={savedPosts}
+          />
         </Grid>
       )}
     </Grid>
