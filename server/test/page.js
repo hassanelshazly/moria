@@ -4,9 +4,10 @@ const mongoose = require('mongoose')
 const User = require("../data/user")
 const Post = require("../data/user")
 const Page = require("../data/page")
+const { group } = require('console')
 const { ObjectId } = mongoose.Types;
 
-describe("Group", () => {
+describe("Page", () => {
     before(async function () {
         try {
             await mongoose.connect(process.env.MONGO_URI_TEMP, {
@@ -62,7 +63,7 @@ describe("Group", () => {
             })
             assert.ok(page)
 
-            const dbPage = await Group.findById(page._id);
+            const dbPage = await Page.findById(page._id);
             assert.ok(dbPage)
            
             assert.strictEqual(page.title, page.title);
@@ -104,9 +105,9 @@ describe("Group", () => {
 
 
         it("Normal Post Post Creation", async () => {
-            const post = await Group.createGroupPost({
+            const post = await Page.createPagePost({
                 userId: testUserId,
-                testPageId: testGroupId,
+                testPageId: testPageId,
                 body: testPostBody
             })
 
