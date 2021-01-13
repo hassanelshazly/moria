@@ -39,6 +39,10 @@ const GET_PAGE_DATA = gql`
         }
         body
         imageUrl
+        meta{
+          type
+          parentId
+        }
         createdAt
         likes {
           id

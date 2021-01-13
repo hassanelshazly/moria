@@ -24,6 +24,11 @@ const GET_USER_POSTS = gql`
       }
       posts {
         id
+        isShared
+        meta{
+          type
+          parentId
+        }
         user {
           id
           username

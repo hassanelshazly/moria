@@ -30,6 +30,10 @@ const GET_GROUP_DATA = gql`
         profileUrl
       }
       posts {
+        meta{
+          type
+          parentId
+        }
         id
         user {
           id
