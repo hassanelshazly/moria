@@ -253,7 +253,7 @@ GroupModel.statics.createGroupPost = async function (args) {
 
 
     if (!group.members.includes(userId) &&
-        toString(group.admin) != toString(userId))
+        group.admin.toString() != userId.toString())
         throw new Error("User not authorized")
 
     const post = await Post.createPost(args);
