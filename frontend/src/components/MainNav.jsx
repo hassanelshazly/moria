@@ -547,7 +547,7 @@ function DrawerItems() {
           <ListItem
             key={item.id}
             className={classes.listItem}
-            selected={history.location.pathname === item.id}
+            selected={history.location.pathname.startsWith(item.id)}
             button
             onClick={() => history.push(item.id)}
           >

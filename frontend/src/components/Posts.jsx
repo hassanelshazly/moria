@@ -250,6 +250,7 @@ function PostViewer(props) {
     body,
     comments,
     likes,
+    likeCount,
     handlePostDelete,
     showSnackbar,
   } = props;
@@ -396,6 +397,7 @@ function PostViewer(props) {
             }}
           />
         </IconButton>
+        {likeCount}
         <IconButton aria-label="share">
           <ShareIcon />
         </IconButton>

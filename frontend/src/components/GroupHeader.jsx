@@ -266,7 +266,7 @@ function GroupHeader(props) {
 
   const handleDelete = () => {
     deleteGroup({ variables: { group_id: id } });
-    <Redirect to="/groups/" />;
+    <Redirect to="/group/" />;
   };
 
   const handleJoinToggle = (event) => {
@@ -411,7 +411,7 @@ function GroupHeader(props) {
                     control={
                       <Checkbox
                         checked={isAMember === true}
-                        intermediate={isARequestee === true}
+                        indeterminate={isARequestee === true}
                         onChange={handleJoinToggle}
                         name="isAMember"
                       />
