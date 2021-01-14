@@ -2,7 +2,6 @@
 #### Social Media App using MERN stack
 
 <br>
-<br>
 <p align="center">  
 <a href="https://moria-asu.herokuapp.com/"><img src="https://api.codacy.com/project/badge/Grade/2cbd62dd3c284ce79f6e2c35817bec12"></a>
 <a href="https://moria-asu.herokuapp.com/"><img src="https://api.codacy.com/project/badge/Coverage/8a941e0f57c047c8a481f4854666b42d"></a>
@@ -11,7 +10,6 @@
 <a href="https://moria-asu.herokuapp.com/"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </p>
 
-<br>
 <br>
 
 ## Features
@@ -63,7 +61,7 @@ You can visit an already deployed version [here](https://moria-asu.herokuapp.com
 ## Built With
 
 - [Express.js](https://expressjs.com/) - Backend web framework 
-- [Heroku](http://heroku.com/) | - Platform to deploy web applications
+- [Heroku](http://heroku.com/)  - Platform to deploy web applications
 - [JSON Web Token](https://jwt.io/) - A standard to securely authenticate HTTP requests
 - [Material-UI](https://material-ui.com/) - UI library for React
 - [GraphQL](https://graphql.org/)  - query language 
