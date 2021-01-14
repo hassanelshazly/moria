@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
@@ -24,6 +25,7 @@ import CoverAnimation from "../assets/animations/laptop-working.json";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
+import MyModal from "./MyModal";
 
 const FOLLOW_USER = gql`
   mutation FollowUser($user_id: ID!) {
@@ -147,7 +149,16 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   },
 }));
 
+
+
 function ProfileHeader(props) {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+      setOpen(false);
+    };
   const {
     user,
     setDialog,
@@ -158,8 +169,9 @@ function ProfileHeader(props) {
     postsCount,
     followersCount,
     followingCount,
+    FOLLOWERS,
+    FOLLOWING
   } = props;
-
   const isOwnProfile =
     user && profile_user ? user.id === profile_user.id : false;
   const isFollowingProfile =
@@ -277,6 +289,13 @@ function ProfileHeader(props) {
       },
     });
   };
+  const newHandleFollowToggle = () => {
+    followUser({
+      variables: {
+        user_id: profile_user.id,
+      },
+    });
+  };
 
   return (
     <form className={classes.relative} noValidate autoComplete="off">
@@ -286,6 +305,8 @@ function ProfileHeader(props) {
         }}
         className={classes.card}
       >
+       {FOLLOWERS &&  
+       <MyModal open={open} toggleFollow={newHandleFollowToggle} handleClose={handleClose} followers={FOLLOWERS} following={FOLLOWING}  />}
         {cover ? (
           <CardMedia
             component="img"
@@ -394,9 +415,9 @@ function ProfileHeader(props) {
                     />
                   </CardContent>
                 </Grid>
-                <Grid item xs={isMobile ? 0 : 8}>
+                <Grid item xs={isMobile ? 0 : 8} onClick={handleOpen}>
                   <div className={classes.userDetailsStyling}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} >
                       <Grid xs={4} item>
                         posts
                         <br />

@@ -287,11 +287,8 @@ function PostViewer(props) {
     handlePostDelete,
     showSnackbar,
     META,
-    // eslint-disable-next-line react/prop-types
     ISSHARED,
-    // eslint-disable-next-line no-unused-vars
-    // eslint-disable-next-line react/prop-types
-    // eslint-disable-next-line no-unused-vars
+   
     
   } = props;
 
@@ -332,7 +329,6 @@ function PostViewer(props) {
       showSnackbar("error", error.message);
     },
   });
-  // eslint-disable-next-line no-unused-vars
   const [sharePost] = useMutation(SHARE_POST);
 
   const [expanded, setExpanded] = React.useState(false);
@@ -410,7 +406,6 @@ function PostViewer(props) {
     });
     setSavedState((prevState) => !prevState);
   };
-  console.log(META)
   return (
     <Card elevation={25} style={{position:"relative" }}>
       <CardHeader
@@ -450,11 +445,11 @@ function PostViewer(props) {
         subheader={formatDistance(new Date(Number(createdAt, 10)), new Date())}
       />
       {ISSHARED &&
-       <Button color="red" onClick={()=>{history.push(`/profile/${encodeURIComponent(username)}`);}}
-       style={{position:"absolute" , left:"210px" , marginRight:"20px", top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, rgb(32, 1, 34), rgb(241 76 76))'}}>
-         Shared post</Button>
-       
-       }
+            <Button color="red" onClick={()=>{history.push(`/profile/${encodeURIComponent(username)}`);}}
+            style={{position:"absolute" , left:"210px" , marginRight:"20px", top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, rgb(32, 1, 34), rgb(241 76 76))'}}>
+              Shared post</Button>
+      
+      }     
        {
          META.type=="GROUP_POST" && <Button color="red" onClick={()=>{history.push(`/group/${encodeURIComponent(META.parentId)}`);}}
          style={{position:"absolute" , left: ISSHARED? "330px":"210px" , top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, #000046, #1cb5e0)'}}>
@@ -491,7 +486,6 @@ function PostViewer(props) {
         </IconButton>
         <IconButton aria-label="share" onClick={
           ()=>{
-            console.log(id);
             sharePost({ variables: { post_id: id} });
             showSnackbar("success" ,"Successfully Shared!")
         }

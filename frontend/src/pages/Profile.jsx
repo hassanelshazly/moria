@@ -18,9 +18,15 @@ const GET_USER_POSTS = gql`
       coverUrl
       followers {
         id
+        username
+        fullname
+        profileUrl
       }
       following {
         id
+        username
+        fullname
+        profileUrl
       }
       posts {
         id
@@ -131,6 +137,8 @@ function Profile(props) {
         followingCount={following ? following.length : 0}
         followersCount={followers ? followers.length : 0}
         postsCount={posts ? posts.length : 0}
+        FOLLOWERS={followers}
+        FOLLOWING={following}
       />
       <br />
       {posts && <Posts type="profile" posts={posts} savedPosts={savedPosts} />}
