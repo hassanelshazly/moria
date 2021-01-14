@@ -13,10 +13,14 @@
 
 <br>
 
+
+![GIF](https://media.giphy.com/media/fzlMuOaSFMnQwGlxZ5/giphy.gif)
+
+
+
 ## Features
 
 - **Messenger** Real time messaging system.
-- **User Status** Check if user is Online or not in real time.
 - **News Feed** Fresh posts from people you are following.
 - **Explore** New Posts and People.
 - **Groups** Create a group & Request to join one & Post on a group.
