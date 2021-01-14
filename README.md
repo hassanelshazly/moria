@@ -1,20 +1,26 @@
 # Moria
 
-## Getting Started
+## Starting the App
 
-First, run the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Download [Node.js](https://nodejs.org/en/download/).
+2. Navigate to where the project is located; that is the path where the folder "moria" resides.
+   1. Copy the path from File Explorer
+   2. Open the terminal
+   3. Change directory (paste the actual path istead, don't write the angle brackets):
+      - Windows:
+        `cd /d <path>`
+      - Linux:
+        `cd <path>`
+3. Install the dependencies and run the server (while still in the same terminal as before)
+   - Server
+     1. Navigate there using `cd server`
+     2. Run `npm install`
+     3. Run `npm start`
+     4. The server should start now and your terminal will freeze (you can't write anything)
+   - Frontend
+     1. Repeate step 2 (open a new terminal and navigate to the project)
+     2. Navigate to the frontend using `cd frontend`
+     3. Run `npm install`
+     4. Run `npx serve -s build`
+     5. A message will be displayed includin a url for the webapp. You can click on it or copy-paste it if it's not clikable.
+     6. The URL will probably be [http://localhost:5000](http://localhost:5000)
