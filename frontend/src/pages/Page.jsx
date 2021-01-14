@@ -39,10 +39,6 @@ const GET_PAGE_DATA = gql`
         }
         body
         imageUrl
-        meta{
-          type
-          parentId
-        }
         createdAt
         likes {
           id
@@ -56,6 +52,10 @@ const GET_PAGE_DATA = gql`
             fullname
             profileUrl
           }
+        }
+        meta {
+          type
+          parentId
         }
         likeCount
         commentCount

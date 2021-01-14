@@ -1,11 +1,10 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable*/
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
-import {  useMediaQuery, useTheme } from "@material-ui/core";
+import { useMediaQuery, useTheme } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
@@ -34,14 +33,13 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { red, yellow } from "@material-ui/core/colors";
 import { formatDistance } from "date-fns";
-import { useHistory } from "react-router-dom";
 
+import { useHistory } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setMenuAnchor, showSnackbar } from "../state/actions";
 
 import uuidv4 from "../utils/uuid";
-import { Button } from "@material-ui/core";
 
 const ADD_COMMENT = gql`
   mutation AddComment($post_id: ID!, $text: String!) {
@@ -84,15 +82,14 @@ const DELETE_PAGE_POST = gql`
     deletePagePost(pageId: $page_id, postId: $post_id)
   }
 `;
+
 const SHARE_POST = gql`
-  mutation SharePost( $post_id: ID!) {
-    sharePost(postId: $post_id)
-    {
+  mutation SharePost($post_id: ID!) {
+    sharePost(postId: $post_id) {
       id
     }
   }
 `;
-
 
 const userPropTypes = {
   id: PropTypes.string.isRequired,
@@ -152,6 +149,7 @@ function CommentInputSender(props) {
       showSnackbar("error", error.message);
     },
   });
+
   const handleTextChange = (event) => {
     setText(event.target.value);
   };
@@ -264,13 +262,6 @@ const usePostStyles = makeStyles((theme) => ({
 }));
 
 function PostViewer(props) {
-  const history = useHistory();
-  const theme = useTheme();
-
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
-    defaultMatches: true,
-  });
- 
   const {
     type,
     thingId,
@@ -286,15 +277,19 @@ function PostViewer(props) {
     likeCount,
     handlePostDelete,
     showSnackbar,
-    META,
-    ISSHARED,
-   
-    
+    isShared,
+    meta,
   } = props;
 
   const isLiking = likes.some((el) => el.id === current_user.id);
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
+    defaultMatches: true,
+  });
+
+  const history = useHistory();
   const classes = usePostStyles();
+  const theme = useTheme();
   const [likePost] = useMutation(LIKE_POST, {
     onError(error) {
       showSnackbar("error", error.message);
@@ -329,7 +324,14 @@ function PostViewer(props) {
       showSnackbar("error", error.message);
     },
   });
-  const [sharePost] = useMutation(SHARE_POST);
+  const [sharePost] = useMutation(SHARE_POST, {
+    onCompleted() {
+      showSnackbar("success", "Successfully Shared!");
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
 
   const [expanded, setExpanded] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -406,8 +408,13 @@ function PostViewer(props) {
     });
     setSavedState((prevState) => !prevState);
   };
+
+  const handlePostShare = () => {
+    sharePost({ variables: { post_id: id } });
+  };
+
   return (
-    <Card elevation={25} style={{position:"relative" }}>
+    <Card elevation={25} style={{ position: "relative" }}>
       <CardHeader
         avatar={
           profileUrl ? (
@@ -444,22 +451,62 @@ function PostViewer(props) {
         }
         subheader={formatDistance(new Date(Number(createdAt, 10)), new Date())}
       />
-      {ISSHARED &&
-            <Button color="red" onClick={()=>{history.push(`/profile/${encodeURIComponent(username)}`);}}
-            style={{position:"absolute" , left:"210px" , marginRight:"20px", top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, rgb(32, 1, 34), rgb(241 76 76))'}}>
-              Shared post</Button>
-      
-      }     
-       {
-         META.type=="GROUP_POST" && <Button color="red" onClick={()=>{history.push(`/group/${encodeURIComponent(META.parentId)}`);}}
-         style={{position:"absolute" , left: ISSHARED? "330px":"210px" , top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, #000046, #1cb5e0)'}}>
-           Group post</Button>
-       }
-       {
-         META.type=="PAGE_POST" && <Button color="red" onClick={()=>{history.push(`/page/${encodeURIComponent(META.parentId)}`);}}
-         style={{position:"absolute" , left: ISSHARED? "330px":"210px" , top:isMobile? "8px" :"15px",color:"white", width: isMobile? "50px" :"max-content", background: 'linear-gradient(to right, #000046, #1cb5e0)'}}>
-           Page post</Button>
-       }
+      {isShared && (
+        <Button
+          color="red"
+          onClick={() => {
+            history.push(`/profile/${encodeURIComponent(username)}`);
+          }}
+          style={{
+            position: "absolute",
+            left: "210px",
+            marginRight: "20px",
+            top: isMobile ? "8px" : "15px",
+            color: "white",
+            width: isMobile ? "50px" : "max-content",
+            background:
+              "linear-gradient(to right, rgb(32, 1, 34), rgb(241 76 76))",
+          }}
+        >
+          Shared post
+        </Button>
+      )}
+      {meta && meta.type == "GROUP_POST" && (
+        <Button
+          color="red"
+          onClick={() => {
+            history.push(`/group/${encodeURIComponent(meta.parentId)}`);
+          }}
+          style={{
+            position: "absolute",
+            left: isShared ? "330px" : "210px",
+            top: isMobile ? "8px" : "15px",
+            color: "white",
+            width: isMobile ? "50px" : "max-content",
+            background: "linear-gradient(to right, #000046, #1cb5e0)",
+          }}
+        >
+          Group post
+        </Button>
+      )}
+      {meta && meta.type == "PAGE_POST" && (
+        <Button
+          color="red"
+          onClick={() => {
+            history.push(`/page/${encodeURIComponent(meta.parentId)}`);
+          }}
+          style={{
+            position: "absolute",
+            left: isShared ? "330px" : "210px",
+            top: isMobile ? "8px" : "15px",
+            color: "white",
+            width: isMobile ? "50px" : "max-content",
+            background: "linear-gradient(to right, #000046, #1cb5e0)",
+          }}
+        >
+          Page post
+        </Button>
+      )}
       {imageUrl && (
         <CardMedia className={classes.media} image={imageUrl} title={body} />
       )}
@@ -484,13 +531,7 @@ function PostViewer(props) {
             }}
           />
         </IconButton>
-        <IconButton aria-label="share" onClick={
-          ()=>{
-            sharePost({ variables: { post_id: id} });
-            showSnackbar("success" ,"Successfully Shared!")
-        }
-
-        }>
+        <IconButton aria-label="share" onClick={handlePostShare}>
           <ShareIcon />
         </IconButton>
         <IconButton
@@ -518,9 +559,10 @@ function PostViewer(props) {
           </List>
         </CardContent>
       </Collapse>
-      </Card>
+    </Card>
   );
 }
+
 const postPropTypes = {
   type: PropTypes.string,
   thingId: PropTypes.string,
@@ -532,6 +574,8 @@ const postPropTypes = {
   likeCount: PropTypes.number.isRequired,
   saved: PropTypes.bool,
   likes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  isShared: PropTypes.bool,
+  meta: PropTypes.any,
   handlePostDelete: PropTypes.func.isRequired,
   user: PropTypes.exact(userPropTypes),
   imageUrl: PropTypes.string,
@@ -567,8 +611,6 @@ function Posts(props) {
         <Grid key={post.id} item xs={12}>
           <Post
             type={props.type}
-            META={post.meta}
-            ISSHARED={post.isShared}
             thingID={props.thingId}
             {...post}
             handlePostDelete={handleDeletePost}

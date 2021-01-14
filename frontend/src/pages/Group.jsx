@@ -30,10 +30,6 @@ const GET_GROUP_DATA = gql`
         profileUrl
       }
       posts {
-        meta{
-          type
-          parentId
-        }
         id
         user {
           id
@@ -56,6 +52,10 @@ const GET_GROUP_DATA = gql`
             fullname
             profileUrl
           }
+        }
+        meta {
+          type
+          parentId
         }
         likeCount
         commentCount

@@ -18,10 +18,6 @@ const GET_FEED_POSTS = gql`
         fullname
         profileUrl
       }
-      meta{
-        type
-        parentId
-      }
       body
       imageUrl
       createdAt
@@ -37,6 +33,10 @@ const GET_FEED_POSTS = gql`
           fullname
           profileUrl
         }
+      }
+      meta {
+        type
+        parentId
       }
       likeCount
       commentCount

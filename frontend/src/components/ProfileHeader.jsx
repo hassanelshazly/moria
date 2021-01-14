@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import useWidth from "../utils/useWidth";
@@ -17,6 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import MyModal from "./MyModal";
 import lottie from "lottie-web";
 
 import Avatar from "../assets/images/avatar-0.png";
@@ -25,7 +25,6 @@ import CoverAnimation from "../assets/animations/laptop-working.json";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
-import MyModal from "./MyModal";
 
 const FOLLOW_USER = gql`
   mutation FollowUser($user_id: ID!) {
@@ -149,16 +148,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   },
 }));
 
-
-
 function ProfileHeader(props) {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-      setOpen(false);
-    };
   const {
     user,
     setDialog,
@@ -169,9 +159,10 @@ function ProfileHeader(props) {
     postsCount,
     followersCount,
     followingCount,
-    FOLLOWERS,
-    FOLLOWING
+    followers,
+    following,
   } = props;
+
   const isOwnProfile =
     user && profile_user ? user.id === profile_user.id : false;
   const isFollowingProfile =
@@ -203,6 +194,14 @@ function ProfileHeader(props) {
       showSnackbar("error", error.message);
     },
   });
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const isMobile = useMediaQuery(theme.breakpoints.only("xs"), {
     defaultMatches: true,
@@ -289,13 +288,6 @@ function ProfileHeader(props) {
       },
     });
   };
-  const newHandleFollowToggle = () => {
-    followUser({
-      variables: {
-        user_id: profile_user.id,
-      },
-    });
-  };
 
   return (
     <form className={classes.relative} noValidate autoComplete="off">
@@ -305,8 +297,15 @@ function ProfileHeader(props) {
         }}
         className={classes.card}
       >
-       {FOLLOWERS &&  
-       <MyModal open={open} toggleFollow={newHandleFollowToggle} handleClose={handleClose} followers={FOLLOWERS} following={FOLLOWING}  />}
+        {followers && (
+          <MyModal
+            open={open}
+            toggleFollow={handleFollowToggle}
+            handleClose={handleClose}
+            followers={followers}
+            following={following}
+          />
+        )}
         {cover ? (
           <CardMedia
             component="img"
@@ -417,7 +416,7 @@ function ProfileHeader(props) {
                 </Grid>
                 <Grid item xs={isMobile ? 0 : 8} onClick={handleOpen}>
                   <div className={classes.userDetailsStyling}>
-                    <Grid container spacing={2} >
+                    <Grid container spacing={2}>
                       <Grid xs={4} item>
                         posts
                         <br />
@@ -481,6 +480,8 @@ ProfileHeader.propTypes = {
   postsCount: PropTypes.number,
   followersCount: PropTypes.number,
   followingCount: PropTypes.number,
+  followers: PropTypes.any,
+  following: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
