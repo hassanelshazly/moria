@@ -4,8 +4,6 @@ const GroupChatModel = require("../models/chat");
 const User = require("./user");
 const Message = require("./message");
 const { pubSub, NEW_MESSAGE } = require("../util/subscription");
-const { populate } = require("./notification");
-const { path } = require("../models/chat");
 
 GroupChatModel.statics.sendGroupMessage = async function (args) {
     let { userId, groupChatId, body } = args;

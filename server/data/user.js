@@ -106,7 +106,11 @@ UserModel.statics.sharePost = async function ({ userId, postId }) {
     if (!post)
         throw new Error("Post not found");
 
-    await user.shareOrUnSharePost(postId);
+    // if (post.user.toString() == userId.toString())
+    //     throw new Error("Really ! Are you trying to share your  ");
+    // await user.shareOrUnSharePost(postId);
+    user.sharedPosts.push(postId);
+    await user.save();
     return user;
 }
 
