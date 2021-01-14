@@ -14,7 +14,7 @@ describe("Sign-Up", () => {
   test("Sign-up successful", async () => {
     let browser = await puppeteer.launch({
       headless: false,
-      slowMo: 100,
+      slowMo: 50,
     });
     let page = await browser.newPage();
 

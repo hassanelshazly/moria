@@ -13,10 +13,7 @@
 
 <br>
 
-
 ![GIF](https://media.giphy.com/media/fzlMuOaSFMnQwGlxZ5/giphy.gif)
-
-
 
 ## Features
 
@@ -62,8 +59,6 @@ You can visit an already deployed version [here](https://moria-asu.herokuapp.com
      5. Run `npx serve -s build`
      6. A message will be displayed including a url for the webapp. You can click on it or copy-paste it if it's not clikable.
      7. The URL will probably be [http://localhost:5000](http://localhost:5000)
-
-
 
 ## Built With
 
