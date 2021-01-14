@@ -88,6 +88,12 @@ const UserSchema = new mongoose.Schema({
             ref: "Group"
         }
     ],
+    requests: [
+        {
+            type: ObjectId,
+            ref: "Group"
+        }
+    ],
 }, { timestamps: true });
 
 // Virtual fields
