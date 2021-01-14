@@ -76,6 +76,9 @@ const GET_SAVED_POSTS = gql`
       savedPosts {
         id
       }
+      requests {
+        id
+      }
     }
   }
 `;
@@ -121,7 +124,9 @@ function Group(props) {
   } = findGroup;
 
   const isAnAdmin = user && admin ? admin.id === user.id : null;
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : [];
+  let groupRequests = dataSaved ? dataSaved.findUser.requests : [];
+  groupRequests.concat(requests ? requests : []);
 
   return (
     <React.Fragment>
@@ -132,7 +137,7 @@ function Group(props) {
         coverUrl={coverUrl}
         profileUrl={profileUrl}
         members={members}
-        requests={requests}
+        requests={groupRequests}
         loading={loading || loadingSaved}
       />
       {isAnAdmin && requests.length > 0 && (

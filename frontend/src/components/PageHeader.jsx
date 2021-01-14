@@ -393,7 +393,7 @@ function PageHeader(props) {
               </CardContent>
               <div className={classes.controls}>
                 <div>
-                  {isAFollower && (
+                  {isAnAdmin && (
                     <Button color="red" onClick={handlePost}>
                       Post Now
                     </Button>

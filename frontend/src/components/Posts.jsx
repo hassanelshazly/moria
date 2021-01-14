@@ -283,10 +283,6 @@ function PostViewer(props) {
 
   const isLiking = likes.some((el) => el.id === current_user.id);
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
-    defaultMatches: true,
-  });
-
   const history = useHistory();
   const classes = usePostStyles();
   const theme = useTheme();
@@ -331,6 +327,10 @@ function PostViewer(props) {
     onError(error) {
       showSnackbar("error", error.message);
     },
+  });
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
+    defaultMatches: true,
   });
 
   const [expanded, setExpanded] = React.useState(false);

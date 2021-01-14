@@ -1,4 +1,5 @@
 # Moria
+
 #### Social Media App using MERN stack
 
 <br>
@@ -26,7 +27,7 @@
 - **Personalize Profile** With profile/cover photo and personal posts.
 - **Authentication & Authorization** with Password reset functionality.
 
-<br> 
+<br>
 
 ## Starting the App
 
@@ -57,19 +58,16 @@
 
 You can visit an already deployed version [here](https://moria-asu.herokuapp.com/).
 
-
 ## Built With
 
-- [Express.js](https://expressjs.com/) - Backend web framework 
-- [Heroku](http://heroku.com/)  - Platform to deploy web applications
+- [Express.js](https://expressjs.com/) - Backend web framework
+- [Heroku](http://heroku.com/) - Platform to deploy web applications
 - [JSON Web Token](https://jwt.io/) - A standard to securely authenticate HTTP requests
 - [Material-UI](https://material-ui.com/) - UI library for React
-- [GraphQL](https://graphql.org/)  - query language 
-- [ApolloClient](https://apollographql.org/)  - fetch, cache, and modify application data, all while automatically updating your UI.
+- [GraphQL](https://graphql.org/) - query language
+- [ApolloClient](https://apollographql.org/) - fetch, cache, and modify application data, all while automatically updating your UI.
 - [MongoDB](https://www.mongodb.com/) - Database to store document-based data
 - [Mongoose](https://mongoosejs.com/) - Object-modeling tool for Node.js
 - [Node.js](https://nodejs.org/en/) - Runtime environment to help build fast server applications
 - [React](https://reactjs.org/) - JavaScript library for building user interfaces
 - [Redux](https://redux.js.org/) - JavaScript library to help better manage application state
-
-
