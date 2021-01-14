@@ -29,9 +29,13 @@
 - **Notifications** Get instant notification when : Someone follows you / Likes or comments on your post / Request to join your group / Post on your Group / Post on a page you are following.
 - **Follow** a particular user and get notified for their activity.
 - **Personalize Profile** With profile/cover photo and personal posts.
-- **Authentication & Authorization** with Password reset functionality.
+- **Authentication & Authorization** with email verification.
 
 <br>
+
+## Deployed Version
+
+You can visit an already deployed version [here](https://moria-asu.herokuapp.com/).
 
 ## Starting the App
 
@@ -59,9 +63,7 @@
      6. A message will be displayed including a url for the webapp. You can click on it or copy-paste it if it's not clikable.
      7. The URL will probably be [http://localhost:5000](http://localhost:5000)
 
-## Deployed Version
 
-You can visit an already deployed version [here](https://moria-asu.herokuapp.com/).
 
 ## Built With
 
