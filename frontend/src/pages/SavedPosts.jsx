@@ -23,6 +23,10 @@ const GET_SAVED_POSTS = gql`
         likes {
           id
         }
+        meta {
+          type
+          parentId
+        }
         comments {
           id
           body
