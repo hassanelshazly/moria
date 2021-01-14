@@ -93,7 +93,7 @@ function SignUpDialog(props) {
 
   return (
     <Container maxWidth="xs">
-      <div className={classes.paper}>
+      <form className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
@@ -190,7 +190,7 @@ function SignUpDialog(props) {
             </Link>
           </Grid>
         </Grid>
-      </div>
+      </form>
     </Container>
   );
 }
