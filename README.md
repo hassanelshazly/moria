@@ -50,9 +50,10 @@
      1. Repeate step 2 (open a new terminal and navigate to the project)
      2. Navigate to the frontend using `cd frontend`
      3. Run `npm install`
-     4. Run `npx serve -s build`
-     5. A message will be displayed includin a url for the webapp. You can click on it or copy-paste it if it's not clikable.
-     6. The URL will probably be [http://localhost:5000](http://localhost:5000)
+     4. Build with `npm build`
+     5. Run `npx serve -s build`
+     6. A message will be displayed including a url for the webapp. You can click on it or copy-paste it if it's not clikable.
+     7. The URL will probably be [http://localhost:5000](http://localhost:5000)
 
 ## Deployed Version
 
