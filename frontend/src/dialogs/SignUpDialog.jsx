@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
+import GoogleIcon from "mdi-material-ui/Google";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Link from "@material-ui/core/Link";
@@ -13,6 +14,8 @@ import Typography from "@material-ui/core/Typography";
 import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, setUser, showSnackbar } from "../state/actions";
+
+import GoogleLogin from "react-google-login";
 
 const SIGN_UP = gql`
   mutation SignUp(
@@ -38,6 +41,20 @@ const SIGN_UP = gql`
   }
 `;
 
+const GOOGLE_SIGN_IN = gql`
+  mutation GoogleSignIn($token: String!) {
+    loginUsingGoogle(accessToken: $token) {
+      id
+      username
+      email
+      fullname
+      profileUrl
+      createdAt
+      token
+    }
+  }
+`;
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     margin: theme.spacing(2, 0, 2, 0),
@@ -52,6 +69,14 @@ const useStyles = makeStyles((theme) => ({
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(4),
+  },
+  google: {
+    backgroundColor: "#4285f4",
+    color: theme.palette.getContrastText("#4285f4"),
+    marginBottom: theme.spacing(2),
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: 0,
+    },
   },
   submit: {
     margin: theme.spacing(2, 0),
@@ -79,6 +104,17 @@ function SignUpDialog(props) {
       showSnackbar("error", error.message);
     },
   });
+  const [googleSignIn] = useMutation(GOOGLE_SIGN_IN, {
+    onCompleted({ loginUsingGoogle: user }) {
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      setDialog(null);
+      showSnackbar("success", "Successfully signed in");
+    },
+    onError(error) {
+      showSnackbar("error", error.message);
+    },
+  });
 
   function handleEmailSignUp() {
     signUp({
@@ -91,6 +127,10 @@ function SignUpDialog(props) {
     });
   }
 
+  const responseGoogle = (response) => {
+    googleSignIn({ variables: { token: response.accessToken } });
+  };
+
   return (
     <Container maxWidth="xs">
       <form className={classes.paper}>
@@ -101,6 +141,27 @@ function SignUpDialog(props) {
           Sign-Up
         </Typography>
         <Grid className={classes.form} container spacing={2}>
+          <Grid item xs={12}>
+            <GoogleLogin
+              clientId="394688971696-793pnb23udgrrc64eqj29437d356ql90.apps.googleusercontent.com"
+              render={(renderProps) => (
+                <Button
+                  className={classes.google}
+                  variant="contained"
+                  fullWidth
+                  endIcon={<GoogleIcon />}
+                  onClick={renderProps.onClick}
+                  disabled={renderProps.disabled}
+                >
+                  Google
+                </Button>
+              )}
+              buttonText="Google"
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle}
+              cookiePolicy={"single_host_origin"}
+            />
+          </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               autoComplete="fname"

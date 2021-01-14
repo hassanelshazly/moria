@@ -1,8 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import CallToAction from "../components/CallToAction";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
 import Grid from "@material-ui/core/Grid";
 import Posts from "../components/Posts";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 import { gql, useQuery } from "@apollo/client";
 import { connect } from "react-redux";
@@ -56,10 +60,14 @@ const GET_SAVED_POSTS = gql`
 
 function Home(props) {
   const { user, showSnackbar, setDialog, fillForm } = props;
-  const { error, data } = useQuery(GET_FEED_POSTS, {
+  const { error, data, loading } = useQuery(GET_FEED_POSTS, {
     skip: !user,
   });
-  const { error: errorSaved, data: dataSaved } = useQuery(GET_SAVED_POSTS, {
+  const {
+    error: errorSaved,
+    data: dataSaved,
+    loading: loadingSaved,
+  } = useQuery(GET_SAVED_POSTS, {
     variables: {
       user_name: user ? user.username : undefined,
     },
@@ -82,7 +90,44 @@ function Home(props) {
     }
   };
 
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : [];
+
+  function displayLoadingPosts() {
+    return [0, 1, 2, 3].map((id) => (
+      <Grid key={id} item xs={12}>
+        <Card>
+          <CardHeader
+            avatar={
+              <Skeleton
+                animation="wave"
+                variant="circle"
+                width={40}
+                height={40}
+              />
+            }
+            title={
+              <Skeleton
+                animation="wave"
+                height={10}
+                width="80%"
+                style={{ marginBottom: 6 }}
+              />
+            }
+            subheader={<Skeleton animation="wave" height={10} width="40%" />}
+          />
+          <Skeleton animation="wave" variant="rect" style={{ height: 190 }} />
+          <CardContent>
+            <Skeleton
+              animation="wave"
+              height={10}
+              style={{ marginBottom: 6 }}
+            />
+            <Skeleton animation="wave" height={10} width="80%" />
+          </CardContent>
+        </Card>
+      </Grid>
+    ));
+  }
 
   return (
     <Grid container spacing={2}>
@@ -97,7 +142,7 @@ function Home(props) {
           handlePrimaryAction={handleAction}
         />
       </Grid>
-      {data && (
+      {data && dataSaved && (
         <Grid item xs={12}>
           <Posts
             type="profile"
@@ -106,6 +151,7 @@ function Home(props) {
           />
         </Grid>
       )}
+      {(loading || loadingSaved) && displayLoadingPosts()}
     </Grid>
   );
 }

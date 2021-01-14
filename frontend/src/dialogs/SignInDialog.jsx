@@ -60,11 +60,6 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(4),
   },
-  facebook: {
-    backgroundColor: "#3c5a99",
-    color: theme.palette.getContrastText("#3c5a99"),
-    marginBottom: theme.spacing(2),
-  },
   google: {
     backgroundColor: "#4285f4",
     color: theme.palette.getContrastText("#4285f4"),
