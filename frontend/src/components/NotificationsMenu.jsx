@@ -115,84 +115,78 @@ function NotificationsMenu(props) {
 
   return (
     <React.Fragment>
-      {notifications
-        .slice(0, 10)
-        .map(({ id, content, contentId, author, user }) => (
-          <MenuItem
-            key={id}
-            onClick={handleNotificationClick(
-              content,
-              contentId,
-              author.username
-            )}
-          >
-            {(() => {
-              if (content == "FOLLOW")
-                return (
-                  <>
-                    <PermIdentityTwoTone className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} started following you!`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "LIKE")
-                return (
-                  <>
-                    <FavoriteTwoTone className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} liked your post.`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "COMMENT")
-                return (
-                  <>
-                    <CommentTwoTone className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} commented on a post you are following.`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "POST")
-                return (
-                  <>
-                    <PostAddTwoTone className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} posted on their timeline.`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "GROUP_REQUEST")
-                return (
-                  <>
-                    <HelpIcon className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} requested to join your group.`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "GROUP_ADD")
-                return (
-                  <>
-                    <AddTwoToneIcon className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} added ${user.fullname} to group.`}
-                    </Typography>{" "}
-                  </>
-                );
-              else if (content == "GROUP_POST")
-                return (
-                  <>
-                    <AllInboxTwoToneIcon className={classes.icon} />{" "}
-                    <Typography>
-                      {`${author.fullname} posted on your group.`}
-                    </Typography>{" "}
-                  </>
-                );
-            })()}
-          </MenuItem>
-        ))}
+      {notifications.slice(0, 10).map(({ id, content, contentId, author }) => (
+        <MenuItem
+          key={id}
+          onClick={handleNotificationClick(content, contentId, author.username)}
+        >
+          {(() => {
+            if (content == "FOLLOW")
+              return (
+                <>
+                  <PermIdentityTwoTone className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} started following you!`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "LIKE")
+              return (
+                <>
+                  <FavoriteTwoTone className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} liked your post.`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "COMMENT")
+              return (
+                <>
+                  <CommentTwoTone className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} commented on a post you are following.`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "POST")
+              return (
+                <>
+                  <PostAddTwoTone className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} posted on their timeline.`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "GROUP_REQUEST")
+              return (
+                <>
+                  <HelpIcon className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} requested to join your group.`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "GROUP_ADD")
+              return (
+                <>
+                  <AddTwoToneIcon className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} added you to group.`}
+                  </Typography>{" "}
+                </>
+              );
+            else if (content == "GROUP_POST")
+              return (
+                <>
+                  <AllInboxTwoToneIcon className={classes.icon} />{" "}
+                  <Typography>
+                    {`${author.fullname} posted on your group.`}
+                  </Typography>{" "}
+                </>
+              );
+          })()}
+        </MenuItem>
+      ))}
     </React.Fragment>
   );
 }
