@@ -28,7 +28,8 @@
 - **Personalize Profile** With profile/cover photo and personal posts.
 - **Authentication & Authorization** with Password reset functionality.
 
-<br>
+<br> 
+
 ## Starting the App
 
 1. Download [Node.js](https://nodejs.org/en/download/).
