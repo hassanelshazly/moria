@@ -29,6 +29,7 @@ UserModel.statics.findTimeline = async function ({ userId }) {
                 id: following._id,
                 noCheck: true
             }));
+
     await user.populate([
         {
             path: 'groups',
@@ -107,7 +108,7 @@ UserModel.statics.sharePost = async function ({ userId, postId }) {
         throw new Error("Post not found");
 
     // if (post.user.toString() == userId.toString())
-    //     throw new Error("Really ! Are you trying to share your  ");
+    //     throw new Error("Really ! Are you trying to share your post");
     // await user.shareOrUnSharePost(postId);
     user.sharedPosts.push(postId);
     await user.save();
@@ -125,7 +126,6 @@ UserModel.statics.findPosts = async function ({ id, noCheck }) {
         .filter(post => !(post.group || post.page))
         .concat(user.sharedPosts)
         .sort((a, b) => b.createdAt - a.createdAt);
-
 }
 
 UserModel.statics.findFollowers = async function ({ id }) {
