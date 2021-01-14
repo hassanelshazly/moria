@@ -150,15 +150,16 @@ function GroupHeader(props) {
     coverUrl,
     profileUrl,
     members,
-    requests,
+    groupRequests,
     loading,
   } = props;
 
   const isAnAdmin = user && admin ? admin.id === user.id : false;
   const isMember =
     user && members ? members.some((el) => el.id === user.id) : false;
-  const isRequestee =
-    user && requests ? requests.some((el) => el.id === user.id) : false;
+  const isRequestee = groupRequests
+    ? groupRequests.some((el) => el.id === id)
+    : false;
 
   const classes = useStyles();
   const theme = useTheme();
@@ -443,7 +444,7 @@ GroupHeader.propTypes = {
   coverUrl: PropTypes.any,
   profileUrl: PropTypes.any,
   members: PropTypes.any,
-  requests: PropTypes.any,
+  groupRequests: PropTypes.any,
   loading: PropTypes.any,
 };
 
