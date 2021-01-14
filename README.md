@@ -9,7 +9,6 @@
 <a href="https://moria-asu.herokuapp.com/"><img src="https://img.shields.io/npm/v/array-mixer.svg"></a>
 <a href="https://moria-asu.herokuapp.com/"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 
-
 <br>
 
 ![GIF](https://media.giphy.com/media/fzlMuOaSFMnQwGlxZ5/giphy.gif)
@@ -25,7 +24,7 @@
 - **Notifications** Get instant notification when : Someone follows you / Likes or comments on your post / Request to join your group / Post on your Group / Post on a page you are following.
 - **Follow** a particular user and get notified for their activity.
 - **Personalize Profile** With profile/cover photo and personal posts.
-- **Authentication & Authorization** 
+- **Authentication & Authorization**
 
 <br>
 
