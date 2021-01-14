@@ -24,3 +24,7 @@
      4. Run `npx serve -s build`
      5. A message will be displayed includin a url for the webapp. You can click on it or copy-paste it if it's not clikable.
      6. The URL will probably be [http://localhost:5000](http://localhost:5000)
+
+## Deployed Version
+
+You can visit an already deployed version [here](https://moria-asu.herokuapp.com/).
