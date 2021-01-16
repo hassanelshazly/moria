@@ -26,6 +26,8 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
+import optimizeImage from "../utils/image";
+
 const FOLLOW_USER = gql`
   mutation FollowUser($user_id: ID!) {
     follow(id: $user_id) {
@@ -235,43 +237,31 @@ function ProfileHeader(props) {
     };
   }, []);
 
-  const handleCoverChange = (event) => {
+  const handleCoverChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setCover(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeCover({
-          variables: {
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeCover({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setPhoto(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeImage({
-          variables: {
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeImage({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 

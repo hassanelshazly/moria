@@ -17,6 +17,8 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
+import optimizeImage from "../utils/image";
+
 const ADD_PROFILE_POST = gql`
   mutation AddProfilePost($text: String!, $image: String) {
     createPost(body: $text, imageSrc: $image) {
@@ -134,30 +136,24 @@ function CreatePostDialog(props) {
     setCardContentHeight(cardContent.current.offsetHeight);
   });
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (media) {
-      const reader = new FileReader();
-      reader.readAsDataURL(media);
-      reader.onloadend = () => {
-        switch (postForm.type) {
-          case "profile":
-            addProfilePost({ variables: { text, image: reader.result } });
-            break;
-          case "group":
-            addGroupPost({
-              variables: { group_id: postForm.id, text, image: reader.result },
-            });
-            break;
-          case "page":
-            addPagePost({
-              variables: { page_id: postForm.id, text, image: reader.result },
-            });
-            break;
-        }
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(media);
+      switch (postForm.type) {
+        case "profile":
+          addProfilePost({ variables: { text, image: optimizedImage } });
+          break;
+        case "group":
+          addGroupPost({
+            variables: { group_id: postForm.id, text, image: optimizedImage },
+          });
+          break;
+        case "page":
+          addPagePost({
+            variables: { page_id: postForm.id, text, image: optimizedImage },
+          });
+          break;
+      }
     } else {
       switch (postForm.type) {
         case "profile":
