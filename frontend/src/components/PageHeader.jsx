@@ -404,18 +404,16 @@ function PageHeader(props) {
                     </Button>
                   )}
                 </div>
-                {!isAFollower && (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={isAFollower}
-                        onChange={handleFollowToggle}
-                        name="isAFollower"
-                      />
-                    }
-                    label={isAFollower ? "Following" : "Follow"}
-                  />
-                )}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isAFollower}
+                      onChange={handleFollowToggle}
+                      name="isAFollower"
+                    />
+                  }
+                  label={isAFollower ? "Following" : "Follow"}
+                />
               </div>
             </div>
           </Card>
