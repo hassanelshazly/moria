@@ -74,7 +74,6 @@ function UserCard(props) {
     });
 
   };
-  console.log(props.profilePic);
    return (
     <Card className={classes.root} key={id}>
       <CardActionArea>
