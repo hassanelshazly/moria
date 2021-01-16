@@ -128,7 +128,7 @@ function SignInDialog(props) {
         <Grid className={classes.form} container spacing={2}>
           <Grid item xs={12}>
             <GoogleLogin
-              clientId="394688971696-793pnb23udgrrc64eqj29437d356ql90.apps.googleusercontent.com"
+              clientId="988523340225-em99cnh78galbc4hepb8fevvkj1nm6ie.apps.googleusercontent.com"
               render={(renderProps) => (
                 <Button
                   className={classes.google}
