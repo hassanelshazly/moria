@@ -1,6 +1,6 @@
 const cloudinary = require("cloudinary");
 
-const cloudinaryBaseUrl = `http://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/`
+const cloudinaryBaseUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/`
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
