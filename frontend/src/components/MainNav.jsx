@@ -59,6 +59,7 @@ import {
   setSnackbar,
   showSnackbar,
 } from "../state/actions";
+import { Tooltip } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -584,15 +585,15 @@ const Toggle = ({ theme, toggleTheme }) => {
         src="https://image.flaticon.com/icons/svg/1164/1164954.svg"
         width="224"
         height="224"
-        alt="Sun free icon"
-        title="Sun free icon"
+        alt="Sun"
+        title="Sun"
       />
       <img
         src="https://image.flaticon.com/icons/svg/2033/2033921.svg"
         width="224"
         height="224"
-        alt="Moon free icon"
-        title="Moon free icon"
+        alt="Moon"
+        title="Moon"
       />
     </ToggleContainer>
   );
@@ -725,6 +726,8 @@ function DrawerItems() {
     return (
       <List>
         {items.map((item) => (
+          <Tooltip  key={item.id} title={item.text} arrow placement="right">
+
           <ListItem
             key={item.id}
             className={classes.listItem}
@@ -735,6 +738,7 @@ function DrawerItems() {
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
+            </Tooltip>
         ))}
         <SWITCHER />
       </List>
