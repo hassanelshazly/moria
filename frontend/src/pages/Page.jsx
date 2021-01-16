@@ -103,7 +103,8 @@ function Page(props) {
   }
 
   const findPage = data ? data.findPage : {};
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
   const { owner, title, coverUrl, profileUrl, followers, posts } = findPage;
 
   return (

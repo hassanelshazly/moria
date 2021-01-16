@@ -110,7 +110,8 @@ function Profile(props) {
   }
 
   const findUser = data ? data.findUser : {};
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
   const {
     id,
     username,

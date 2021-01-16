@@ -90,7 +90,8 @@ function Home(props) {
     }
   };
 
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : [];
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
 
   function displayLoadingPosts() {
     return [0, 1, 2, 3].map((id) => (

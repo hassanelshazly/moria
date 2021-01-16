@@ -124,7 +124,8 @@ function Group(props) {
   } = findGroup;
 
   const isAnAdmin = user && admin ? admin.id === user.id : null;
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : [];
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
   const groupRequests = dataSaved ? dataSaved.findUser.requests : [];
 
   return (
