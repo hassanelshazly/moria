@@ -72,18 +72,18 @@ function NotificationsMenu(props) {
     },
   });
   useSubscription(NOTIFICATION_SUBSCRIPTION, {
-    onSubscriptionData({ subscriptionData }) {
+    onSubscriptionData({ subscriptionData: { data } }) {
       if (
-        subscriptionData &&
-        subscriptionData.newNotification &&
+        data &&
+        data.newNotification &&
         (notifications.length === 0 ||
-          subscriptionData.newNotification.id !== notifications[0].id)
+          data.newNotification.id !== notifications[0].id)
       ) {
         play();
 
         setNotifications((notifications) => [
           ...notifications,
-          subscriptionData.newNotification,
+          data.newNotification,
         ]);
         showSnackbar("info", "New Notification");
       }

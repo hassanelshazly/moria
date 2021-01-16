@@ -235,32 +235,28 @@ const Chat = (props) => {
     defaultMatches: true,
   });
 
-  const { data: subData, error: subError } = useSubscription(
-    MESSAGE_SUBSCRIPTION,
-    {
-      onSubscriptionData({ subscriptionData }) {
-        if (
-          subscriptionData &&
-          (messageArray.length == 0 ||
-            subscriptionData.newMessage.id !=
-              messageArray[messageArray.length - 1].id) &&
-          currentReceiver != "#" &&
-          subscriptionData.newMessage.from.id === currentReceiver
-        ) {
-          play();
-          setMessageArray((messageArray) => [
-            ...messageArray,
-            {
-              id: subData.newMessage.id,
-              createdAt: subData.newMessage.createdAt,
-              body: subData.newMessage.body,
-              sender: false,
-            },
-          ]);
-        }
-      },
-    }
-  );
+  const { error: subError } = useSubscription(MESSAGE_SUBSCRIPTION, {
+    onSubscriptionData({ subscriptionData: { data: subData } }) {
+      if (
+        subData &&
+        (messageArray.length == 0 ||
+          subData.newMessage.id != messageArray[messageArray.length - 1].id) &&
+        currentReceiver != "#" &&
+        subData.newMessage.from.id === currentReceiver
+      ) {
+        play();
+        setMessageArray((messageArray) => [
+          ...messageArray,
+          {
+            id: subData.newMessage.id,
+            createdAt: subData.newMessage.createdAt,
+            body: subData.newMessage.body,
+            sender: false,
+          },
+        ]);
+      }
+    },
+  });
 
   if (subError) console.error(subError);
 
