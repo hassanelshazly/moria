@@ -27,9 +27,6 @@ const GET_NOTIFICATIONS = gql`
       id
       content
       contentId
-      user {
-        fullname
-      }
       author {
         id
         username
@@ -45,10 +42,6 @@ const NOTIFICATION_SUBSCRIPTION = gql`
       id
       content
       contentId
-      user {
-        username
-        fullname
-      }
       author {
         id
         fullname
@@ -66,19 +59,36 @@ const useStyles = makeStyles(() => ({
 
 function NotificationsMenu(props) {
   const { closeMenu, showSnackbar } = props;
-  const { data: subData } = useSubscription(NOTIFICATION_SUBSCRIPTION);
 
   const classes = useStyles();
   const history = useHistory();
 
   const [notifications, setNotifications] = useState([]);
+  const [play] = useSound(notificationSound);
 
   const { loading } = useQuery(GET_NOTIFICATIONS, {
     onCompleted({ findNotifications }) {
       setNotifications(findNotifications);
     },
   });
-  const [play] = useSound(notificationSound);
+  useSubscription(NOTIFICATION_SUBSCRIPTION, {
+    onSubscriptionData({ subscriptionData }) {
+      if (
+        subscriptionData &&
+        subscriptionData.newNotification &&
+        (notifications.length === 0 ||
+          subscriptionData.newNotification.id !== notifications[0].id)
+      ) {
+        play();
+
+        setNotifications((notifications) => [
+          ...notifications,
+          subscriptionData.newNotification,
+        ]);
+        showSnackbar("info", "New Notification");
+      }
+    },
+  });
 
   const handleNotificationClick = (content, contentId, username) => () => {
     if (content === "FOLLOW" || content === "POST")
@@ -102,16 +112,6 @@ function NotificationsMenu(props) {
         <Divider variant="inset" component="li" />
       </React.Fragment>
     ));
-
-  if (subData && subData.newNotification.id != notifications[0].id) {
-    play();
-
-    setNotifications((notifications) => [
-      subData.newNotification,
-      ...notifications,
-    ]);
-    showSnackbar("info", "New Notification");
-  }
 
   return (
     <React.Fragment>
