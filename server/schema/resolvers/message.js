@@ -33,7 +33,7 @@ module.exports = {
                 },
                 ({ newMessage }, { userId }) => {
                     const { to, from } = newMessage;
-                    return userId == to._id || userId == from._id;
+                    return userId == to._id;
                 }
             )
         }

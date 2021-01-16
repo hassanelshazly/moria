@@ -14,11 +14,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
-import { Redirect } from "react-router-dom";
-import useSound from 'use-sound';
+import useSound from "use-sound";
 import { formatDistance } from "date-fns";
 
-import { CircularProgress, Typography, useMediaQuery, useTheme } from "@material-ui/core";
+import { CircularProgress, useMediaQuery, useTheme } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
@@ -26,17 +25,19 @@ import { Picker } from "emoji-mart";
 import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
 import { connect } from "react-redux";
 import lottie from "lottie-web";
+import uuidv4 from "../utils/uuid";
 import classNames from "classnames";
 import Message from "./Message";
 
-import MessageReceivedAnimation from "../assets/animations/message-received.json";
 import MessageSound from "../assets/sounds/message-sound.mp3";
 import Skeleton from "@material-ui/lab/Skeleton";
 
-
 let messageArrayLoading = false;
 
-const skeletonHolder=Array.from({length: Math.floor(Math.random() * (12 - 4 + 1)) + 4}, () => Math.floor(Math.random() * 100)  );
+const skeletonHolder = Array.from(
+  { length: Math.floor(Math.random() * (12 - 4 + 1)) + 4 },
+  () => Math.floor(Math.random() * 100)
+);
 
 const useImperativeQuery = (query) => {
   const { refetch } = useQuery(query, { skip: true });
@@ -49,8 +50,8 @@ const useImperativeQuery = (query) => {
 };
 
 const useStyles = makeStyles((theme) => ({
-  holder:{
-    position:"relative",
+  holder: {
+    position: "relative",
   },
   table: {
     minWidth: 650,
@@ -59,18 +60,17 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   container: {
-    position:"absolute",
+    position: "absolute",
     width: "400px",
     height: "400px",
-    overflow:"hidden",
-    
-    
+    overflow: "hidden",
+
     [theme.breakpoints.down("md")]: {
-      position:"absolute",
-      top:"10vh",
-      left:"1.5vw",
+      position: "absolute",
+      top: "10vh",
+      left: "1.5vw",
       width: "300px",
-     height: "300px",
+      height: "300px",
     },
   },
   headBG: {
@@ -118,8 +118,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   peopleList: {
-    [theme.breakpoints.down("sm")]: {
-    },
+    [theme.breakpoints.down("sm")]: {},
   },
 }));
 
@@ -179,32 +178,24 @@ const GET_FOLLOWERS = gql`
   }
 `;
 const MESSAGE_SUBSCRIPTION = gql`
-subscription onNewMessage {
-  newMessage {
-    id
-    body
-    from{
+  subscription onNewMessage {
+    newMessage {
       id
+      body
+      from {
+        id
+      }
+      createdAt
     }
-    createdAt
   }
-}
-
 `;
 
 const Chat = (props) => {
   const { user } = props;
 
   if (user == null) {
-    return <p>Loading ...</p>
+    return <p>Loading ...</p>;
   }
-  const {
-    data: subData,
-    loading: subLoading,
-    error: subError,
-  } = useSubscription(MESSAGE_SUBSCRIPTION);
-  
-  if(subError) console.log (subError)
 
   const container = useRef(null);
   useEffect(() => {
@@ -215,9 +206,7 @@ const Chat = (props) => {
       loop: true,
       animationData: require("./../assets/animations/message-received.json"),
     });
-
-    
-  } );
+  });
   const classes = useStyles();
   const theme = useTheme();
   const dummy = useRef();
@@ -245,7 +234,36 @@ const Chat = (props) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
     defaultMatches: true,
   });
- 
+
+  const { data: subData, error: subError } = useSubscription(
+    MESSAGE_SUBSCRIPTION,
+    {
+      onSubscriptionData({ subscriptionData }) {
+        if (
+          subscriptionData &&
+          (messageArray.length == 0 ||
+            subscriptionData.newMessage.id !=
+              messageArray[messageArray.length - 1].id) &&
+          currentReceiver != "#" &&
+          subscriptionData.newMessage.from.id === currentReceiver
+        ) {
+          play();
+          setMessageArray((messageArray) => [
+            ...messageArray,
+            {
+              id: subData.newMessage.id,
+              createdAt: subData.newMessage.createdAt,
+              body: subData.newMessage.body,
+              sender: false,
+            },
+          ]);
+        }
+      },
+    }
+  );
+
+  if (subError) console.error(subError);
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       handleSendMessage();
@@ -262,6 +280,15 @@ const Chat = (props) => {
     // setMessageArray([...messageArray,{id:x.id ,createdAt:x.createdAt , body:x.body , sender:x.from.id==user.id} ])
     //console.log("Current Receiver  " + currentReceiver + " Text: " + newMessage);
     addMessage({ variables: { receiver: currentReceiver, text: newMessage } });
+    setMessageArray((messageArray) => [
+      ...messageArray,
+      {
+        id: uuidv4(),
+        createdAt: new Date().getTime(),
+        body: newMessage,
+        sender: true,
+      },
+    ]);
     setNewMessage("");
   };
 
@@ -276,44 +303,30 @@ const Chat = (props) => {
           width: "100px",
           height: "100px",
           position: "absolute",
-          top: isMobile? "40%" : "45%",
-          left: isMobile? "40%" : "45%",
+          top: isMobile ? "40%" : "45%",
+          left: isMobile ? "40%" : "45%",
         }}
         color="primary"
       />
     );
 
-  if (error) return <p>Error :(</p>;
-    if (!subLoading && subData!=null && messageArray.length && subData.newMessage.id != messageArray[messageArray.length - 1].id) { //subData.newMessage.body
-      if(subData.newMessage.from.id != user.id)
-        {play();}
-      setMessageArray((messageArray) => [
-        ...messageArray,
-        {
-          id: subData.newMessage.id,
-          createdAt: subData.newMessage.createdAt,
-          body: subData.newMessage.body,
-          sender: subData.newMessage.from.id == user.id,
-        },
-      ]
-      
-      );
-      
-      // console.log(subData.newMessage)
-    }
-    console.log(user)
+  if (error || !data.findUser) return <p>Error :(</p>;
+
   return (
     <div>
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid
           item
-          xs={isMobile? 12: 4}
+          xs={isMobile ? 12 : 4}
           className={classNames(classes.peopleList, classes.borderRight500)}
         >
           <List>
             <ListItem button key={user.id}>
               <ListItemIcon>
-                <Avatar alt={user.fullname} src={data.findUser.profileUrl? data.findUser.profileUrl : ""} />
+                <Avatar
+                  alt={user.fullname}
+                  src={data.findUser.profileUrl ? data.findUser.profileUrl : ""}
+                />
               </ListItemIcon>
               <ListItemText primary={user.fullname}></ListItemText>
             </ListItem>
@@ -348,15 +361,17 @@ const Chat = (props) => {
                     }}
                     onClick={async () => {
                       setCurrentReceiver(someuser.id);
-                      messageArrayLoading=true;
-                      setMessageArray((messageArray) => []);
+                      messageArrayLoading = true;
+                      setMessageArray(() => []);
 
-                      const { data, error,loading } = await callQuery({
+                      const { data, loading } = await callQuery({
                         receiver: someuser.id,
                       });
-                      if(!loading) {messageArrayLoading=false;}
-                      setMessageArray((messageArray) => []);
-                     
+                      if (!loading) {
+                        messageArrayLoading = false;
+                      }
+                      setMessageArray(() => []);
+
                       // if(error) { return;}
                       data.findMessages.forEach((x) => {
                         setMessageArray((messageArray) => [
@@ -369,11 +384,13 @@ const Chat = (props) => {
                           },
                         ]);
                       });
-                      // console.log(messageArray);
                     }}
                   >
                     <ListItemIcon>
-                      <Avatar alt={someuser.fullname} src={someuser.profileUrl} />
+                      <Avatar
+                        alt={someuser.fullname}
+                        src={someuser.profileUrl}
+                      />
                     </ListItemIcon>
                     <ListItemText primary={someuser.fullname}>
                       {someuser.fullname}
@@ -384,10 +401,12 @@ const Chat = (props) => {
           </List>
         </Grid>
 
-        {isMobile && <Grid xs={12} style={{margin:"10px 0" , }}>
-          <Divider />
-        </Grid>}
-        <Grid item xs={isMobile? 12: 8} className={classes.holder} >
+        {isMobile && (
+          <Grid xs={12} style={{ margin: "10px 0" }}>
+            <Divider />
+          </Grid>
+        )}
+        <Grid item xs={isMobile ? 12 : 8} className={classes.holder}>
           <List
             className={classes.messageArea}
             onClick={() => {
@@ -399,28 +418,46 @@ const Chat = (props) => {
                 {" "}
               </div>
             )}
-           { currentReceiver != "#" && messageArrayLoading &&
-                <div style={{display:"flex" , flexDirection:"column" , justifyContent:"flex-end"}}> 
-                {
-                    skeletonHolder.map(id=>(
-                      <Skeleton key={id} variant="rect" animation="wave" align="right" width={Math.floor(Math.random() * (240 - 80 + 1)) + 80} height={Math.floor(Math.random() * (60 - 20 + 1)) + 20 }  
-                      style={{ alignSelf:id%2==0 ? "flex-start":"flex-end" ,marginBottom:"10px" , marginRight: id%2==0? "0":"10px" , backgroundColor:id%2==0?"#E0DBDA":"rgb(44,225,210)" ,  marginLeft: id%2==0? "10px":"0px", borderRadius:"20px"}}>
+            {currentReceiver != "#" && messageArrayLoading && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-end",
+                }}
+              >
+                {skeletonHolder.map((id) => (
+                  <Skeleton
+                    key={id}
+                    variant="rect"
+                    animation="wave"
+                    align="right"
+                    width={Math.floor(Math.random() * (240 - 80 + 1)) + 80}
+                    height={Math.floor(Math.random() * (60 - 20 + 1)) + 20}
+                    style={{
+                      alignSelf: id % 2 == 0 ? "flex-start" : "flex-end",
+                      marginBottom: "10px",
+                      marginRight: id % 2 == 0 ? "0" : "10px",
+                      backgroundColor:
+                        id % 2 == 0 ? "#E0DBDA" : "rgb(44,225,210)",
+                      marginLeft: id % 2 == 0 ? "10px" : "0px",
+                      borderRadius: "20px",
+                    }}
+                  ></Skeleton>
+                ))}
+                {/* <Skeleton variant="rect" animation="wave" width={Math.floor(Math.random() * 240)} height={Math.floor(Math.random() * 140)}  style={{ borderRadius:"30px"}}/> */}
+              </div>
+            )}
 
-                      
-                      </Skeleton>
-                      ))                  
-
-                }
-               {/* <Skeleton variant="rect" animation="wave" width={Math.floor(Math.random() * 240)} height={Math.floor(Math.random() * 140)}  style={{ borderRadius:"30px"}}/> */}
-               </div>
-            } 
-           
             {messageArray.map((x) => (
               <Message
                 ISSMALL={isMobile}
                 key={x.id}
                 messageText={x.body}
-                messageDate={  formatDistance(new Date(Number(x.createdAt , 10)), new Date())}
+                messageDate={formatDistance(
+                  new Date(Number(x.createdAt, 10)),
+                  new Date()
+                )}
                 sender={x.sender}
               />
             ))}
@@ -438,7 +475,6 @@ const Chat = (props) => {
             style={{
               padding: "10px",
               display: currentReceiver == "#" ? "none" : "block",
-              
             }}
           >
             <Grid container spacing={isMobile ? 4 : 2}>
@@ -484,7 +520,6 @@ const Chat = (props) => {
     </div>
   );
 };
-
 
 const mapStateToProps = (state) => {
   return { user: state.user };
