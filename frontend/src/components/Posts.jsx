@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import { useMediaQuery, useTheme } from "@material-ui/core";
+import { emphasize, makeStyles, withStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardMedia from "@material-ui/core/CardMedia";
+import Chip from "@material-ui/core/Chip";
 import Collapse from "@material-ui/core/Collapse";
+import CreateIcon from "@material-ui/icons/Create";
 import Divider from "@material-ui/core/Divider";
+import FaceIcon from "@material-ui/icons/Face";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import FilledInput from "@material-ui/core/FilledInput";
 import Grid from "@material-ui/core/Grid";
+import GroupIcon from "@material-ui/icons/Group";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import Link from "@material-ui/core/Link";
-import { Link as RouterLink } from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import FilledInput from "@material-ui/core/FilledInput";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import SendIcon from "@material-ui/icons/Send";
@@ -234,6 +235,22 @@ const CommentInput = connect(
   mapCommentInputDispatchToProps
 )(CommentInputSender);
 
+const StyledBreadcrumb = withStyles((theme) => ({
+  root: {
+    backgroundColor: theme.palette.grey[100],
+    height: theme.spacing(3),
+    color: theme.palette.grey[800],
+    fontWeight: theme.typography.fontWeightRegular,
+    "&:hover, &:focus": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    "&:active": {
+      boxShadow: theme.shadows[1],
+      backgroundColor: emphasize(theme.palette.grey[300], 0.12),
+    },
+  },
+}))(Chip);
+
 const usePostStyles = makeStyles((theme) => ({
   media: {
     height: 0,
@@ -251,6 +268,9 @@ const usePostStyles = makeStyles((theme) => ({
   },
   avatar: {
     backgroundColor: red[500],
+  },
+  datetime: {
+    marginLeft: theme.spacing(1.5),
   },
   comments: {
     width: "100%",
@@ -285,7 +305,6 @@ function PostViewer(props) {
 
   const history = useHistory();
   const classes = usePostStyles();
-  const theme = useTheme();
   const [likePost] = useMutation(LIKE_POST, {
     onError(error) {
       showSnackbar("error", error.message);
@@ -327,10 +346,6 @@ function PostViewer(props) {
     onError(error) {
       showSnackbar("error", error.message);
     },
-  });
-
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), {
-    defaultMatches: true,
   });
 
   const [expanded, setExpanded] = React.useState(false);
@@ -413,6 +428,18 @@ function PostViewer(props) {
     sharePost({ variables: { post_id: id } });
   };
 
+  function handleParentClick(path) {
+    return function handleParentClick(event) {
+      event.preventDefault();
+      history.push(`/${path}/${encodeURIComponent(meta.parentId)}`);
+    };
+  }
+
+  function handleChildClick(event) {
+    event.preventDefault();
+    history.push(`/profile/${encodeURIComponent(username)}`);
+  }
+
   return (
     <Card elevation={25} style={{ position: "relative" }}>
       <CardHeader
@@ -442,71 +469,48 @@ function PostViewer(props) {
           </React.Fragment>
         }
         title={
-          <Link
-            component={RouterLink}
-            to={`/profile/${encodeURIComponent(username)}`}
-          >
-            {user_name}
-          </Link>
+          <Breadcrumbs aria-label="breadcrumb">
+            <StyledBreadcrumb
+              component="a"
+              href="#"
+              label={user_name}
+              onClick={handleChildClick}
+            />
+            {isShared && (
+              <StyledBreadcrumb
+                component="a"
+                href="#"
+                label="Shared"
+                icon={<FaceIcon fontSize="small" />}
+                onClick={(event) => event.preventDefault()}
+              />
+            )}
+            {meta && meta.type == "GROUP_POST" && (
+              <StyledBreadcrumb
+                component="a"
+                href="#"
+                label="Group"
+                icon={<GroupIcon fontSize="small" />}
+                onClick={handleParentClick("group")}
+              />
+            )}
+            {meta && meta.type == "GROUP_POST" && (
+              <StyledBreadcrumb
+                component="a"
+                href="#"
+                label="Page"
+                icon={<CreateIcon fontSize="small" />}
+                onClick={handleParentClick("page")}
+              />
+            )}
+          </Breadcrumbs>
         }
-        subheader={formatDistance(new Date(Number(createdAt, 10)), new Date())}
+        subheader={
+          <Typography className={classes.datetime} variant="caption">
+            {formatDistance(new Date(Number(createdAt, 10)), new Date())}
+          </Typography>
+        }
       />
-      {isShared && (
-        <Button
-          color="red"
-          onClick={() => {
-            history.push(`/profile/${encodeURIComponent(username)}`);
-          }}
-          style={{
-            position: "absolute",
-            left: "210px",
-            marginRight: "20px",
-            top: isMobile ? "8px" : "15px",
-            color: "white",
-            width: isMobile ? "50px" : "max-content",
-            background:
-              "linear-gradient(to right, rgb(32, 1, 34), rgb(241 76 76))",
-          }}
-        >
-          Shared post
-        </Button>
-      )}
-      {meta && meta.type == "GROUP_POST" && (
-        <Button
-          color="red"
-          onClick={() => {
-            history.push(`/group/${encodeURIComponent(meta.parentId)}`);
-          }}
-          style={{
-            position: "absolute",
-            left: isShared ? "330px" : "210px",
-            top: isMobile ? "8px" : "15px",
-            color: "white",
-            width: isMobile ? "50px" : "max-content",
-            background: "linear-gradient(to right, #000046, #1cb5e0)",
-          }}
-        >
-          Group post
-        </Button>
-      )}
-      {meta && meta.type == "PAGE_POST" && (
-        <Button
-          color="red"
-          onClick={() => {
-            history.push(`/page/${encodeURIComponent(meta.parentId)}`);
-          }}
-          style={{
-            position: "absolute",
-            left: isShared ? "330px" : "210px",
-            top: isMobile ? "8px" : "15px",
-            color: "white",
-            width: isMobile ? "50px" : "max-content",
-            background: "linear-gradient(to right, #000046, #1cb5e0)",
-          }}
-        >
-          Page post
-        </Button>
-      )}
       {imageUrl && (
         <CardMedia className={classes.media} image={imageUrl} title={body} />
       )}
