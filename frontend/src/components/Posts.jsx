@@ -20,6 +20,8 @@ import Grid from "@material-ui/core/Grid";
 import GroupIcon from "@material-ui/icons/Group";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Link from "@material-ui/core/Link";
+import { Link as RouterLink } from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
@@ -269,9 +271,6 @@ const usePostStyles = makeStyles((theme) => ({
   avatar: {
     backgroundColor: red[500],
   },
-  datetime: {
-    marginLeft: theme.spacing(1.5),
-  },
   comments: {
     width: "100%",
     backgroundColor: theme.palette.background.paper,
@@ -435,11 +434,6 @@ function PostViewer(props) {
     };
   }
 
-  function handleChildClick(event) {
-    event.preventDefault();
-    history.push(`/profile/${encodeURIComponent(username)}`);
-  }
-
   return (
     <Card elevation={25} style={{ position: "relative" }}>
       <CardHeader
@@ -470,12 +464,12 @@ function PostViewer(props) {
         }
         title={
           <Breadcrumbs aria-label="breadcrumb">
-            <StyledBreadcrumb
-              component="a"
-              href="#"
-              label={user_name}
-              onClick={handleChildClick}
-            />
+            <Link
+              component={RouterLink}
+              to={`/profile/${encodeURIComponent(username)}/`}
+            >
+              {user_name}
+            </Link>
             {isShared && (
               <StyledBreadcrumb
                 component="a"
@@ -494,7 +488,7 @@ function PostViewer(props) {
                 onClick={handleParentClick("group")}
               />
             )}
-            {meta && meta.type == "GROUP_POST" && (
+            {meta && meta.type == "PAGE_POST" && (
               <StyledBreadcrumb
                 component="a"
                 href="#"
@@ -506,7 +500,7 @@ function PostViewer(props) {
           </Breadcrumbs>
         }
         subheader={
-          <Typography className={classes.datetime} variant="caption">
+          <Typography variant="caption">
             {formatDistance(new Date(Number(createdAt, 10)), new Date())}
           </Typography>
         }
