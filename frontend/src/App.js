@@ -31,7 +31,7 @@ function App(props) {
   const { token } = props;
 
   const httpLink = createHttpLink({
-    uri: "http://localhost:4000",
+    uri: "https://moria-asu.herokuapp.com/graphql",
   });
 
   const authLink = setContext((_, { headers }) => {
@@ -44,11 +44,11 @@ function App(props) {
   });
 
   const wsLink = new WebSocketLink({
-    uri: `ws://localhost:4000/graphql`,
+    uri: "wss://moria-asu.herokuapp.com/graphql",
     options: {
       reconnect: true,
       connectionParams: {
-        authorization: `Bearer ${token}`,
+        authorization: token ? `Bearer ${token}` : "",
       },
     },
   });

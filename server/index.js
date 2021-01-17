@@ -1,17 +1,21 @@
-const { ApolloServer } = require("apollo-server");
+const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv").config();
+const { ApolloServer } = require("apollo-server-express");
+const { createServer } = require("http");
+const path = require("path");
+
+require("dotenv").config();
 
 const typeDefs = require("./schema/types/index");
 const resolvers = require("./schema/resolvers/index");
 
-// Configure the enviroment
-const port = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
+const expressApp = express();
 
-const myPlugin = {
-  requestDidStart(requestContext) {
+const errorsPlugin = {
+  requestDidStart() {
     return {
-      parsingDidStart(requestContext) {
+      parsingDidStart() {
         return (err) => {
           if (err) {
             console.error(err);
@@ -19,7 +23,7 @@ const myPlugin = {
         };
       },
 
-      validationDidStart(requestContext) {
+      validationDidStart() {
         return (err) => {
           if (err) {
             console.error(err);
@@ -27,7 +31,7 @@ const myPlugin = {
         };
       },
 
-      executionDidStart(requestContext) {
+      executionDidStart() {
         return (err) => {
           if (err) {
             console.error(err);
@@ -37,14 +41,6 @@ const myPlugin = {
     };
   },
 };
-
-// Create apollo server
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req, connection }) => ({ req, connection }),
-  plugins: [myPlugin],
-});
 
 // Connect to the database
 mongoose
@@ -60,9 +56,35 @@ mongoose.connection.on("error", (err) => {
   console.log(`DB connection error: ${err.message}`);
 });
 
-// Start apollo server
-server.listen(port, () => {
-  console.log(`Server started on http://localhost:${port}`);
+const apolloServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req, connection }) => ({ req, connection }),
+  plugins: [errorsPlugin],
+  debug: false,
 });
 
-process.on("warning", (e) => console.warn(e.stack));
+// Priority serve any static files.
+expressApp.use(express.static(path.resolve(__dirname, "../frontend/build")));
+
+apolloServer.applyMiddleware({ app: expressApp });
+
+// All remaining requests return to the React app, so it can handle routing.
+expressApp.get("*", function (request, response) {
+  response.sendFile(path.resolve(__dirname, "../frontend/build", "index.html"));
+});
+
+const httpServer = createServer(expressApp);
+
+apolloServer.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(PORT, () => {
+  console.info(
+    `Server ready at https://moria-asu.herokuapp.com${apolloServer.graphqlPath}`
+  );
+  console.info(
+    `Subscriptions ready at wss://moria-asu.herokuapp.com${apolloServer.subscriptionsPath}`
+  );
+});
+
+process.on("warning", (w) => console.warn(w.stack));

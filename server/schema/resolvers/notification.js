@@ -1,4 +1,4 @@
-const { withFilter } = require("apollo-server");
+const { withFilter } = require('apollo-server-express');
 
 const User = require("../../data/user");
 const { getAuthUser } = require("../../util/auth");
