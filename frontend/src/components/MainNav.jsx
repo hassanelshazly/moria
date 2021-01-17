@@ -44,6 +44,7 @@ import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
 import StarIcon from "@material-ui/icons/Star";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Toolbar from "@material-ui/core/Toolbar";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
@@ -59,7 +60,6 @@ import {
   setSnackbar,
   showSnackbar,
 } from "../state/actions";
-import { Tooltip } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -726,19 +726,17 @@ function DrawerItems() {
     return (
       <List>
         {items.map((item) => (
-          <Tooltip  key={item.id} title={item.text} arrow placement="right">
-
-          <ListItem
-            key={item.id}
-            className={classes.listItem}
-            selected={history.location.pathname == item.id}
-            button
-            onClick={() => history.push(item.id)}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
-            </Tooltip>
+          <Tooltip key={item.id} title={item.text} arrow placement="right">
+            <ListItem
+              className={classes.listItem}
+              selected={history.location.pathname == item.id}
+              button
+              onClick={() => history.push(item.id)}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          </Tooltip>
         ))}
         <SWITCHER />
       </List>
