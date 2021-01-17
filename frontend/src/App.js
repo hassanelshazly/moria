@@ -14,15 +14,15 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 
 import MainNav from "./components/MainNav";
 
-import Home from "./pages/Home";
-import Profile from "./pages/Profile";
-import SavedPosts from "./pages/SavedPosts";
-import Pages from "./pages/Pages";
-import Page from "./pages/Page";
-import Groups from "./pages/Groups";
-import Group from "./pages/Group";
-import Chat from "./pages/Chat";
-import Discovery from "./pages/Discovery";
+const Home = React.lazy(() => import("./pages/Home"));
+const Profile = React.lazy(() => import("./pages/Profile"));
+const SavedPosts = React.lazy(() => import("./pages/SavedPosts"));
+const Pages = React.lazy(() => import("./pages/Pages"));
+const Page = React.lazy(() => import("./pages/Page"));
+const Groups = React.lazy(() => import("./pages/Groups"));
+const Group = React.lazy(() => import("./pages/Group"));
+const Chat = React.lazy(() => import("./pages/Chat"));
+const Discovery = React.lazy(() => import("./pages/Discovery"));
 
 import { connect } from "react-redux";
 // TODO: Revise useMemo() and useCallback(). Should we use React.memo(). Correct data after network.
@@ -73,35 +73,37 @@ function App(props) {
   return (
     <ApolloProvider client={apolloClient}>
       <MainNav>
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/profile/">
-            <Profile />
-          </Route>
-          <Route path="/saved/">
-            <SavedPosts />
-          </Route>
-          <Route exact path="/page/">
-            <Pages />
-          </Route>
-          <Route path="/page/:id/">
-            <Page />
-          </Route>
-          <Route exact path="/group/">
-            <Groups />
-          </Route>
-          <Route path="/group/:id/">
-            <Group />
-          </Route>
-          <Route path="/chat/">
-            <Chat />
-          </Route>
-          <Route path="/discovery/">
-            <Discovery />
-          </Route>
-        </Switch>
+        <React.Suspense fallback={<p>Loading...</p>}>
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/profile/">
+              <Profile />
+            </Route>
+            <Route path="/saved/">
+              <SavedPosts />
+            </Route>
+            <Route exact path="/page/">
+              <Pages />
+            </Route>
+            <Route path="/page/:id/">
+              <Page />
+            </Route>
+            <Route exact path="/group/">
+              <Groups />
+            </Route>
+            <Route path="/group/:id/">
+              <Group />
+            </Route>
+            <Route path="/chat/">
+              <Chat />
+            </Route>
+            <Route path="/discovery/">
+              <Discovery />
+            </Route>
+          </Switch>
+        </React.Suspense>
       </MainNav>
     </ApolloProvider>
   );
