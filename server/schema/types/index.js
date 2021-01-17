@@ -1,4 +1,4 @@
-const { gql } = require("apollo-server");
+const { gql } = require('apollo-server-express');
 
 const { Post } = require("./post");
 const { User } = require("./user");
