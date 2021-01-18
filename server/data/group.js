@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Types;
 const Notification = require("./notification");
 const User = require("./user");
 const Post = require("./post");
 const GroupModel = require("../models/group");
-const { uploadImage } = require("../util/image");
 const { getAuthUser } = require("../util/auth");
+const {
+    uploadImage,
+    deleteImage
+} = require("../util/image");
 const {
     GROUP_ADD,
     GROUP_POST,
@@ -208,6 +210,10 @@ GroupModel.statics.changeGroupCover = async function (args) {
     if (group.admin != userId)
         throw new Error("User not authoried");
 
+    if (group.coverUrl)
+        deleteImage(group.coverUrl)
+            .catch(err => console.error(err));
+
     group.coverUrl = await uploadImage(coverSrc);
     return await group.save();
 }
@@ -224,6 +230,10 @@ GroupModel.statics.changeGroupProfile = async function (args) {
 
     if (group.admin != userId)
         throw new Error("User not authoried");
+
+    if (group.profileUrl)
+        deleteImage(group.profileUrl)
+            .catch(err => console.error(err));
 
     group.profileUrl = await uploadImage(profileSrc);
     return await group.save();

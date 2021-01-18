@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const Post = require("./post");
 const User = require("./user");
 const PageModel = require("../models/page");
-const { uploadImage } = require("../util/image");
+const {
+    uploadImage,
+    deleteImage
+} = require("../util/image");
 
 PageModel.statics.findPage = async function ({ pageId }) {
     const page = await Page.findById(pageId);
@@ -90,6 +93,10 @@ PageModel.statics.changePageCover = async function (args) {
     if (page.owner != userId)
         throw new Error("User not authoried");
 
+    if (page.coverUrl)
+        deleteImage(page.coverUrl)
+            .catch(err => console.error(err));
+
     page.coverUrl = await uploadImage(coverSrc);
     return await page.save();
 }
@@ -105,6 +112,10 @@ PageModel.statics.changePageProfile = async function (args) {
 
     if (page.owner != userId)
         throw new Error("User not authoried");
+
+    if (page.profileUrl)
+        deleteImage(page.profileUrl)
+            .catch(err => console.error(err));
 
     page.profileUrl = await uploadImage(profileSrc);
     return await page.save();

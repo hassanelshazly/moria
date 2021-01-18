@@ -9,8 +9,8 @@ const Post = require("./post");
 const Notification = require("./notification");
 const { FOLLOW } = require("../util/constant");
 const { sendVerifyMail } = require("../util/mail");
-const { uploadImage } = require("../util/image");
 const { authFacebook, authGoogle } = require("../util/auth");
+const { uploadImage, deleteImage } = require("../util/image");
 
 UserModel.statics.findUser = function ({ username }) {
     return User.findOne({ username });
@@ -255,6 +255,10 @@ UserModel.statics.changeCover = async function ({ coverSrc, userId }) {
     if (!user)
         throw new Error("User not found");
 
+    if (user.coverUrl)
+        deleteImage(user.coverUrl)
+            .catch(err => console.error(err));
+
     user.coverUrl = await uploadImage(coverSrc);
     return await user.save();
 }
@@ -263,6 +267,10 @@ UserModel.statics.changeProfile = async function ({ profileSrc, userId }) {
     const user = await User.findById(userId);
     if (!user)
         throw new Error("User not found");
+
+    if (user.profileUrl)
+        deleteImage(user.profileUrl)
+            .catch(err => console.error(err));
 
     user.profileUrl = await uploadImage(profileSrc);
     return await user.save();

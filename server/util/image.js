@@ -21,11 +21,11 @@ async function uploadImage(imageSrc) {
 async function deleteImage(imageUrl) {
     let idx = imageUrl.lastIndexOf("/");
     let public_id = folderName + imageUrl.slice(idx);
-    console.log(public_id)
     let result = await cloudinary.v2.uploader.destroy(public_id);
     return result;
 }
 
 module.exports = {
-    uploadImage
+    uploadImage,
+    deleteImage
 }
