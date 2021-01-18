@@ -9,7 +9,7 @@ async function sendVerifyMail(email, name, token) {
 
         text: `Dear ${name}, Welcome to Moria platform 
             Please, verfiy your account using the following link 
-            localhost:3000/verify-acount/${token}`,
+            https://moria-asu.herokuapp.com/verify-acount/${token}`,
 
         html: `<div style="font-family:'Open Sans','Helvetica Neue','Helvetica',Helvetica,Arial,sans-serif;
                 color:#294661;align-content: center; max-width:600px;margin: auto; padding: 10px;">
@@ -30,7 +30,7 @@ async function sendVerifyMail(email, name, token) {
                     </div>
 
                     <div style="font-size:18px;text-align: center;">
-                        <a href="http://localhost:3000/verify-account/${token}"> <br>Verify My Account</a> 
+                        <a href="https://moria-asu.herokuapp.com/verify-account/${token}"> <br>Verify My Account</a> 
                     </div>
 
                     <div style="font-size:12px;text-align: center;">
