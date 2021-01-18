@@ -44,7 +44,7 @@ const errorsPlugin = {
 
 // Connect to the database
 mongoose
-  .connect(process.env.MONGO_URI_TEMP, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -80,10 +80,10 @@ apolloServer.installSubscriptionHandlers(httpServer);
 
 httpServer.listen(PORT, () => {
   console.info(
-    `Server ready at https://moria-asu.herokuapp.com${apolloServer.graphqlPath}`
+    `Server ready at ${apolloServer.graphqlPath}`
   );
   console.info(
-    `Subscriptions ready at wss://moria-asu.herokuapp.com${apolloServer.subscriptionsPath}`
+    `Subscriptions ready at ${apolloServer.subscriptionsPath}`
   );
 });
 

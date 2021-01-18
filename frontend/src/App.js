@@ -31,7 +31,7 @@ function App(props) {
   const { token } = props;
 
   const httpLink = createHttpLink({
-    uri: "https://moria-asu.herokuapp.com/graphql",
+    uri: `${process.env.REACT_APP_HTTP_SCHEME}://${process.env.REACT_APP_HOSTNAME}${process.env.REACT_APP_PORT}/graphql`,
   });
 
   const authLink = setContext((_, { headers }) => {
@@ -44,7 +44,7 @@ function App(props) {
   });
 
   const wsLink = new WebSocketLink({
-    uri: "wss://moria-asu.herokuapp.com/graphql",
+    uri: `${process.env.REACT_APP_WEBSOCKETS_SCHEME}://${process.env.REACT_APP_HOSTNAME}${process.env.REACT_APP_PORT}/graphql`,
     options: {
       reconnect: true,
       connectionParams: {

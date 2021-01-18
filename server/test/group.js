@@ -9,7 +9,7 @@ const { ObjectId } = mongoose.Types;
 describe("Group", () => {
     before(async function () {
         try {
-            await mongoose.connect(process.env.MONGO_URI_TEMP, {
+            await mongoose.connect(process.env.MONGO_URI, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
                 useCreateIndex: true

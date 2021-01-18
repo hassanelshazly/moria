@@ -6,7 +6,7 @@ const User = require("../data/user");
 describe("User", () => {
     before(async function () {
         try {
-            await mongoose.connect(process.env.MONGO_URI_TEMP, {
+            await mongoose.connect(process.env.MONGO_URI, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
                 useCreateIndex: true
