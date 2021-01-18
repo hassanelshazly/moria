@@ -14,13 +14,13 @@ describe("Sign-Up", () => {
   test("Sign-up successful", async () => {
     let browser = await puppeteer.launch({
       args: [
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--no-first-run',
-        '--no-sandbox',
-        '--no-zygote',
-        '--single-process',
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-setuid-sandbox",
+        "--no-first-run",
+        "--no-sandbox",
+        "--no-zygote",
+        "--single-process",
       ],
       headless: false,
       slowMo: 50,
