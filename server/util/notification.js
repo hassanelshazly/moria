@@ -35,3 +35,74 @@
  *      contentId: post
  * }
  **************************************************/
+
+/*************************************************
+ *
+    [
+        {
+            path: 'posts',
+            populate: [
+                { path: 'user' },
+                { path: 'likes' },
+                { path: 'comments.user' }
+            ],
+            limit: 1
+        },
+        {
+            path: 'sharedPosts',
+            populate: [
+                { path: 'user' },
+                { path: 'likes' },
+                { path: 'comments.user' }
+            ],
+            limit: 1
+        },
+        {
+            path: 'following',
+            populate: [
+                {
+                    path: 'posts',
+                    populate: [
+                        { path: 'user' },
+                        { path: 'likes' },
+                        { path: 'comments.user' }
+                    ],
+                    limit: 1
+                },
+                {
+                    path: 'sharedPosts',
+                    populate: [
+                        { path: 'user' },
+                        { path: 'likes' },
+                        { path: 'comments.user' }
+                    ],
+                    limit: 1
+                }
+            ]
+        },
+        {
+            path: 'groups',
+            populate: {
+                path: 'posts',
+                populate: [
+                    { path: 'user' },
+                    { path: 'likes' },
+                    { path: 'comments.user' }
+                ],
+                limit: 1
+            }
+        },
+        {
+            path: 'pages',
+            populate: {
+                path: 'posts',
+                populate: [
+                    { path: 'user' },
+                    { path: 'likes' },
+                    { path: 'comments.user' }
+                ],
+                limit: 1
+            }
+        },
+    ]
+ ***********************************************/
