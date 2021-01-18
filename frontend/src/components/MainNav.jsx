@@ -44,12 +44,14 @@ import SnackbarContentWrapper from "../components/SnackbarContentWrapper";
 import StarIcon from "@material-ui/icons/Star";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Toolbar from "@material-ui/core/Toolbar";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import styled from "styled-components";
 
 import { useHistory } from "react-router-dom";
+import { ApolloConsumer } from "@apollo/client";
 import { connect } from "react-redux";
 import {
   setDialog,
@@ -398,52 +400,66 @@ function MainMenu(props) {
   const isAccountMenuOpen = Boolean(menus.account);
   const isNotificationsMenuOpen = Boolean(menus.notifications);
 
-  return useMemo(() => {
-    const handleMenuClose = (menu) => () => {
-      setMenuAnchor(menu, null);
-    };
+  return (
+    <ApolloConsumer>
+      {(apolloClient) => {
+        const handleMenuClose = (menu) => () => {
+          setMenuAnchor(menu, null);
+        };
 
-    const handleAccountClick = () => {
-      if (!user) {
-        setDialog("sign-in");
-      } else {
-        localStorage.removeItem("user");
-        setUser(null);
-        showSnackbar("success", "Signed out");
-      }
-      handleMenuClose("account")();
-    };
+        const handleAccountClick = () => {
+          if (!user) {
+            setDialog("sign-in");
+          } else {
+            localStorage.removeItem("user");
+            setUser(null);
+            apolloClient.resetStore();
+            showSnackbar("success", "Signed out");
+          }
+          handleMenuClose("account")();
+        };
 
-    return (
-      <React.Fragment>
-        <Menu
-          anchorEl={menus.notifications}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          id={notificationsMenuId}
-          keepMounted
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          open={isNotificationsMenuOpen}
-          onClose={handleMenuClose("notifications")}
-        >
-          <NotificationsMenu closeMenu={handleMenuClose("notifications")} />
-        </Menu>
-        <Menu
-          anchorEl={menus.account}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          id={accountMenuId}
-          keepMounted
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          open={isAccountMenuOpen}
-          onClose={handleMenuClose("account")}
-        >
-          <MenuItem onClick={handleAccountClick}>
-            {!user ? "Sign in" : "Sign out"}
-          </MenuItem>
-        </Menu>
-      </React.Fragment>
-    );
-  }, [setMenuAnchor, user, menus, isAccountMenuOpen]);
+        return (
+          <React.Fragment>
+            <Menu
+              anchorEl={menus.notifications}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              id={notificationsMenuId}
+              keepMounted
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              open={isNotificationsMenuOpen}
+              onClose={handleMenuClose("notifications")}
+            >
+              <NotificationsMenu closeMenu={handleMenuClose("notifications")} />
+            </Menu>
+            <Menu
+              anchorEl={menus.account}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              id={accountMenuId}
+              keepMounted
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              open={isAccountMenuOpen}
+              onClose={handleMenuClose("account")}
+            >
+              <MenuItem onClick={handleAccountClick}>
+                {!user ? "Sign in" : "Sign out"}
+              </MenuItem>
+            </Menu>
+          </React.Fragment>
+        );
+      }}
+    </ApolloConsumer>
+  );
 }
+
+MainMenu.propTypes = {
+  user: PropTypes.any,
+  menus: PropTypes.any,
+  setMenuAnchor: PropTypes.func.isRequired,
+  setDialog: PropTypes.func.isRequired,
+  setUser: PropTypes.func.isRequired,
+  showSnackbar: PropTypes.func.isRequired,
+};
 
 const mapMenuStateToProps = (state) => {
   return { user: state.user, menus: state.menus };
@@ -569,15 +585,15 @@ const Toggle = ({ theme, toggleTheme }) => {
         src="https://image.flaticon.com/icons/svg/1164/1164954.svg"
         width="224"
         height="224"
-        alt="Sun free icon"
-        title="Sun free icon"
+        alt="Sun"
+        title="Sun"
       />
       <img
         src="https://image.flaticon.com/icons/svg/2033/2033921.svg"
         width="224"
         height="224"
-        alt="Moon free icon"
-        title="Moon free icon"
+        alt="Moon"
+        title="Moon"
       />
     </ToggleContainer>
   );
@@ -710,16 +726,17 @@ function DrawerItems() {
     return (
       <List>
         {items.map((item) => (
-          <ListItem
-            key={item.id}
-            className={classes.listItem}
-            selected={history.location.pathname == item.id}
-            button
-            onClick={() => history.push(item.id)}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
+          <Tooltip key={item.id} title={item.text} arrow placement="right">
+            <ListItem
+              className={classes.listItem}
+              selected={history.location.pathname == item.id}
+              button
+              onClick={() => history.push(item.id)}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          </Tooltip>
         ))}
         <SWITCHER />
       </List>

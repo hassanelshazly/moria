@@ -17,6 +17,8 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar } from "../state/actions";
 
+import optimizeImage from "../utils/image";
+
 const CREATE_GROUP = gql`
   mutation CreateGroup(
     $title: String!
@@ -109,22 +111,16 @@ function CreatePostDialog(props) {
     setCardContentHeight(cardContent.current.offsetHeight);
   });
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (cover) {
-      const reader = new FileReader();
-      reader.readAsDataURL(cover);
-      reader.onloadend = () => {
-        createGroup({
-          variables: {
-            title,
-            current_user_id: user.id,
-            cover_image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(cover);
+      createGroup({
+        variables: {
+          title,
+          current_user_id: user.id,
+          cover_image: optimizedImage,
+        },
+      });
     } else {
       createGroup({
         variables: {

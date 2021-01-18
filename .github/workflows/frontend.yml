@@ -2,12 +2,12 @@ name: Frontend CI
 
 on:
   push:
-    branches: [master, frontend]
+    branches: [master]
   pull_request:
     branches: [master]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
 
     defaults:
@@ -15,13 +15,22 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
           node-version: "14"
       - run: npm ci
-      - run: npm run format
       - run: npm run lint
-      - run: npm run build
+      - name: Prettify code
+        uses: creyD/prettier_action@v3.1
+        with:
+          prettier_options: --write frontend/**/*.{js,jsx,md}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - run: npm run format
+      # - run: npm run build
       # - run: npm test

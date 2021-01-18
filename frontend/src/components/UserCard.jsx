@@ -10,9 +10,9 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
-import  { Redirect,useHistory  } from 'react-router-dom'
+import { Redirect, useHistory } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
-import {  showSnackbar  } from "../state/actions";
+import { showSnackbar } from "../state/actions";
 import { connect } from "react-redux";
 
 import anon from "../assets/images/anonymous.png";
@@ -46,44 +46,39 @@ const FOLLOW_USER = gql`
   }
 `;
 
-
-
 function UserCard(props) {
-  const { fullname ,id,username,canFollow} = props;
+  const { fullname, id, username, canFollow } = props;
   let history = useHistory();
-
 
   const PROFILE_LINK = `/profile/${username}`;
   const classes = useStyles();
-  
+
   const [followUser] = useMutation(FOLLOW_USER, {
     onError(error) {
       showSnackbar("error", error.message);
     },
-  }); 
-  const [currentIsFollowing , setCurrentIsFollowing]= useState(props.canFollow);
-  const useForceUpdate = () =>{
+  });
+  const [currentIsFollowing, setCurrentIsFollowing] = useState(props.canFollow);
+  const useForceUpdate = () => {
     const [value, setValue] = useState(0); // integer state
-    return () => setValue(value => value + 1); // update the state to force render
-  }
+    return () => setValue((value) => value + 1); // update the state to force render
+  };
   const handleFollowToggle = (id) => {
     followUser({
       variables: {
         user_id: id,
       },
     });
-
   };
-  console.log(props.profilePic);
-   return (
+  return (
     <Card className={classes.root} key={id}>
       <CardActionArea>
         <CardMedia
           className={classes.cardmediaStyling}
           component="img"
           alt="Avatar"
-          style={{width:"250px" , height:"250px" , margin:"20px auto"}}
-          image={props.profilePic==null? anon : props.profilePic}
+          style={{ width: "250px", height: "250px", margin: "20px auto" }}
+          image={props.profilePic == null ? anon : props.profilePic}
           title="Contemplative Reptile"
         />
         <CardContent>
@@ -104,9 +99,8 @@ function UserCard(props) {
             size="small"
             color="primary"
             className={classes.buttonStyling}
-            onClick={()=>{
+            onClick={() => {
               history.push(PROFILE_LINK);
-
             }}
           >
             View
@@ -117,15 +111,17 @@ function UserCard(props) {
             size="small"
             color="primary"
             className={classes.buttonStyling}
-            onClick={ ()=>{
+            onClick={() => {
               handleFollowToggle(id);
-              setCurrentIsFollowing(currentIsFollowing=> !currentIsFollowing);
+              setCurrentIsFollowing(
+                (currentIsFollowing) => !currentIsFollowing
+              );
             }}
             style={{
-              color: currentIsFollowing? "blue" :"red"
+              color: currentIsFollowing ? "blue" : "red",
             }}
           >
-           {currentIsFollowing? "Follow":"Unfollow"} 
+            {currentIsFollowing ? "Follow" : "Unfollow"}
           </Button>
         </Grid>
       </CardActions>
@@ -135,7 +131,6 @@ function UserCard(props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    
     showSnackbar: (variant, message) =>
       dispatch(showSnackbar(variant, message)),
   };

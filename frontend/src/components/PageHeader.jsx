@@ -24,6 +24,8 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
+import optimizeImage from "../utils/image";
+
 const DELETE_PAGE = gql`
   mutation DeletePage($page_id: ID!) {
     deletePage(pageId: $page_id)
@@ -216,45 +218,31 @@ function PageHeader(props) {
     };
   }, []);
 
-  const handleCoverChange = (event) => {
+  const handleCoverChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setCover(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeCover({
-          variables: {
-            page_id: id,
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeCover({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setPhoto(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeImage({
-          variables: {
-            page_id: id,
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeImage({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 
@@ -393,7 +381,7 @@ function PageHeader(props) {
               </CardContent>
               <div className={classes.controls}>
                 <div>
-                  {isAFollower && (
+                  {isAnAdmin && (
                     <Button color="red" onClick={handlePost}>
                       Post Now
                     </Button>
@@ -404,18 +392,16 @@ function PageHeader(props) {
                     </Button>
                   )}
                 </div>
-                {!isAFollower && (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={isAFollower}
-                        onChange={handleFollowToggle}
-                        name="isAFollower"
-                      />
-                    }
-                    label={isAFollower ? "Following" : "Follow"}
-                  />
-                )}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isAFollower}
+                      onChange={handleFollowToggle}
+                      name="isAFollower"
+                    />
+                  }
+                  label={isAFollower ? "Following" : "Follow"}
+                />
               </div>
             </div>
           </Card>

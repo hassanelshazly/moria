@@ -30,10 +30,6 @@ const GET_GROUP_DATA = gql`
         profileUrl
       }
       posts {
-        meta{
-          type
-          parentId
-        }
         id
         user {
           id
@@ -57,6 +53,10 @@ const GET_GROUP_DATA = gql`
             profileUrl
           }
         }
+        meta {
+          type
+          parentId
+        }
         likeCount
         commentCount
       }
@@ -74,6 +74,9 @@ const GET_SAVED_POSTS = gql`
   query GetSavedPosts($user_name: String!) {
     findUser(username: $user_name) {
       savedPosts {
+        id
+      }
+      requests {
         id
       }
     }
@@ -121,7 +124,9 @@ function Group(props) {
   } = findGroup;
 
   const isAnAdmin = user && admin ? admin.id === user.id : null;
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
+  const groupRequests = dataSaved ? dataSaved.findUser.requests : [];
 
   return (
     <React.Fragment>
@@ -132,7 +137,7 @@ function Group(props) {
         coverUrl={coverUrl}
         profileUrl={profileUrl}
         members={members}
-        requests={requests}
+        groupRequests={groupRequests}
         loading={loading || loadingSaved}
       />
       {isAnAdmin && requests.length > 0 && (

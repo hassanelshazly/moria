@@ -58,7 +58,7 @@ function SavedPosts(props) {
 
   if (!data) return null;
 
-  const posts = data.findUser.savedPosts;
+  const posts = data.findUser ? data.findUser.savedPosts : [];
 
   return <Posts type="profile" posts={posts} savedPosts={posts} />;
 }

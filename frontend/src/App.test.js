@@ -23,7 +23,7 @@ describe("Sign-Up", () => {
         '--single-process',
       ],
       headless: false,
-      slowMo: 100,
+      slowMo: 50,
     });
     let page = await browser.newPage();
 

@@ -1,0 +1,49 @@
+{
+  "name": "moria",
+  "version": "0.1.0",
+  "license": "MPL-2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hassanelshazly/moria"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "scripts": {
+    "start": "node server",
+    "build": "cd frontend/ && npm install && npm run build"
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "frontend/node_modules"
+  ],
+  "dependencies": {
+    "@sendgrid/mail": "^7.4.1",
+    "apollo-server-express": "^2.19.2",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.23.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql": "^14.7.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.12",
+    "mongoose-mongodb-errors": "0.0.2",
+    "passport": "^0.4.1",
+    "passport-facebook-token": "^4.0.0",
+    "passport-google-token": "^0.1.2",
+    "validator": "^13.5.2"
+  }
+}

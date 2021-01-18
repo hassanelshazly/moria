@@ -1,20 +1,72 @@
 # Moria
 
-## Getting Started
+#### Social Media App using MERN stack
 
-First, run the development server:
+<br>
+<a href="https://moria-asu.herokuapp.com/"><img src="https://api.codacy.com/project/badge/Coverage/8a941e0f57c047c8a481f4854666b42d"></a>
+<a href="https://moria-asu.herokuapp.com/"><img src="https://travis-ci.org/teles/array-mixer.svg?branch=master"></a>
+<a href="https://moria-asu.herokuapp.com/"><img src="https://img.shields.io/npm/v/array-mixer.svg"></a>
+<a href="https://moria-asu.herokuapp.com/"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 
-```bash
-npm run dev
-```
+<br>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![GIF](https://media.giphy.com/media/fzlMuOaSFMnQwGlxZ5/giphy.gif)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Features
 
-## Learn More
+- **Messenger** Real time messaging system.
+- **News Feed** Fresh posts from people you are following.
+- **Explore** New Posts and People.
+- **Groups** Create a group & Request to join one & Post on a group.
+- **Page** Create a Page & Follow a page.
+- **Discovery** Find people you may know.
+- **Notifications** Get instant notification when : Someone follows you / Likes or comments on your post / Request to join your group / Post on your Group / Post on a page you are following.
+- **Follow** a particular user and get notified for their activity.
+- **Personalize Profile** With profile/cover photo and personal posts.
+- **Authentication & Authorization**
 
-To learn more about Next.js, take a look at the following resources:
+<br>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployed Version
+
+You can visit an already deployed version [here](https://moria-asu.herokuapp.com/).
+
+## Starting the App
+
+1. Download [Node.js](https://nodejs.org/en/download/).
+2. Navigate to where the project is located; that is the path where the folder "moria" resides.
+   1. Copy the path from File Explorer
+   2. Open the terminal
+   3. Change directory (paste the actual path istead, don't write the angle brackets):
+      - Windows:
+        `cd /d <path>`
+      - Linux:
+        `cd <path>`
+3. Install the dependencies and run the server (while still in the same terminal as before)
+   - Server
+     1. Navigate there using `cd server`
+     2. Run `npm install`
+     3. Run `npm start`
+     4. The server should start now and your terminal will freeze (you can't write anything)
+   - Frontend
+     1. Repeate step 2 (open a new terminal and navigate to the project)
+     2. Navigate to the frontend using `cd frontend`
+     3. Run `npm install`
+     4. Build with `npm build`
+     5. Run `npx serve -s build`
+     6. A message will be displayed including a url for the webapp. You can click on it or copy-paste it if it's not clikable.
+     7. The URL will probably be [http://localhost:5000](http://localhost:5000)
+
+## Built With
+
+- [Express.js](https://expressjs.com/) - Backend web framework
+- [Heroku](http://heroku.com/) - Platform to deploy web applications
+- [JSON Web Token](https://jwt.io/) - A standard to securely authenticate HTTP requests
+- [Material-UI](https://material-ui.com/) - UI library for React
+- [GraphQL](https://graphql.org/) - query language
+- [ApolloClient](https://apollographql.org/) - fetch, cache, and modify application data, all while automatically updating your UI.
+- [MongoDB](https://www.mongodb.com/) - Database to store document-based data
+- [Mongoose](https://mongoosejs.com/) - Object-modeling tool for Node.js
+- [Node.js](https://nodejs.org/en/) - Runtime environment to help build fast server applications
+- [React](https://reactjs.org/) - JavaScript library for building user interfaces
+- [Redux](https://redux.js.org/) - JavaScript library to help better manage application state

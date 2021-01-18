@@ -30,11 +30,6 @@ const GET_USER_POSTS = gql`
       }
       posts {
         id
-        isShared
-        meta{
-          type
-          parentId
-        }
         user {
           id
           username
@@ -56,6 +51,11 @@ const GET_USER_POSTS = gql`
             fullname
             profileUrl
           }
+        }
+        isShared
+        meta {
+          type
+          parentId
         }
         likeCount
         commentCount
@@ -110,7 +110,8 @@ function Profile(props) {
   }
 
   const findUser = data ? data.findUser : {};
-  const savedPosts = dataSaved ? dataSaved.findUser.savedPosts : {};
+  const savedPosts =
+    dataSaved && dataSaved.findUser ? dataSaved.findUser.savedPosts : [];
   const {
     id,
     username,
@@ -137,8 +138,8 @@ function Profile(props) {
         followingCount={following ? following.length : 0}
         followersCount={followers ? followers.length : 0}
         postsCount={posts ? posts.length : 0}
-        FOLLOWERS={followers}
-        FOLLOWING={following}
+        followers={followers}
+        following={following}
       />
       <br />
       {posts && <Posts type="profile" posts={posts} savedPosts={savedPosts} />}

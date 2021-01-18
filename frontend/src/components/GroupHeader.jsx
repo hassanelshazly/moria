@@ -24,6 +24,8 @@ import { gql, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
 import { setDialog, showSnackbar, fillForm } from "../state/actions";
 
+import optimizeImage from "../utils/image";
+
 const DELETE_GROUP = gql`
   mutation DeleteGroup($group_id: ID!) {
     deleteGroup(groupId: $group_id)
@@ -150,15 +152,16 @@ function GroupHeader(props) {
     coverUrl,
     profileUrl,
     members,
-    requests,
+    groupRequests,
     loading,
   } = props;
 
   const isAnAdmin = user && admin ? admin.id === user.id : false;
   const isMember =
     user && members ? members.some((el) => el.id === user.id) : false;
-  const isRequestee =
-    user && requests ? requests.some((el) => el.id === user.id) : false;
+  const isRequestee = groupRequests
+    ? groupRequests.some((el) => el.id === id)
+    : false;
 
   const classes = useStyles();
   const theme = useTheme();
@@ -221,45 +224,31 @@ function GroupHeader(props) {
     };
   }, []);
 
-  const handleCoverChange = (event) => {
+  const handleCoverChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setCover(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeCover({
-          variables: {
-            group_id: id,
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeCover({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const files = event.target.files;
     if (files.length > 0) {
       setPhoto(URL.createObjectURL(files[0]));
 
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        changeImage({
-          variables: {
-            group_id: id,
-            image: reader.result,
-          },
-        });
-      };
-      reader.onerror = () => {
-        showSnackbar("Something went wrong!");
-      };
+      const optimizedImage = await optimizeImage(files[0]);
+      changeImage({
+        variables: {
+          image: optimizedImage,
+        },
+      });
     }
   };
 
@@ -443,7 +432,7 @@ GroupHeader.propTypes = {
   coverUrl: PropTypes.any,
   profileUrl: PropTypes.any,
   members: PropTypes.any,
-  requests: PropTypes.any,
+  groupRequests: PropTypes.any,
   loading: PropTypes.any,
 };
 
