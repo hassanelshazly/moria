@@ -25,8 +25,9 @@
   "scripts": {
     "start": "node server",
     "build": "cd frontend/ && npm install && npm run build",
+    "start-backend": "nodemon server/",
     "start-frontend": "cd frontend/ && npm start",
-    "dev": "run-p start start-frontend"
+    "dev": "run-p start-backend start-frontend"
   },
   "cacheDirectories": [
     "node_modules",
@@ -49,6 +50,7 @@
     "validator": "^13.5.2"
   },
   "devDependencies": {
+    "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5"
   }
 }
