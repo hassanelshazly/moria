@@ -65,6 +65,8 @@ const apolloServer = new ApolloServer({
 });
 
 // Priority serve any static files.
+expressApp.use(express.json({ limit: "2mb" }));
+expressApp.use(express.urlencoded({ limit: "2mb", extended: true }));
 expressApp.use(express.static(path.resolve(__dirname, "../frontend/build")));
 
 apolloServer.applyMiddleware({ app: expressApp });
@@ -79,12 +81,8 @@ const httpServer = createServer(expressApp);
 apolloServer.installSubscriptionHandlers(httpServer);
 
 httpServer.listen(PORT, () => {
-  console.info(
-    `Server ready at ${apolloServer.graphqlPath}`
-  );
-  console.info(
-    `Subscriptions ready at ${apolloServer.subscriptionsPath}`
-  );
+  console.info(`Server ready at ${apolloServer.graphqlPath}`);
+  console.info(`Subscriptions ready at ${apolloServer.subscriptionsPath}`);
 });
 
 process.on("warning", (w) => console.warn(w.stack));

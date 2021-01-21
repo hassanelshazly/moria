@@ -14,6 +14,7 @@ async function uploadImage(imageSrc) {
         allowed_formats: ["jpg", "png"],
         public_id: "",
         folder: folderName,
+        secure: true,
     });
     return cloudinaryBaseUrl + result.public_id;
 }
