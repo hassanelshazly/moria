@@ -31,7 +31,9 @@ function App(props) {
   const { token } = props;
 
   const httpLink = createHttpLink({
-    uri: `${process.env.REACT_APP_HTTP_SCHEME}://${process.env.REACT_APP_HOSTNAME}${process.env.REACT_APP_PORT}/graphql`,
+    uri: `${process.env.REACT_APP_HTTP_SCHEME}://${
+      process.env.REACT_APP_HOSTNAME
+    }${process.env.REACT_APP_PORT ? process.env.REACT_APP_PORT : ""}/graphql`,
   });
 
   const authLink = setContext((_, { headers }) => {
@@ -44,7 +46,9 @@ function App(props) {
   });
 
   const wsLink = new WebSocketLink({
-    uri: `${process.env.REACT_APP_WEBSOCKETS_SCHEME}://${process.env.REACT_APP_HOSTNAME}${process.env.REACT_APP_PORT}/graphql`,
+    uri: `${process.env.REACT_APP_WEBSOCKETS_SCHEME}://${
+      process.env.REACT_APP_HOSTNAME
+    }${process.env.REACT_APP_PORT ? process.env.REACT_APP_PORT : ""}/graphql`,
     options: {
       reconnect: true,
       connectionParams: {
